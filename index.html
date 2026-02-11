@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MonPatrimoine - Gestion Financière</title>
+    <title>Welcker - Wealth Tracker</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="icon" href="icon-192.png">
 </head>
 <body>
     <!-- Navigation -->
     <nav class="sidebar" id="sidebar">
         <div class="logo-container">
-            <div class="logo"></div>
-            <h2 class="app-name">MonPatrimoine</h2>
+            <img src="logo.png" alt="Logo" class="logo">
+            <h2 class="app-name">Welcker</h2>
         </div>
         <div class="nav-links">
             <a href="#" class="nav-link active" data-page="accueil">
@@ -741,6 +744,12 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log('Service Worker Enregistré'));
+        }
+        </script>
     <script src="app.js"></script>
 </body>
 </html>

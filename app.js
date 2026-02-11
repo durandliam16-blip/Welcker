@@ -35,7 +35,7 @@ class DataManager {
     }
 
     getData() {
-        return JSON.parse(localStorage.getItem('monpatrimoine_data'));
+        return JSON.parse(localStorage.getItem('welcker_data'));
     }
 
     saveData(data) {

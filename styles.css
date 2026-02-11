@@ -69,17 +69,26 @@ body {
 }
 
 .logo {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    height: 32px;
+    width: 32px;
+    padding: 6px;
     background: var(--primary-color);
-    flex-shrink: 0;
+    border-radius: 12px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 24px;
+    margin-bottom: 32px;
 }
 
 .app-name {
-    font-size: 20px;
+    font-size: 22px;
+    letter-spacing: -0.5px; /* Un peu plus serré pour le style premium */
+    color: #1e293b;
     font-weight: 700;
-    color: var(--text-primary);
 }
 
 .nav-links {
