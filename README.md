@@ -1,5 +1,7 @@
 # MonPatrimoine - Guide
 
+Voir Notion pour accès et détails DB
+
 ## 📋 Description
 Application web complète de gestion financière personnelle avec suivi de patrimoine, investissements (CTO, PEA), comptes bancaires, biens, et analyse des flux financiers.
 

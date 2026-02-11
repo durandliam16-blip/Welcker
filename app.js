@@ -1,183 +1,105 @@
 // Data Storage Manager
+// Configuration Supabase
+const supabaseUrl = 'https://qktbcgumyqjgbvcpynjo.supabase.co/';
+const supabaseKey = 'TA_CLE_ANON_PUBLIQUE'; // À récupérer dans Settings > API
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
 class DataManager {
-    constructor() {
-        this.initializeData();
+    // Gestion du Profil & Settings
+    async getProfile() {
+        const { data } = await supabase.from('profiles').select('*').single();
+        return data || {};
     }
 
-    initializeData() {
-        if (!localStorage.getItem('monpatrimoine_data')) {
-            const initialData = {
-                transactions: {
-                    CTO: [],
-                    PEA: []
-                },
-                comptes: [],
-                biens: [],
-                entrees: [],
-                depenses: [],
-                profile: {
-                    nom: '',
-                    email: '',
-                    telephone: '',
-                    dateInscription: new Date().toISOString()
-                },
-                settings: {
-                    theme: 'light',
-                    devise: 'EUR',
-                    notifications: {
-                        transactions: true,
-                        rapport: true
-                    }
-                }
-            };
-            this.saveData(initialData);
-        }
+    async updateProfile(profileData) {
+        const { error } = await supabase.from('profiles').upsert(profileData);
+        if (error) console.error("Erreur profil:", error);
     }
 
-    getData() {
-        return JSON.parse(localStorage.getItem('welcker_data'));
+    // Gestion des Transactions CTO
+    async getTransactionsCTO() {
+        const { data } = await supabase
+            .from('investment_transactions_cto')
+            .select('*')
+            .order('date', { ascending: false });
+        return data || [];
     }
 
-    saveData(data) {
-        localStorage.setItem('monpatrimoine_data', JSON.stringify(data));
-        localStorage.setItem('last_update', new Date().toISOString());
+    async addTransactionCTO(transaction) {
+        const { data, error } = await supabase.from('investment_transactions_cto').insert([transaction]);
+        return data;
     }
 
-    addTransaction(compte, transaction) {
-        const data = this.getData();
-        transaction.id = Date.now().toString();
-        transaction.date = transaction.date || new Date().toISOString().split('T')[0];
-        data.transactions[compte].push(transaction);
-        this.saveData(data);
-        return transaction;
+    async deleteTransactionCTO(id) {
+        await supabase.from('investment_transactions_cto').delete().eq('id', id);
     }
 
-    deleteTransaction(compte, id) {
-        const data = this.getData();
-        data.transactions[compte] = data.transactions[compte].filter(t => t.id !== id);
-        this.saveData(data);
+// Gestion des Transactions PEA
+    async getTransactionsPEA() {
+        const { data } = await supabase
+            .from('investment_transactions_pea')
+            .select('*')
+            .order('date', { ascending: false });
+        return data || [];
     }
 
-    addCompte(compte) {
-        const data = this.getData();
-        compte.id = Date.now().toString();
-        data.comptes.push(compte);
-        this.saveData(data);
-        return compte;
+    async addTransactionPEA(transaction) {
+        const { data, error } = await supabase.from('investment_transactions_pea').insert([transaction]);
+        return data;
     }
 
-    addBien(bien) {
-        const data = this.getData();
-        bien.id = Date.now().toString();
-        data.biens.push(bien);
-        this.saveData(data);
-        return bien;
+    async deleteTransactionPEA(id) {
+        await supabase.from('investment_transactions_pea').delete().eq('id', id);
     }
 
-    deleteBien(id) {
-        const data = this.getData();
-        data.biens = data.biens.filter(b => b.id !== id);
-        this.saveData(data);
+    // Flux Financiers Dépenses
+    async getCashFlowD() {
+        const { data } = await supabase.from('cash_flow_sorties').select('*');
+        return data || [];
     }
 
-    addEntree(entree) {
-        const data = this.getData();
-        entree.id = Date.now().toString();
-        data.entrees.push(entree);
-        this.saveData(data);
-        return entree;
+    async addCashFlowD(item) {
+        await supabase.from('cash_flow_sorties').insert([item]);
     }
 
-    deleteEntree(id) {
-        const data = this.getData();
-        data.entrees = data.entrees.filter(e => e.id !== id);
-        this.saveData(data);
+    // Comptes et Biens
+    async getAccounts() {
+        const { data } = await supabase.from('accounts').select('*');
+        return data || [];
     }
 
-    addDepense(depense) {
-        const data = this.getData();
-        depense.id = Date.now().toString();
-        data.depenses.push(depense);
-        this.saveData(data);
-        return depense;
+    async addAccount(account) {
+        await supabase.from('accounts').insert([account]);
     }
 
-    deleteDepense(id) {
-        const data = this.getData();
-        data.depenses = data.depenses.filter(d => d.id !== id);
-        this.saveData(data);
+    // Flux Financiers Entrées
+    async getCashFlowE() {
+        const { data } = await supabase.from('cash_flow_entrees').select('*');
+        return data || [];
     }
 
-    updateProfile(profile) {
-        const data = this.getData();
-        data.profile = { ...data.profile, ...profile };
-        this.saveData(data);
-    }
-
-    updateSettings(settings) {
-        const data = this.getData();
-        data.settings = { ...data.settings, ...settings };
-        this.saveData(data);
-    }
-
-    exportData() {
-        const data = this.getData();
-        const dataStr = JSON.stringify(data, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(dataBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `monpatrimoine_backup_${new Date().toISOString().split('T')[0]}.json`;
-        link.click();
-    }
-
-    importData(file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const data = JSON.parse(e.target.result);
-                this.saveData(data);
-                alert('Données importées avec succès !');
-                location.reload();
-            } catch (error) {
-                alert('Erreur lors de l\'importation des données');
-            }
-        };
-        reader.readAsText(file);
-    }
-
-    clearAllData() {
-        if (confirm('Êtes-vous sûr de vouloir supprimer toutes les données ? Cette action est irréversible.')) {
-            localStorage.removeItem('monpatrimoine_data');
-            localStorage.removeItem('last_update');
-            this.initializeData();
-            alert('Toutes les données ont été supprimées');
-            location.reload();
-        }
+    async addCashFlowE(item) {
+        await supabase.from('cash_flow_entrees').insert([item]);
     }
 }
+
 
 // Initialize DataManager
 const dataManager = new DataManager();
 
 // Navigation
-function navigateTo(page) {
-    // Update active nav link
+async function navigateTo(page) {
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
-        if (link.dataset.page === page) {
-            link.classList.add('active');
-        }
+        if (link.dataset.page === page) link.classList.add('active');
     });
 
-    // Show active page
-    document.querySelectorAll('.page').forEach(p => {
-        p.classList.remove('active');
-    });
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const activePage = document.getElementById(`page-${page}`);
+    
     if (activePage) {
         activePage.classList.add('active');
-        updatePageContent(page);
+        await updatePageContent(page);
     }
 }
 
@@ -222,10 +144,21 @@ document.querySelectorAll('.modal').forEach(modal => {
 
 // Format Currency
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('fr-FR', {
-        style: 'currency',
-        currency: 'EUR'
-    }).format(amount);
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
+}
+
+// --- LOGIQUE DE CALCUL ---
+function calculatePortfolioStats(transactions) {
+    let invested = 0;
+    transactions.forEach(t => {
+        const total = parseFloat(t.quantite) * parseFloat(t.prix_unitaire);
+        if (t.type === true) { // Achat
+            invested += total + parseFloat(t.frais || 0);
+        } else { // Vente
+            invested -= total - parseFloat(t.frais || 0);
+        }
+    });
+    return { current: invested, performance: 0 }; 
 }
 
 // Calculate Portfolio Value
@@ -270,243 +203,137 @@ function calculatePortfolioValue(compte) {
 }
 
 // Update Page Content
-function updatePageContent(page) {
+async function updatePageContent(page) {
     switch (page) {
-        case 'accueil':
-            updateAccueil();
-            break;
-        case 'bilan':
-            updateBilan();
-            break;
-        case 'comptes':
-            updateComptes();
-            break;
-        case 'cto':
-            updateCTO();
-            break;
-        case 'pea':
-            updatePEA();
-            break;
-        case 'autres-biens':
-            updateAutresBiens();
-            break;
-        case 'flux':
-            updateFlux();
-            break;
-        case 'entrees':
-            updateEntrees();
-            break;
-        case 'depenses':
-            updateDepenses();
-            break;
-        case 'profil':
-            updateProfil();
-            break;
-        case 'parametres':
-            updateParametres();
-            break;
+        case 'accueil': await updateAccueil(); break;
+        case 'bilan': await updateBilan(); break;
+        case 'comptes': await updateComptes(); break;
+        case 'cto': await updateInvestmentPage('CTO'); break;
+        case 'pea': await updateInvestmentPage('PEA'); break;
+        case 'flux': await updateFlux(); break;
+        case 'entrees': await updateCashFlowPage('entree'); break;
+        case 'depenses': await updateCashFlowPage('sortie'); break;
+        case 'profil': await updateProfil(); break;
     }
 }
 
 // Update Accueil
-function updateAccueil() {
-    const data = dataManager.getData();
-    
-    // Calculate totals
-    const ctoValue = calculatePortfolioValue('CTO').valeurActuelle;
-    const peaValue = calculatePortfolioValue('PEA').valeurActuelle;
-    const comptesTotal = data.comptes.reduce((sum, c) => sum + parseFloat(c.solde), 0);
-    const biensTotal = data.biens.reduce((sum, b) => sum + parseFloat(b.valeur), 0);
-    
-    const patrimoineTotal = ctoValue + peaValue + comptesTotal + biensTotal;
-    const liquidites = comptesTotal;
-    const investissements = ctoValue + peaValue;
+async function updateAccueil() {
+    const [accounts, ctoTrans, peaTrans, entrees, sorties] = await Promise.all([
+        dataManager.getAccounts(),
+        dataManager.getTransactions('CTO'),
+        dataManager.getTransactions('PEA'),
+        dataManager.getCashFlow('entree'),
+        dataManager.getCashFlow('sortie')
+    ]);
 
-    document.getElementById('patrimoineTotal').textContent = formatCurrency(patrimoineTotal);
-    document.getElementById('liquiditesTotal').textContent = formatCurrency(liquidites);
-    document.getElementById('investissementsTotal').textContent = formatCurrency(investissements);
+    const ctoStats = calculatePortfolioStats(ctoTrans);
+    const peaStats = calculatePortfolioStats(peaTrans);
+    const accountsTotal = accounts.reduce((sum, a) => sum + parseFloat(a.solde), 0);
+    const invTotal = ctoStats.current + peaStats.current;
+    
+    document.getElementById('patrimoineTotal').textContent = formatCurrency(accountsTotal + invTotal);
+    document.getElementById('liquiditesTotal').textContent = formatCurrency(accountsTotal);
+    document.getElementById('investissementsTotal').textContent = formatCurrency(invTotal);
 
-    // Update last transactions
-    const allTransactions = [
-        ...data.transactions.CTO.map(t => ({ ...t, compte: 'CTO' })),
-        ...data.transactions.PEA.map(t => ({ ...t, compte: 'PEA' })),
-        ...data.entrees.map(t => ({ ...t, type: 'entree' })),
-        ...data.depenses.map(t => ({ ...t, type: 'depense' }))
-    ];
-    
-    allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    const dernières = allTransactions.slice(0, 5);
-    const container = document.getElementById('dernieresTransactions');
-    
-    if (dernières.length === 0) {
-        container.innerHTML = '<p class="empty-state">Aucune transaction</p>';
-    } else {
-        container.innerHTML = dernières.map(t => `
-            <div class="transaction-item">
-                <div>
-                    <strong>${t.titre || t.description || 'Transaction'}</strong>
-                    <div style="font-size: 12px; color: var(--text-secondary);">${new Date(t.date).toLocaleDateString('fr-FR')}</div>
-                </div>
-                <div style="font-weight: 600; ${t.type === 'vente' || t.type === 'depense' ? 'color: var(--danger-color)' : 'color: var(--success-color)'}">
-                    ${t.type === 'vente' || t.type === 'depense' ? '-' : '+'}${formatCurrency(t.montant || (t.quantite * t.prix))}
-                </div>
-            </div>
-        `).join('');
-    }
-
-    // Update charts
-    updateAccueilCharts(patrimoineTotal, liquidites, investissements, biensTotal);
+    updateAccueilCharts(accountsTotal, invTotal, 0);
+    renderRecentTransactions([...entrees, ...sorties]);
 }
 
 // Update Accueil Charts
-function updateAccueilCharts(patrimoineTotal, liquidites, investissements, biensTotal) {
-    // Patrimoine Chart
-    const patrimoineCtx = document.getElementById('patrimoineChart');
-    if (patrimoineCtx && Chart.getChart(patrimoineCtx)) {
-        Chart.getChart(patrimoineCtx).destroy();
-    }
-    
-    if (patrimoineCtx) {
-        new Chart(patrimoineCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Liquidités', 'Investissements', 'Biens'],
-                datasets: [{
-                    data: [liquidites, investissements, biensTotal],
-                    backgroundColor: ['#10b981', '#2563eb', '#f59e0b']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
-        });
-    }
+function updateAccueilCharts(liq, inv, biens) {
+    const ctx = document.getElementById('patrimoineChart');
+    if (!ctx) return;
+    if (Chart.getChart(ctx)) Chart.getChart(ctx).destroy();
 
-    // Evolution Chart
-    const evolutionCtx = document.getElementById('evolutionChart');
-    if (evolutionCtx && Chart.getChart(evolutionCtx)) {
-        Chart.getChart(evolutionCtx).destroy();
-    }
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Liquidités', 'Investissements', 'Biens'],
+            datasets: [{
+                data: [liq, inv, biens],
+                backgroundColor: ['#10b981', '#2563eb', '#f59e0b']
+            }]
+        }
+    });
+}
+
+async function updateCashFlowPage(type) {
+    const data = await dataManager.getCashFlow(type);
+    const tbody = document.getElementById(type === 'entree' ? 'entreesTable' : 'depensesTable');
     
-    if (evolutionCtx) {
-        const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun'];
-        const values = months.map((_, i) => patrimoineTotal * (0.8 + i * 0.04));
-        
-        new Chart(evolutionCtx, {
-            type: 'line',
-            data: {
-                labels: months,
-                datasets: [{
-                    label: 'Patrimoine',
-                    data: values,
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false
-                    }
-                }
-            }
-        });
-    }
+    tbody.innerHTML = data.map(i => `
+        <tr>
+            <td>${new Date(i.date).toLocaleDateString()}</td>
+            <td><span class="compte-type">${i.categorie}</span></td>
+            <td>${i.description}</td>
+            <td class="${type === 'entree' ? 'positive' : 'negative'}">${formatCurrency(i.montant)}</td>
+            <td><button class="btn-icon" onclick="deleteCashFlowAction('${type}','${i.id}')">🗑️</button></td>
+        </tr>
+    `).join('');
+}
+
+async function updateInvestmentPage(mode) {
+    const data = await dataManager.getInvestments(mode);
+    const stats = calculateStats(data);
+    const pfx = mode.toLowerCase();
+
+    document.getElementById(`${pfx}ValeurActuelle`).textContent = formatCurrency(stats.current);
+    document.getElementById(`${pfx}TransactionsTable`).innerHTML = data.map(t => `
+        <tr>
+            <td>${new Date(t.date).toLocaleDateString()}</td>
+            <td><span class="compte-type" style="background:${t.type?'#10b981':'#ef4444'};color:white">${t.type?'Achat':'Vente'}</span></td>
+            <td>${t.titre}</td>
+            <td>${t.quantite}</td>
+            <td>${formatCurrency(t.prix_unitaire)}</td>
+            <td>${formatCurrency(t.quantite * t.prix_unitaire)}</td>
+            <td><button class="btn-icon" onclick="deleteInvestmentAction('${mode}','${t.id}')">🗑️</button></td>
+        </tr>
+    `).join('');
+}
+
+async function updateFlux() {
+    const [e, s] = await Promise.all([dataManager.getCashFlow('entree'), dataManager.getCashFlow('sortie')]);
+    const totalE = e.reduce((sum, i) => sum + parseFloat(i.montant), 0);
+    const totalS = s.reduce((sum, i) => sum + parseFloat(i.montant), 0);
+
+    document.getElementById('entreesTotales').textContent = formatCurrency(totalE);
+    document.getElementById('sortiesTotales').textContent = formatCurrency(totalS);
+    const soldeEl = document.getElementById('soldeFlux');
+    soldeEl.textContent = formatCurrency(totalE - totalS);
+    soldeEl.className = `flux-value ${(totalE - totalS) >= 0 ? 'positive' : 'negative'}`;
 }
 
 // Update Bilan
-function updateBilan() {
-    const data = dataManager.getData();
-    
-    const ctoValue = calculatePortfolioValue('CTO').valeurActuelle;
-    const peaValue = calculatePortfolioValue('PEA').valeurActuelle;
-    const comptesTotal = data.comptes.reduce((sum, c) => sum + parseFloat(c.solde), 0);
-    const biensTotal = data.biens.reduce((sum, b) => sum + parseFloat(b.valeur), 0);
-    
-    const patrimoineTotal = ctoValue + peaValue + comptesTotal + biensTotal;
+async function updateBilan() {
+    const [accs, cto, pea] = await Promise.all([
+        dataManager.getAccounts(), dataManager.getInvestments('CTO'), dataManager.getInvestments('PEA')
+    ]);
 
-    document.getElementById('bilanPatrimoineTotal').textContent = formatCurrency(patrimoineTotal);
+    const ctoVal = calculateStats(cto).current;
+    const peaVal = calculateStats(pea).current;
+    const accTotal = accs.reduce((sum, a) => sum + parseFloat(a.solde), 0);
 
-    // Comptes
+    document.getElementById('bilanPatrimoineTotal').textContent = formatCurrency(accTotal + ctoVal + peaVal);
     document.getElementById('bilanComptes').innerHTML = `
-        <div class="stat-item">
-            <span>CTO</span>
-            <span>${formatCurrency(ctoValue)}</span>
-        </div>
-        <div class="stat-item">
-            <span>PEA</span>
-            <span>${formatCurrency(peaValue)}</span>
-        </div>
-        ${data.comptes.map(c => `
-            <div class="stat-item">
-                <span>${c.nom}</span>
-                <span>${formatCurrency(c.solde)}</span>
-            </div>
-        `).join('')}
-    `;
-
-    // Investissements
-    document.getElementById('bilanInvestissements').innerHTML = `
-        <div class="stat-item">
-            <span>Total investissements</span>
-            <span>${formatCurrency(ctoValue + peaValue)}</span>
-        </div>
-    `;
-
-    // Autres biens
-    document.getElementById('bilanAutresBiens').innerHTML = `
-        <div class="stat-item">
-            <span>Total autres biens</span>
-            <span>${formatCurrency(biensTotal)}</span>
-        </div>
-        ${data.biens.slice(0, 3).map(b => `
-            <div class="stat-item">
-                <span>${b.nom}</span>
-                <span>${formatCurrency(b.valeur)}</span>
-            </div>
-        `).join('')}
+        <div class="stat-item"><span>Investissements (Total)</span><span>${formatCurrency(ctoVal + peaVal)}</span></div>
+        ${accs.map(a => `<div class="stat-item"><span>${a.nom}</span><span>${formatCurrency(a.solde)}</span></div>`).join('')}
     `;
 }
 
 // Update Comptes
-function updateComptes() {
-    const data = dataManager.getData();
-    const cto = calculatePortfolioValue('CTO');
-    const pea = calculatePortfolioValue('PEA');
+async function updateComptes() {
+    const [accs, cto, pea] = await Promise.all([
+        dataManager.getAccounts(), dataManager.getInvestments('CTO'), dataManager.getInvestments('PEA')
+    ]);
 
-    document.getElementById('ctoAmount').textContent = formatCurrency(cto.valeurActuelle);
-    document.getElementById('ctoEvolution').textContent = `${cto.performance >= 0 ? '+' : ''}${cto.performance.toFixed(2)}%`;
-    document.getElementById('ctoEvolution').className = cto.performance >= 0 ? 'positive' : 'negative';
+    document.getElementById('ctoAmount').textContent = formatCurrency(calculateStats(cto).current);
+    document.getElementById('peaAmount').textContent = formatCurrency(calculateStats(pea).current);
 
-    document.getElementById('peaAmount').textContent = formatCurrency(pea.valeurActuelle);
-    document.getElementById('peaEvolution').textContent = `${pea.performance >= 0 ? '+' : ''}${pea.performance.toFixed(2)}%`;
-    document.getElementById('peaEvolution').className = pea.performance >= 0 ? 'positive' : 'negative';
-
-    // Other accounts
-    const container = document.getElementById('autresComptesContainer');
-    container.innerHTML = data.comptes.map(compte => `
+    document.getElementById('autresComptesContainer').innerHTML = accs.map(a => `
         <div class="card compte-card">
-            <div class="compte-header">
-                <h3>${compte.nom}</h3>
-                <span class="compte-type">${compte.type}</span>
-            </div>
-            <div class="compte-amount">${formatCurrency(compte.solde)}</div>
+            <div class="compte-header"><h3>${a.nom}</h3><span class="compte-type">${a.type}</span></div>
+            <div class="compte-amount">${formatCurrency(a.solde)}</div>
         </div>
     `).join('');
 }
@@ -694,22 +521,6 @@ function deleteBien(id) {
         dataManager.deleteBien(id);
         updateAutresBiens();
     }
-}
-
-// Update Flux
-function updateFlux() {
-    const data = dataManager.getData();
-    
-    const entreesTotal = data.entrees.reduce((sum, e) => sum + parseFloat(e.montant), 0);
-    const depensesTotal = data.depenses.reduce((sum, d) => sum + parseFloat(d.montant), 0);
-    const solde = entreesTotal - depensesTotal;
-
-    document.getElementById('entreesTotales').textContent = formatCurrency(entreesTotal);
-    document.getElementById('sortiesTotales').textContent = formatCurrency(depensesTotal);
-    document.getElementById('soldeFlux').textContent = formatCurrency(solde);
-    document.getElementById('soldeFlux').className = `flux-value ${solde >= 0 ? 'positive' : 'negative'}`;
-
-    updateFluxCharts(data);
 }
 
 // Update Flux Charts
@@ -1019,28 +830,11 @@ function deleteDepense(id) {
 }
 
 // Update Profil
-function updateProfil() {
-    const data = dataManager.getData();
-    const profile = data.profile;
-
-    document.getElementById('profilNom').value = profile.nom || '';
-    document.getElementById('profilEmail').value = profile.email || '';
-    document.getElementById('profilTel').value = profile.telephone || '';
-
-    const dateInscription = new Date(profile.dateInscription);
-    document.getElementById('membreDepuis').textContent = dateInscription.toLocaleDateString('fr-FR');
-
-    const totalTransactions = 
-        data.transactions.CTO.length + 
-        data.transactions.PEA.length + 
-        data.entrees.length + 
-        data.depenses.length;
-    document.getElementById('nbTransactions').textContent = totalTransactions;
-
-    const lastUpdate = localStorage.getItem('last_update');
-    if (lastUpdate) {
-        document.getElementById('derniereConnexion').textContent = new Date(lastUpdate).toLocaleString('fr-FR');
-    }
+async function updateProfil() {
+    const p = await dataManager.getProfile();
+    document.getElementById('profilNom').value = p.nom || '';
+    document.getElementById('profilEmail').value = p.email || '';
+    document.getElementById('profilTel').value = p.telephone || '';
 }
 
 // Save Profile
@@ -1103,30 +897,73 @@ document.getElementById('formAddEntree')?.addEventListener('submit', addEntree);
 document.getElementById('formAddDepense')?.addEventListener('submit', addDepense);
 document.getElementById('formAddCompte')?.addEventListener('submit', addCompte);
 
-function addTransaction(e) {
+// Form Handlers (Exemple pour transaction)
+async function addTransaction(e) {
     e.preventDefault();
-    
-    const transaction = {
-        type: document.getElementById('transactionType').value,
+    const mode = document.getElementById('transactionCompte').value;
+    await dataManager.addInvestment(mode, {
+        type: document.getElementById('transactionType').value === 'achat',
         date: document.getElementById('transactionDate').value,
         titre: document.getElementById('transactionTitre').value,
-        quantite: document.getElementById('transactionQuantite').value,
-        prix: document.getElementById('transactionPrix').value,
-        frais: document.getElementById('transactionFrais').value,
-        notes: document.getElementById('transactionNotes').value
-    };
-
-    const compte = document.getElementById('transactionCompte').value;
-    dataManager.addTransaction(compte, transaction);
-    
+        quantite: parseFloat(document.getElementById('transactionQuantite').value),
+        prix_unitaire: parseFloat(document.getElementById('transactionPrix').value),
+        frais: parseFloat(document.getElementById('transactionFrais').value)
+    });
     closeModal('modalAddTransaction');
-    
-    if (compte === 'CTO') {
-        updateCTO();
-    } else {
-        updatePEA();
-    }
+    await updatePageContent(mode.toLowerCase());
 }
+
+async function addCashFlowAction(e, type) {
+    e.preventDefault();
+    const pfx = type === 'entree' ? 'entree' : 'depense';
+    await dataManager.addCashFlow(type, {
+        date: document.getElementById(`${pfx}Date`).value,
+        categorie: document.getElementById(`${pfx}Categorie`).value,
+        description: document.getElementById(`${pfx}Description`).value,
+        montant: parseFloat(document.getElementById(`${pfx}Montant`).value)
+    });
+    closeModal(type === 'entree' ? 'modalAddEntree' : 'modalAddDepense');
+    await updatePageContent(type === 'entree' ? 'entrees' : 'depenses');
+}
+
+// Global Helpers pour les boutons supprimer (onclick)
+window.deleteInvestmentAction = async (m, id) => { if(confirm('Supprimer ?')) { await dataManager.deleteInvestment(m, id); updatePageContent(m.toLowerCase()); }};
+window.deleteCashFlowAction = async (t, id) => { if(confirm('Supprimer ?')) { await dataManager.deleteCashFlow(t, id); updatePageContent(t === 'entree' ? 'entrees' : 'depenses'); }};
+
+// --- 6. UTILS & CHARTS ---
+function formatCurrency(v) { return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(v); }
+
+function updateAccueilCharts(liq, inv, b) {
+    const ctx = document.getElementById('patrimoineChart');
+    if (!ctx) return;
+    if (Chart.getChart(ctx)) Chart.getChart(ctx).destroy();
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: { labels:['Liquidités','Investissements','Biens'], datasets:[{data:[liq, inv, b], backgroundColor:['#10b981','#2563eb','#f59e0b']}]}
+    });
+}
+
+function renderRecentList(list) {
+    const container = document.getElementById('dernieresTransactions');
+    if (!list.length) { container.innerHTML = '<p class="empty-state">Aucune transaction</p>'; return; }
+    container.innerHTML = list.map(t => `
+        <div class="transaction-item">
+            <span>${t.description || t.titre}</span>
+            <span class="${t.montant ? 'negative' : 'positive'}">${formatCurrency(t.montant || (t.quantite*t.prix_unitaire))}</span>
+        </div>
+    `).join('');
+}
+
+// --- 7. BOOTSTRAP ---
+document.addEventListener('DOMContentLoaded', () => {
+    navigateTo('accueil');
+    document.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', e => navigateTo(e.currentTarget.dataset.page)));
+    
+    // Bind forms
+    document.getElementById('formAddTransaction')?.addEventListener('submit', addTransaction);
+    document.getElementById('formAddEntree')?.addEventListener('submit', e => addCashFlowAction(e, 'entree'));
+    document.getElementById('formAddDepense')?.addEventListener('submit', e => addCashFlowAction(e, 'sortie'));
+});
 
 function addBien(e) {
     e.preventDefault();
@@ -1190,20 +1027,13 @@ function addCompte(e) {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    // Set today's date as default for date inputs
-    const today = new Date().toISOString().split('T')[0];
-    document.querySelectorAll('input[type="date"]').forEach(input => {
-        if (!input.value) {
-            input.value = today;
-        }
+    navigateTo('accueil');
+    
+    // Bind navigation
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            navigateTo(link.dataset.page);
+        });
     });
-
-    // Load theme
-    const data = dataManager.getData();
-    if (data.settings?.theme) {
-        document.body.setAttribute('data-theme', data.settings.theme);
-    }
-
-    // Initialize first page
-    updateAccueil();
 });

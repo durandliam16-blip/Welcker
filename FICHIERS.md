@@ -12,3 +12,5 @@
 - icon-192.png = logo format 192x102pixels
 - icon-512.png = logo format 512x512pixels
 - logo = logo fond transparent
+
+- DB_schema.sql = script lancer dans Supabase pour créer DB
