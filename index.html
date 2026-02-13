@@ -54,6 +54,11 @@
                 <span>Paramètres</span>
             </a>
         </div>
+        <div class="sidebar-footer" style="padding: 16px; border-top: 1px solid var(--border-color);">
+            <button class="btn-secondary" onclick="handleLogout()" style="width: 100%; justify-content: center;">
+                <span>🚪</span> Se déconnecter
+            </button>
+        </div>
     </nav>
 
     <!-- Main Content -->
@@ -590,7 +595,7 @@
                 <button class="modal-close" onclick="closeModal('modalAddBien')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="formAddBien" onsubmit="addBien(event)">
+                <form id="formAddBien" onsubmit="addBienForm(event)">
                     <div class="form-group">
                         <label>Type de bien</label>
                         <select id="bienType" required>
@@ -609,12 +614,8 @@
                         <input type="number" id="bienValeur" step="0.01" required>
                     </div>
                     <div class="form-group">
-                        <label>Date d'acquisition</label>
-                        <input type="date" id="bienDateAcquisition">
-                    </div>
-                    <div class="form-group">
-                        <label>Notes</label>
-                        <textarea id="bienNotes" rows="3"></textarea>
+                        <label>Notes / Description</label>
+                        <textarea id="bienNotes" rows="2" placeholder="Ex: Résidence principale, état..."></textarea>
                     </div>
                     <div class="modal-actions">
                         <button type="button" class="btn-secondary" onclick="closeModal('modalAddBien')">Annuler</button>
@@ -633,7 +634,7 @@
                 <button class="modal-close" onclick="closeModal('modalAddEntree')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="formAddEntree" onsubmit="addEntree(event)">
+                <form id="formAddEntree" onsubmit="addEntreeForm(event)">
                     <div class="form-group">
                         <label>Date</label>
                         <input type="date" id="entreeDate" required>
@@ -673,7 +674,7 @@
                 <button class="modal-close" onclick="closeModal('modalAddDepense')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="formAddDepense" onsubmit="addDepense(event)">
+                <form id="formAddDepense" onsubmit="addDepenseForm(event)">
                     <div class="form-group">
                         <label>Date</label>
                         <input type="date" id="depenseDate" required>
@@ -716,7 +717,7 @@
                 <button class="modal-close" onclick="closeModal('modalAddCompte')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="formAddCompte" onsubmit="addCompte(event)">
+                <form id="formAddCompte" onsubmit="addCompteForm(event)">
                     <div class="form-group">
                         <label>Nom du compte</label>
                         <input type="text" id="compteNom" placeholder="Ex: Livret A" required>
@@ -743,14 +744,28 @@
         </div>
     </div>
 
+    <!-- ORDRE CRITIQUE : Supabase → Chart.js → app.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Guard : redirige vers login.html si l'utilisateur n'est pas connecté -->
+    <script>
+        (async () => {
+            const { createClient } = window.supabase;
+            const _sb = createClient(
+                'https://qktbcgumyqjgbvcpynjo.supabase.co',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrdGJjZ3VteXFqZ2J2Y3B5bmpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MDQ0MDYsImV4cCI6MjA4NjM4MDQwNn0.Bjv4bb2gnXKG8-UY4oSUQrjaJIzNWEG_zM8_XTQbwsY' // ← même clé que dans login.html
+            );
+            const { data: { session } } = await _sb.auth.getSession();
+            if (!session) window.location.replace('login.html');
+        })();
+    </script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js')
-            .then(() => console.log('Service Worker Enregistré'));
+                .then(() => console.log('Service Worker enregistré'))
+                .catch(() => {});
         }
-        </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> <!-- Connection Postgre -->
+    </script>
     <script src="app.js"></script>
 </body>
 </html>

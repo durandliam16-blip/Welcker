@@ -1,6 +1,9 @@
 # MonPatrimoine - Guide
 
-Voir Notion pour accès et détails DB
+- Voir *Notion* pour à faire 
+- Voir *Supabase* pour gestion DB
+- Voir *Google docs* pour idées et lien
+- Vor *Github* pour repo
 
 ## 📋 Description
 Application web complète de gestion financière personnelle avec suivi de patrimoine, investissements (CTO, PEA), comptes bancaires, biens, et analyse des flux financiers.

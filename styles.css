@@ -45,6 +45,13 @@ body {
     overflow-x: hidden;
 }
 
+/* ── SIDEBAR FOOTER ────────────────────────────────────────────────────────── */
+.sidebar-footer {
+    margin-top: auto;
+    padding: 16px;
+    border-top: 1px solid var(--border-color);
+}
+
 /* Sidebar Navigation */
 .sidebar {
     position: fixed;
@@ -58,14 +65,6 @@ body {
     flex-direction: column;
     padding: 24px 0;
     z-index: 100;
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0 24px;
-    margin-bottom: 32px;
 }
 
 .logo {
