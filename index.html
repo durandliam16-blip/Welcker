@@ -545,7 +545,7 @@
                 <button class="modal-close" onclick="closeModal('modalAddTransaction')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="formAddTransaction" onsubmit="addTransaction(event)">
+                <form id="formAddTransaction" >
                     <input type="hidden" id="transactionCompte" value="">
                     <div class="form-group">
                         <label>Type</label>
@@ -595,7 +595,7 @@
                 <button class="modal-close" onclick="closeModal('modalAddBien')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="formAddBien" onsubmit="addBienForm(event)">
+                <form id="formAddBien" >
                     <div class="form-group">
                         <label>Type de bien</label>
                         <select id="bienType" required>
@@ -634,7 +634,7 @@
                 <button class="modal-close" onclick="closeModal('modalAddEntree')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="formAddEntree" onsubmit="addEntreeForm(event)">
+                <form id="formAddEntree" >
                     <div class="form-group">
                         <label>Date</label>
                         <input type="date" id="entreeDate" required>
@@ -674,7 +674,7 @@
                 <button class="modal-close" onclick="closeModal('modalAddDepense')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="formAddDepense" onsubmit="addDepenseForm(event)">
+                <form id="formAddDepense" >
                     <div class="form-group">
                         <label>Date</label>
                         <input type="date" id="depenseDate" required>
@@ -717,7 +717,7 @@
                 <button class="modal-close" onclick="closeModal('modalAddCompte')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="formAddCompte" onsubmit="addCompteForm(event)">
+                <form id="formAddCompte" >
                     <div class="form-group">
                         <label>Nom du compte</label>
                         <input type="text" id="compteNom" placeholder="Ex: Livret A" required>
