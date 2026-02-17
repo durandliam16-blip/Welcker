@@ -2,26 +2,27 @@
 
 - Voir *Notion* pour à faire 
 - Voir *Supabase* pour gestion DB
-- Voir *Google docs* pour idées et lien
+- Voir *Google docs* pour idées et liens
 - Vor *Github* pour repo
 
 ## 📋 Description
 Application web complète de gestion financière personnelle avec suivi de patrimoine, investissements (CTO, PEA), comptes bancaires, biens, et analyse des flux financiers.
++ 2 fonctionnalitées innovantes :
+Compte commun famille qui cumule les comptes dans une nouvelle page
+Comme un réseau social avec suivi et amis
 
-## 🎯 Fonctionnalités
+## ✅ Pages implémentées
 
-### ✅ Pages implémentées
-- **Page 0** : Accueil avec vue d'ensemble et graphiques
-- **Page 1** : Bilan du patrimoine
+- **Page 0** : Page de connexion/inscription
+- **Page 1** : Accueil avec vue d'ensemble et graphiques
 - **Page 2** : Suivi des comptes bancaires
-- **Page 3** : CTO avec graphe d'évolution et historique
-- **Page 4** : PEA avec graphe d'évolution et historique
-- **Page 5** : Autres biens (immobilier, véhicules, etc.)
-- **Page 6** : Comparaison entrées/sorties
-- **Page 7** : Détails des entrées d'argent
-- **Page 8** : Détails des dépenses
-- **Page 9** : Profil utilisateur
-- **Page 10** : Paramètres
+- **Page 3** : Page onvestissement cad resumé des transactions tout compte confondus
+- **Page 4** : Autres biens (immobilier, véhicules, etc.)
+- **Page 5** : Comparaison entrées/sorties
+- **Page 6** : Détails des entrées d'argent
+- **Page 7** : Détails des dépenses
+- **Page 8** : Profil utilisateur
+- **Page 9** : Paramètres
 
 ## 🚀 Hébergement
 
@@ -33,7 +34,7 @@ Application web complète de gestion financière personnelle avec suivi de patri
 5. Attendez 2-3 minutes
 6. Votre site sera accessible à : `https://votre-username.github.io/monpatrimoine/`
 
-### Option 2 : Netlify (encore plus simple)
+### Option 2 : Netlify (ACTIVE)
 1. Allez sur https://www.netlify.com
 2. Créez un compte gratuit (avec GitHub, email, etc.)
 3. Une fois connecté, cliquez sur "Add new site" → "Deploy manually"
@@ -107,6 +108,6 @@ Cela nécessitera de modifier le code JavaScript pour remplacer `localStorage` p
 
 ---
 
-**Version** : 1.0.0  
+**Version** : 2.0.0  
 **Date** : Février 2026  
 **Licence** : Usage personnel
