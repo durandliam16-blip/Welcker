@@ -684,6 +684,149 @@ window.filterTransactions = async (mode) => {
 };
 
 // =============================================================================
+// POPUPS HEADER — Profil & Notifications
+// =============================================================================
+
+function _placePopup(el, anchor) {
+    const r = anchor.getBoundingClientRect();
+    el.style.cssText += `position:fixed;top:${r.bottom + 8}px;right:${window.innerWidth - r.right}px;z-index:6000;`;
+    document.body.appendChild(el);
+}
+
+// ── Popup Profil ──────────────────────────────────────────────────────────────
+async function toggleProfilPopup() {
+    document.getElementById('popupNotifs')?.remove();
+    if (document.getElementById('popupProfil')) {
+        document.getElementById('popupProfil').remove();
+        return;
+    }
+
+    const [profile, bankAccs, cto, pea, biens] = await Promise.all([
+        dataManager.getProfile(),
+        dataManager.getBankAccounts(),
+        dataManager.getInvestments('CTO'),
+        dataManager.getInvestments('PEA'),
+        dataManager.getBiens()
+    ]);
+
+    const accTotal = bankAccs.reduce((s,a) => s + parseFloat(a.solde||0), 0);
+    const invTotal = calcStats(cto).current + calcStats(pea).current;
+    const biensVal = biens.reduce((s,b) => s + parseFloat(b.solde||0), 0);
+    const patrimoine = accTotal + invTotal + biensVal;
+
+    const initiale = (profile.nom || 'U')[0].toUpperCase();
+    const pop = document.createElement('div');
+    pop.id = 'popupProfil';
+    pop.className = 'header-popup';
+    pop.innerHTML = `
+      <div class="popup-header">
+        <div class="popup-avatar">${initiale}</div>
+        <div>
+          <div class="popup-name">${profile.nom || 'Utilisateur'}</div>
+          <div class="popup-email">${profile.email || ''}</div>
+        </div>
+      </div>
+      <div class="popup-divider"></div>
+      <div class="popup-stat">
+        <span class="popup-stat-label">💰 Patrimoine total</span>
+        <span class="popup-stat-value">${fmt(patrimoine)}</span>
+      </div>
+      <div class="popup-stat">
+        <span class="popup-stat-label">📞 Téléphone</span>
+        <span class="popup-stat-value">${profile.telephone || '—'}</span>
+      </div>
+      <div class="popup-divider"></div>
+      <button class="popup-action-btn" onclick="navigateTo('profil');document.getElementById('popupProfil')?.remove()">✏️ Modifier le profil</button>
+      <button class="popup-action-btn popup-logout-btn" onclick="handleLogout()">🚪 Se déconnecter</button>
+    `;
+    _placePopup(pop, document.getElementById('userBtn'));
+}
+
+// ── Popup Notifications ───────────────────────────────────────────────────────
+async function toggleNotifsPopup() {
+    document.getElementById('popupProfil')?.remove();
+    if (document.getElementById('popupNotifs')) {
+        document.getElementById('popupNotifs').remove();
+        return;
+    }
+
+    const [cto, pea, entrees, sorties] = await Promise.all([
+        dataManager.getInvestments('CTO'),
+        dataManager.getInvestments('PEA'),
+        dataManager.getCashFlow('entree'),
+        dataManager.getCashFlow('sortie')
+    ]);
+
+    const notifs = [];
+
+    // Dernières transactions d'investissement
+    [...cto, ...pea].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 2).forEach(t => {
+        const achat = t.type === true;
+        const montant = parseFloat(t.quantite) * parseFloat(t.prix_unitaire);
+        notifs.push({
+            icon: achat ? '📈' : '📉',
+            title: `${achat ? 'Achat' : 'Vente'} — ${t.titre}`,
+            detail: `${fmt(montant)} · ${new Date(t.date).toLocaleDateString('fr-FR')}`,
+            type: achat ? 'success' : 'warning'
+        });
+    });
+
+    // Dernière entrée
+    const lastEntree = [...entrees].sort((a,b) => new Date(b.date) - new Date(a.date))[0];
+    if (lastEntree) {
+        notifs.push({
+            icon: '💸',
+            title: `Entrée — ${lastEntree.categorie}`,
+            detail: `${fmt(lastEntree.montant)} · ${new Date(lastEntree.date).toLocaleDateString('fr-FR')}`,
+            type: 'success'
+        });
+    }
+
+    // Dépense la plus importante récente
+    const bigSortie = [...sorties].sort((a,b) => b.montant - a.montant)[0];
+    if (bigSortie) {
+        notifs.push({
+            icon: '⚠️',
+            title: `Grosse dépense — ${bigSortie.categorie}`,
+            detail: `${fmt(bigSortie.montant)} · ${new Date(bigSortie.date).toLocaleDateString('fr-FR')}`,
+            type: 'danger'
+        });
+    }
+
+    // Placeholder demande de suivi (à relier à une vraie table amis plus tard)
+    notifs.push({
+        icon: '👥',
+        title: 'Demandes de suivi',
+        detail: 'Aucune nouvelle demande',
+        type: 'info'
+    });
+
+    const notifsHTML = notifs.length
+        ? notifs.map(n => `
+            <div class="popup-notif popup-notif-${n.type}">
+                <span class="popup-notif-icon">${n.icon}</span>
+                <div class="popup-notif-body">
+                    <div class="popup-notif-title">${n.title}</div>
+                    <div class="popup-notif-detail">${n.detail}</div>
+                </div>
+            </div>`).join('')
+        : '<p style="color:var(--text-secondary);text-align:center;padding:16px;font-size:13px">Aucune notification</p>';
+
+    const pop = document.createElement('div');
+    pop.id = 'popupNotifs';
+    pop.className = 'header-popup';
+    pop.innerHTML = `
+      <div class="popup-notif-header">
+        <span style="font-weight:600;font-size:14px">🔔 Notifications</span>
+        <span class="popup-notif-badge">${notifs.length}</span>
+      </div>
+      <div class="popup-divider"></div>
+      <div class="popup-notif-list">${notifsHTML}</div>
+    `;
+    _placePopup(pop, document.getElementById('notificationBtn'));
+}
+
+// =============================================================================
 // BOOTSTRAP
 // =============================================================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -692,12 +835,35 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', e => { e.preventDefault(); navigateTo(link.dataset.page); });
     });
 
+    // Modales — fermeture en cliquant sur le fond
+    document.querySelectorAll('.modal').forEach(m => {
+        m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
+    });
+
     // Formulaires
     document.getElementById('formAddTransaction')?.addEventListener('submit', addTransaction);
     document.getElementById('formAddBien')?.addEventListener('submit', addBienForm);
     document.getElementById('formAddEntree')?.addEventListener('submit', addEntreeForm);
     document.getElementById('formAddDepense')?.addEventListener('submit', addDepenseForm);
     document.getElementById('formAddCompte')?.addEventListener('submit', addCompteForm);
+
+    // Boutons popups header
+    document.getElementById('userBtn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleProfilPopup();
+    });
+    document.getElementById('notificationBtn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleNotifsPopup();
+    });
+
+    // Fermer les popups en cliquant ailleurs
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#popupProfil') && !e.target.closest('#userBtn'))
+            document.getElementById('popupProfil')?.remove();
+        if (!e.target.closest('#popupNotifs') && !e.target.closest('#notificationBtn'))
+            document.getElementById('popupNotifs')?.remove();
+    });
 
     // Thème
     document.body.setAttribute('data-theme', dataManager.getSettings().theme || 'light');
