@@ -68,11 +68,12 @@ body {
 }
 
 .logo {
-    height: 32px;
-    width: 32px;
-    padding: 6px;
-    background: var(--primary-color);
-    border-radius: 12px;
+    height: 60px;
+    width: auto;
+    flex-shrink: 0;
+    /* Ajoute des coins arrondis à l'image */
+    border-radius: 15px; 
+    /* Optionnel : Si vous voulez un logo parfaitement rond, mettez '50%' au lieu de '15px' */
 }
 
 .logo-container {
@@ -85,8 +86,8 @@ body {
 
 .app-name {
     font-size: 22px;
-    letter-spacing: -0.5px; /* Un peu plus serré pour le style premium */
-    color: #1e293b;
+    letter-spacing: -0.5px;
+    color: var(--text-primary); /* <-- S'adaptera tout seul au mode clair/sombre ! */
     font-weight: 700;
 }
 
