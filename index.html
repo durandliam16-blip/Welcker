@@ -18,12 +18,8 @@
         </div>
         <div class="nav-links">
             <a href="#" class="nav-link active" data-page="accueil">
-                <span class="icon">🏠</span>
-                <span>Accueil</span>
-            </a>
-            <a href="#" class="nav-link" data-page="bilan">
                 <span class="icon">📊</span>
-                <span>Bilan</span>
+                <span>Accueil</span>
             </a>
             <a href="#" class="nav-link" data-page="comptes">
                 <span class="icon">💳</span>
@@ -85,7 +81,7 @@
                     <div class="overview-content">
                         <div class="stat-item">
                             <span class="stat-label">Patrimoine total</span>
-                            <span class="stat-value" id="patrimoineTotal">0 €</span>
+                            <span class="amount-display" id="patrimoineTotal">0 €</span>
                         </div>
                         <div class="stat-item">
                             <span class="stat-label">Liquidités</span>
@@ -111,32 +107,10 @@
                     <h3>Évolution mensuelle</h3>
                     <canvas id="evolutionChart"></canvas>
                 </div>
-            </div>
-        </div>
-
-        <!-- Page: Bilan -->
-        <div class="page" id="page-bilan">
-            <div class="page-header">
-                <h1>Bilan du patrimoine</h1>
-            </div>
-            <div class="bilan-grid">
-                <div class="card card-summary">
-                    <h2>Patrimoine total</h2>
-                    <div class="amount-display" id="bilanPatrimoineTotal">0 €</div>
-                </div>
                 <div class="card">
                     <h3>Comptes bancaires</h3>
                     <div id="bilanComptes"></div>
                     <button class="btn-secondary" onclick="navigateTo('comptes')">Voir détails</button>
-                </div>
-                <div class="card">
-                    <h3>Investissements</h3>
-                    <div id="bilanInvestissements"></div>
-                </div>
-                <div class="card">
-                    <h3>Autres biens</h3>
-                    <div id="bilanAutresBiens"></div>
-                    <button class="btn-secondary" onclick="navigateTo('autres-biens')">Voir détails</button>
                 </div>
             </div>
         </div>
