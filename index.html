@@ -415,10 +415,43 @@
             </div>
             <div class="profil-layout">
                 <div class="card profil-card">
-                    <div class="profil-avatar">
-                        <div class="avatar-placeholder">👤</div>
-                        <button class="btn-secondary">Changer la photo</button>
+                    <div class="profil-avatar-section">
+                        <div class="profil-avatar-preview">
+                            <img id="profilAvatarImg" src="" alt="Photo de profil" style="display:none;">
+                            <div id="profilAvatarPlaceholder" class="avatar-placeholder-large">👤</div>
+                        </div>
+                        <div class="profil-avatar-actions">
+                            <h4 style="margin-bottom: 12px; font-size: 14px; font-weight: 600; color: var(--text-primary);">Photo de profil</h4>
+                            
+                            <!-- Avatars par défaut -->
+                            <div class="avatar-presets">
+                                <div class="avatar-preset" data-avatar="1" onclick="selectPresetAvatar('1')">
+                                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">💼</div>
+                                </div>
+                                <div class="avatar-preset" data-avatar="2" onclick="selectPresetAvatar('2')">
+                                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">🚀</div>
+                                </div>
+                                <div class="avatar-preset" data-avatar="3" onclick="selectPresetAvatar('3')">
+                                    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">🌟</div>
+                                </div>
+                                <div class="avatar-preset" data-avatar="4" onclick="selectPresetAvatar('4')">
+                                    <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">💎</div>
+                                </div>
+                            </div>
+
+                            <!-- Upload personnalisé -->
+                            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                                <input type="file" id="avatarUpload" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+                                <button class="btn-secondary" onclick="document.getElementById('avatarUpload').click()" style="width: 100%; justify-content: center;">
+                                    📤 Upload une photo
+                                </button>
+                                <p style="font-size: 11px; color: var(--text-tertiary); margin-top: 8px; text-align: center;">
+                                    PNG, JPG • Max 2MB
+                                </p>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="profil-info">
                         <div class="form-group">
                             <label>Nom complet</label>
@@ -536,11 +569,11 @@
                         Une question, un bug à signaler, ou juste envie de discuter ?
                     </p>
                     <div class="contact-links">
-                        <a href="mailto:contact@welcker.app" class="contact-link" target="_blank">
+                        <a href="/cdn-cgi/l/email-protection#f3909c9d87929087b384969f90989681dd928383" class="contact-link" target="_blank">
                             <span class="contact-icon">📧</span>
                             <div>
                                 <div class="contact-label">Email</div>
-                                <div class="contact-value">contact@welcker.app</div>
+                                <div class="contact-value"><span class="__cf_email__" data-cfemail="caa9a5a4beaba9be8abdafa6a9a1afb8e4abbaba">[email&#160;protected]</span></div>
                             </div>
                         </a>
                         <a href="https://twitter.com/welcker_app" class="contact-link" target="_blank">
@@ -768,7 +801,7 @@
     </div>
 
     <!-- ORDRE CRITIQUE : Supabase → Chart.js → app.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <!-- Guard : redirige vers login.html si l'utilisateur n'est pas connecté -->
     <script>

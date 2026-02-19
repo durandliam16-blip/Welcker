@@ -49,6 +49,7 @@ class DataManager {
             nom:        profileData.nom        || null,
             email:      profileData.email      || null,
             telephone:  profileData.telephone  || null,
+            avatar_url: profileData.avatar_url || null,
             updated_at: new Date().toISOString()
         });
         if (error) { console.error('updateProfile:', error.message); showToast('Erreur profil : ' + error.message, 'error'); }
@@ -578,19 +579,156 @@ async function updateCashFlowPage(type) {
 // =============================================================================
 // PAGE PROFIL & PARAMÈTRES
 // =============================================================================
+let currentAvatarData = null; // Stocke temporairement l'avatar sélectionné
+
 async function updateProfil() {
     const p = await dataManager.getProfile();
     document.getElementById('profilNom').value   = p.nom       || '';
     document.getElementById('profilEmail').value = p.email     || '';
     document.getElementById('profilTel').value   = p.telephone || '';
+    
+    // Charger l'avatar
+    if (p.avatar_url) {
+        displayAvatar(p.avatar_url);
+    } else {
+        // Afficher placeholder par défaut
+        document.getElementById('profilAvatarImg').style.display = 'none';
+        document.getElementById('profilAvatarPlaceholder').style.display = 'flex';
+    }
+}
+
+function displayAvatar(url) {
+    const img = document.getElementById('profilAvatarImg');
+    const placeholder = document.getElementById('profilAvatarPlaceholder');
+    
+    img.src = url;
+    img.style.display = 'block';
+    placeholder.style.display = 'none';
+}
+
+// Sélection d'un avatar prédéfini
+function selectPresetAvatar(avatarId) {
+    // Avatars encodés en data URL (petits gradients + emoji)
+    const presets = {
+        '1': 'data:image/svg+xml;base64,' + btoa(`
+            <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <circle cx="100" cy="100" r="100" fill="url(#grad1)" />
+                <text x="100" y="130" font-size="80" text-anchor="middle" fill="white">💼</text>
+            </svg>
+        `),
+        '2': 'data:image/svg+xml;base64,' + btoa(`
+            <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#f093fb;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#f5576c;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <circle cx="100" cy="100" r="100" fill="url(#grad2)" />
+                <text x="100" y="130" font-size="80" text-anchor="middle" fill="white">🚀</text>
+            </svg>
+        `),
+        '3': 'data:image/svg+xml;base64,' + btoa(`
+            <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <circle cx="100" cy="100" r="100" fill="url(#grad3)" />
+                <text x="100" y="130" font-size="80" text-anchor="middle" fill="white">🌟</text>
+            </svg>
+        `),
+        '4': 'data:image/svg+xml;base64,' + btoa(`
+            <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#43e97b;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#38f9d7;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <circle cx="100" cy="100" r="100" fill="url(#grad4)" />
+                <text x="100" y="130" font-size="80" text-anchor="middle" fill="white">💎</text>
+            </svg>
+        `)
+    };
+    
+    currentAvatarData = { type: 'preset', url: presets[avatarId] };
+    displayAvatar(presets[avatarId]);
+    
+    // Highlight visuel
+    document.querySelectorAll('.avatar-preset').forEach(el => el.classList.remove('selected'));
+    document.querySelector(`.avatar-preset[data-avatar="${avatarId}"]`).classList.add('selected');
+    
+    showToast('Avatar sélectionné ! Cliquez sur "Enregistrer" pour sauvegarder.', 'info');
+}
+
+// Upload d'un fichier image
+async function handleAvatarUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Vérifications
+    if (!file.type.startsWith('image/')) {
+        showToast('Veuillez sélectionner une image (PNG, JPG...)', 'error');
+        return;
+    }
+    if (file.size > 2 * 1024 * 1024) { // 2MB max
+        showToast('L\'image est trop lourde (max 2MB)', 'error');
+        return;
+    }
+    
+    showToast('Upload en cours...', 'info');
+    
+    try {
+        const user = await getUser();
+        if (!user) throw new Error('Non authentifié');
+        
+        // Upload vers Supabase Storage
+        const fileName = `avatar_${user.id}_${Date.now()}.${file.name.split('.').pop()}`;
+        const { data, error } = await sb.storage
+            .from('avatars')
+            .upload(fileName, file, { upsert: true });
+        
+        if (error) throw error;
+        
+        // Récupérer l'URL publique
+        const { data: urlData } = sb.storage.from('avatars').getPublicUrl(fileName);
+        
+        currentAvatarData = { type: 'upload', url: urlData.publicUrl };
+        displayAvatar(urlData.publicUrl);
+        
+        showToast('Photo uploadée ! Cliquez sur "Enregistrer".', 'success');
+        
+    } catch (err) {
+        console.error('Upload avatar:', err);
+        showToast('Erreur upload : ' + err.message, 'error');
+    }
 }
 
 async function saveProfile() {
-    await dataManager.updateProfile({
+    const profileData = {
         nom:       document.getElementById('profilNom').value,
         email:     document.getElementById('profilEmail').value,
         telephone: document.getElementById('profilTel').value
-    });
+    };
+    
+    // Ajouter l'avatar si un nouveau a été sélectionné
+    if (currentAvatarData) {
+        profileData.avatar_url = currentAvatarData.url;
+    }
+    
+    await dataManager.updateProfile(profileData);
+    
+    // Réinitialiser le state temporaire
+    currentAvatarData = null;
 }
 
 function updateParametres() {
@@ -775,12 +913,18 @@ async function toggleProfilPopup() {
     const patrimoine = accTotal + invTotal + biensVal;
 
     const initiale = (profile.nom || 'U')[0].toUpperCase();
+    
+    // Avatar : afficher l'image si disponible, sinon initiale
+    const avatarHTML = profile.avatar_url
+        ? `<img src="${profile.avatar_url}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+        : initiale;
+    
     const pop = document.createElement('div');
     pop.id = 'popupProfil';
     pop.className = 'header-popup';
     pop.innerHTML = `
       <div class="popup-header">
-        <div class="popup-avatar">${initiale}</div>
+        <div class="popup-avatar">${avatarHTML}</div>
         <div>
           <div class="popup-name">${profile.nom || 'Utilisateur'}</div>
           <div class="popup-email">${profile.email || ''}</div>
