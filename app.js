@@ -500,11 +500,6 @@ async function updateFlux() {
             { label:'Sorties', data: Array.from({length:6},(_,i)=>sumByOffset(s,i)), backgroundColor:'#ef4444' }
         ]}, options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
     });
-    const ctx2 = destroyChart('fluxAnnuelChart');
-    if (ctx2) new Chart(ctx2, { type: 'doughnut',
-        data: { labels:['Entrées','Sorties'], datasets:[{ data:[tE,tS], backgroundColor:['#10b981','#ef4444'] }] },
-        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
-    });
 }
 
 // =============================================================================
@@ -543,21 +538,42 @@ async function updateCashFlowPage(type) {
             options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
     }
-    if (!isE) {
-        const now2 = new Date();
-        const months = ['Jan','Fév','Mar','Avr','Mai','Jun'];
-        const vals = Array.from({length:6},(_,i) => {
-            const d = new Date(now2.getFullYear(), now2.getMonth()-5+i, 1);
-            return data.filter(x => { const id=new Date(x.date); return id.getMonth()===d.getMonth()&&id.getFullYear()===d.getFullYear(); })
-                       .reduce((s,x) => s+parseFloat(x.montant||0), 0);
-        });
-        const ctx = destroyChart('depensesEvolutionChart');
-        if (ctx) new Chart(ctx, { type: 'line',
-            data: { labels: months, datasets: [{ data: vals, borderColor:'#ef4444', backgroundColor:'rgba(239,68,68,0.1)', tension:0.4, fill:true }] },
+    // --- GRAPHIQUE ÉVOLUTION (Ligne) - S'adapte aux Entrées et Dépenses ---
+    const now2 = new Date();
+    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun'];
+    
+    // Les données "data" contiennent déjà les entrées ou les dépenses selon la page
+    const vals = Array.from({length:6}, (_,i) => {
+        const d = new Date(now2.getFullYear(), now2.getMonth()-5+i, 1);
+        return data.filter(x => { 
+            const id = new Date(x.date); 
+            return id.getMonth() === d.getMonth() && id.getFullYear() === d.getFullYear(); 
+        }).reduce((s,x) => s + parseFloat(x.montant || 0), 0);
+    });
+
+    // Définition des couleurs et de l'ID selon la page
+    const chartId = isE ? 'entreesEvolutionChart' : 'depensesEvolutionChart';
+    const borderColor = isE ? '#10b981' : '#ef4444'; // Vert pour Entrées, Rouge pour Dépenses
+    const bgColor = isE ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
+
+    const ctxEvo = destroyChart(chartId);
+    if (ctxEvo) {
+        new Chart(ctxEvo, { 
+            type: 'line',
+            data: { 
+                labels: months, 
+                datasets: [{ 
+                    data: vals, 
+                    borderColor: borderColor, 
+                    backgroundColor: bgColor, 
+                    tension: 0.4, 
+                    fill: true 
+                }] 
+            },
             options: { responsive: true, plugins: { legend: { display: false } } }
         });
     }
-}
+} // <-- Fin de la fonction updateCashFlowPage
 
 // =============================================================================
 // PAGE PROFIL & PARAMÈTRES
@@ -587,6 +603,50 @@ function changeTheme() {
     const theme = document.getElementById('settingTheme').value;
     document.body.setAttribute('data-theme', theme);
     dataManager.saveSettings({ ...dataManager.getSettings(), theme });
+}
+
+async function submitFeatureSuggestion() {
+    const textarea = document.getElementById('featureSuggestion');
+    const status = document.getElementById('suggestionStatus');
+    const suggestion = textarea.value.trim();
+
+    if (!suggestion) {
+        status.textContent = '⚠️ Veuillez écrire une suggestion avant d\'envoyer.';
+        status.style.color = 'var(--warning-color)';
+        return;
+    }
+
+    status.textContent = '📤 Envoi en cours...';
+    status.style.color = 'var(--text-secondary)';
+
+    try {
+        const user = await getUser();
+        const profile = await dataManager.getProfile();
+
+        // Enregistrement dans une table Supabase 'feature_suggestions'
+        const { error } = await sb.from('feature_suggestions').insert([{
+            user_id: user?.id || null,
+            user_name: profile.nom || 'Anonyme',
+            user_email: profile.email || null,
+            suggestion: suggestion,
+            created_at: new Date().toISOString()
+        }]);
+
+        if (error) {
+            console.error('submitFeatureSuggestion:', error.message);
+            status.textContent = '❌ Erreur lors de l\'envoi. Réessayez plus tard.';
+            status.style.color = 'var(--danger-color)';
+        } else {
+            status.textContent = '✅ Merci ! Votre suggestion a été envoyée.';
+            status.style.color = 'var(--success-color)';
+            textarea.value = '';
+            setTimeout(() => { status.textContent = ''; }, 5000);
+        }
+    } catch (err) {
+        console.error('submitFeatureSuggestion catch:', err);
+        status.textContent = '❌ Erreur réseau. Vérifiez votre connexion.';
+        status.style.color = 'var(--danger-color)';
+    }
 }
 
 // =============================================================================

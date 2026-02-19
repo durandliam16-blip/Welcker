@@ -327,10 +327,6 @@
                     <h3>Évolution mensuelle</h3>
                     <canvas id="fluxChart"></canvas>
                 </div>
-                <div class="card">
-                    <h3>Répartition annuelle</h3>
-                    <canvas id="fluxAnnuelChart"></canvas>
-                </div>
             </div>
         </div>
 
@@ -346,20 +342,26 @@
                     <canvas id="entreesChart"></canvas>
                 </div>
                 <div class="card">
-                    <h3>Liste des entrées</h3>
-                    <div class="filter-controls">
-                        <select id="entreesFilterCategorie" onchange="filterEntrees()">
-                            <option value="all">Toutes catégories</option>
-                            <option value="salaire">Salaire</option>
-                            <option value="covoiturage">Covoiturage</option>
-                            <option value="freelance">Freelance</option>
-                            <option value="autre">Autre</option>
-                        </select>
-                        <select id="entreesFilterPeriode" onchange="filterEntrees()">
-                            <option value="all">Toutes périodes</option>
-                            <option value="mois">Ce mois</option>
-                            <option value="annee">Cette année</option>
-                        </select>
+                    <h3>Évolution des entrées</h3>
+                    <canvas id="entreesEvolutionChart"></canvas>
+                </div>
+                <div class="card card-full">
+                    <div class="card-header">
+                        <h3>Liste des entrées</h3>
+                        <div class="filter-controls">
+                            <select id="entreesFilterCategorie" onchange="filterEntrees()">
+                                <option value="all">Toutes catégories</option>
+                                <option value="salaire">Salaire</option>
+                                <option value="covoiturage">Covoiturage</option>
+                                <option value="freelance">Freelance</option>
+                                <option value="autre">Autre</option>
+                            </select>
+                            <select id="entreesFilterPeriode" onchange="filterEntrees()">
+                                <option value="all">Toutes périodes</option>
+                                <option value="mois">Ce mois</option>
+                                <option value="annee">Cette année</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="table-container">
                         <table class="transactions-table">
@@ -530,6 +532,53 @@
                         <button class="btn-secondary" onclick="exportData()">Exporter mes données</button>
                         <button class="btn-secondary" onclick="importData()">Importer des données</button>
                         <button class="btn-danger" onclick="confirmDeleteData()">Supprimer toutes les données</button>
+                    </div>
+                </div>
+
+                <!-- Bloc Améliorations possibles -->
+                <div class="card">
+                    <h3>💡 Proposer une amélioration</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
+                        Une idée pour améliorer Welcker ? Partagez vos suggestions de fonctionnalités ! (Anonyme)
+                    </p>
+                    <div class="settings-group">
+                        <textarea 
+                            id="featureSuggestion" 
+                            placeholder="Ex: IA qui donne des conseils d'investissement, import automatique bancaire, graphiques avancés..."
+                            rows="4"
+                            style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: inherit; font-size: 14px; resize: vertical;"
+                        ></textarea>
+                        <button class="btn-primary" onclick="submitFeatureSuggestion()" style="margin-top: 12px;">
+                            📤 Envoyer ma suggestion
+                        </button>
+                        <div id="suggestionStatus" style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);"></div>
+                    </div>
+                </div>
+
+                <!-- Bloc Contact -->
+                <div class="card">
+                    <h3>📬 Contact & Réseaux</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
+                        Une question, un bug à signaler, ou juste envie de discuter ?
+                    </p>
+                    <div class="contact-links">
+                        <a href="mailto:contact@welcker.app" class="contact-link" target="_blank">
+                            <span class="contact-icon">📧</span>
+                            <div>
+                                <div class="contact-label">Email</div>
+                                <div class="contact-value">contact@welcker.app</div>
+                            </div>
+                        </a>
+                        <a href="https://twitter.com/welcker_app" class="contact-link" target="_blank">
+                            <span class="contact-icon">🐦</span>
+                            <div>
+                                <div class="contact-label">Twitter</div>
+                                <div class="contact-value">@welcker_app</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color); font-size: 12px; color: var(--text-tertiary); text-align: center;">
+                        Welcker v1.0 — Made with ❤️
                     </div>
                 </div>
             </div>
