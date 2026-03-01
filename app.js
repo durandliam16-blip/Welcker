@@ -52,8 +52,19 @@ class DataManager {
             avatar_url: profileData.avatar_url || null,
             updated_at: new Date().toISOString()
         });
-        if (error) { console.error('updateProfile:', error.message); showToast('Erreur profil : ' + error.message, 'error'); }
-        else showToast('Profil enregistré !', 'success');
+        if (error) { 
+            console.error('updateProfile:', error.message); 
+            showToast('Erreur profil : ' + error.message, 'error'); 
+            return;
+        }
+        
+        showToast('Profil enregistré !', 'success');
+        
+        // Rafraîchir le popup s'il est ouvert
+        if (document.getElementById('popupProfil')) {
+            document.getElementById('popupProfil').remove();
+            await toggleProfilPopup();
+        }
     }
 
     // ── Investissements CTO/PEA ───────────────────────────────────────────────
@@ -583,27 +594,40 @@ let currentAvatarData = null; // Stocke temporairement l'avatar sélectionné
 
 async function updateProfil() {
     const p = await dataManager.getProfile();
+    console.log('updateProfil - profile data:', p);
+    
     document.getElementById('profilNom').value   = p.nom       || '';
     document.getElementById('profilEmail').value = p.email     || '';
     document.getElementById('profilTel').value   = p.telephone || '';
     
     // Charger l'avatar
     if (p.avatar_url) {
+        console.log('Loading avatar from DB:', p.avatar_url);
         displayAvatar(p.avatar_url);
     } else {
+        console.log('No avatar_url in profile, showing placeholder');
         // Afficher placeholder par défaut
-        document.getElementById('profilAvatarImg').style.display = 'none';
-        document.getElementById('profilAvatarPlaceholder').style.display = 'flex';
+        const img = document.getElementById('profilAvatarImg');
+        const placeholder = document.getElementById('profilAvatarPlaceholder');
+        if (img) img.style.display = 'none';
+        if (placeholder) placeholder.style.display = 'flex';
     }
 }
 
 function displayAvatar(url) {
+    console.log('displayAvatar called with:', url);
     const img = document.getElementById('profilAvatarImg');
     const placeholder = document.getElementById('profilAvatarPlaceholder');
+    
+    if (!img || !placeholder) {
+        console.error('Avatar elements not found in DOM');
+        return;
+    }
     
     img.src = url;
     img.style.display = 'block';
     placeholder.style.display = 'none';
+    console.log('Avatar displayed successfully');
 }
 
 // Sélection d'un avatar prédéfini
@@ -729,6 +753,9 @@ async function saveProfile() {
     
     // Réinitialiser le state temporaire
     currentAvatarData = null;
+    
+    // Rafraîchir l'affichage de la page profil pour montrer l'avatar sauvegardé
+    await updateProfil();
 }
 
 function updateParametres() {
@@ -873,6 +900,10 @@ window._deleteAccount = async (id) => {
     const ok = await dataManager.deleteAccount(id);
     if (ok) await updateComptes();
 };
+
+// Exposer les fonctions avatar pour les onclick HTML
+window.selectPresetAvatar = selectPresetAvatar;
+window.handleAvatarUpload = handleAvatarUpload;
 
 window.filterEntrees      = () => updateCashFlowPage('entree');
 window.filterDepenses     = () => updateCashFlowPage('sortie');
