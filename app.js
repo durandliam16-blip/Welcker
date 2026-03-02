@@ -445,7 +445,15 @@ function calcStatsPro(transactions, cashTransactions = []) {
     
     const pvTotale = pvRealiseeTotal + pvLatenteTotal;
     const totalPortefeuille = valorisationTotale + cashTotal;
-    const performance = capitalTotalInvesti > 0 ? (pvTotale / capitalTotalInvesti) * 100 : 0;
+    // Calculer total déposé (somme des dépôts - retraits)
+let totalDepose = 0;
+cashTransactions.forEach(ct => {
+    if (ct.type === 'depot') totalDepose += parseFloat(ct.montant || 0);
+    else if (ct.type === 'retrait') totalDepose -= parseFloat(ct.montant || 0);
+});
+
+// Performance = (total portefeuille - total déposé) / total déposé × 100
+const performance = totalDepose > 0 ? ((totalPortefeuille - totalDepose) / totalDepose) * 100 : 0;
     
     return {
         positions: positionsActives,
@@ -572,16 +580,24 @@ async function updateBilan() {
 // PAGE COMPTES
 // =============================================================================
 async function updateComptes() {
-    const [accs, cto, pea] = await Promise.all([
-        dataManager.getBankAccounts(),       // exclut les biens physiques
+    const [accs, cto, pea, ctoCash, peaCash] = await Promise.all([
+        dataManager.getBankAccounts(),
         dataManager.getInvestments('CTO'),
-        dataManager.getInvestments('PEA')
+        dataManager.getInvestments('PEA'),
+        dataManager.getCashTransactions('CTO'),
+        dataManager.getCashTransactions('PEA')
     ]);
-    document.getElementById('ctoAmount').textContent = fmt(calcStats(cto).current);
-    document.getElementById('peaAmount').textContent = fmt(calcStats(pea).current);
-    document.getElementById('ctoEvolution').innerHTML = '<span>+0%</span>';
-    document.getElementById('peaEvolution').innerHTML = '<span>+0%</span>';
-    document.getElementById('autresComptesContainer').innerHTML = accs.length
+    
+    const ctoStats = calcStatsPro(cto, ctoCash);
+    const peaStats = calcStatsPro(pea, peaCash);
+    
+    document.getElementById('ctoAmount').textContent = fmt(ctoStats.totalPortefeuille);
+    document.getElementById('peaAmount').textContent = fmt(peaStats.totalPortefeuille);
+    document.getElementById('ctoEvolution').innerHTML = `<span>${ctoStats.performance >= 0 ? '+' : ''}${ctoStats.performance.toFixed(2)}%</span>`;
+    document.getElementById('peaEvolution').innerHTML = `<span>${peaStats.performance >= 0 ? '+' : ''}${peaStats.performance.toFixed(2)}%</span>`;
+    
+    const cont = document.getElementById('comptesContainer');
+    cont.innerHTML = accs.length
         ? accs.map(a => `
             <div class="card compte-card">
                 <div class="compte-header"><h3>${a.nom}</h3><span class="compte-type">${a.type || 'compte'}</span></div>
