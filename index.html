@@ -154,29 +154,11 @@
                 <button class="btn-primary" onclick="openModal('modalAddTransaction', 'CTO')">+ Nouvelle transaction</button>
             </div>
             <div class="investment-layout">
-                <div class="card card-large">
-                    <h3>Évolution du portefeuille</h3>
-                    <div class="portfolio-stats">
-                        <div class="stat-item">
-                            <span class="stat-label">Valeur actuelle</span>
-                            <span class="stat-value" id="ctoValeurActuelle">0 €</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Performance</span>
-                            <span class="stat-value" id="ctoPerformance">+0%</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Plus/Moins-value</span>
-                            <span class="stat-value" id="ctoPlusMoinsValue">0 €</span>
-                        </div>
-                    </div>
-                    <canvas id="ctoEvolutionChart"></canvas>
-                </div>
                 <!-- Dashboard Stats -->
                 <div class="investment-dashboard">
                     <div class="card">
                         <h3>💰 Cash disponible</h3>
-                        <div class="stat-value" id="ctoCCash">0,00 €</div>
+                        <div class="stat-value" id="ctoCash">0,00 €</div>
                         <button class="btn-secondary btn-sm" onclick="openCashModal('CTO')" style="margin-top: 12px;">
                             ➕ Gérer le cash
                         </button>
@@ -236,6 +218,13 @@
                         <p class="empty-state">Aucune transaction cash</p>
                     </div>
                 </div>
+
+                <!-- Graphique répartition positions -->
+                <div class="card">
+                    <h3>Répartition du portefeuille</h3>
+                    <canvas id="ctoPositionsChart"></canvas>
+                </div>
+
                 <div class="card">
                     <div class="card-header">
                         <h3>Historique des transactions</h3>
