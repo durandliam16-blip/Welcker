@@ -1283,3 +1283,89 @@ body[data-theme="dark"] {
     font-size: 12px;
     font-weight: 700;
 }
+
+/* Investment Dashboard */
+.investment-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.investment-dashboard .card {
+    padding: 20px;
+}
+
+.investment-dashboard .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 12px 0;
+}
+
+/* Positions Table */
+.positions-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.positions-table th,
+.positions-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.positions-table th {
+    background: var(--bg-secondary);
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.positions-table tr:hover {
+    background: var(--bg-secondary);
+}
+
+/* Cash History */
+.cash-history {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cash-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+}
+
+.cash-icon {
+    font-size: 24px;
+    width: 40px;
+    text-align: center;
+}
+
+.cash-details {
+    flex: 1;
+}
+
+.cash-desc {
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.cash-date {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.cash-amount {
+    font-weight: 600;
+    font-size: 16px;
+}

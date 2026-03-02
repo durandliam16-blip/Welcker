@@ -172,6 +172,70 @@
                     </div>
                     <canvas id="ctoEvolutionChart"></canvas>
                 </div>
+                <!-- Dashboard Stats -->
+                <div class="investment-dashboard">
+                    <div class="card">
+                        <h3>💰 Cash disponible</h3>
+                        <div class="stat-value" id="ctoCCash">0,00 €</div>
+                        <button class="btn-secondary btn-sm" onclick="openCashModal('CTO')" style="margin-top: 12px;">
+                            ➕ Gérer le cash
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📈 Valorisation positions</h3>
+                        <div class="stat-value" id="ctoValeurActuelle">0,00 €</div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>💼 Total portefeuille</h3>
+                        <div class="stat-value" id="ctoTotalPortefeuille">0,00 €</div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📊 Performance</h3>
+                        <div class="stat-value" id="ctoPerformance">+0,00%</div>
+                        <div style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">
+                            <div>PV réalisée: <span id="ctoPvRealisee">0€</span></div>
+                            <div>PV latente: <span id="ctoPvLatente">0€</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tableau des positions actuelles -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📊 Positions actuelles</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="positions-table">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Nom</th>
+                                    <th>Quantité</th>
+                                    <th>PRU</th>
+                                    <th>Dernier prix</th>
+                                    <th>Valorisation</th>
+                                    <th>PV latente</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ctoPositionsTable">
+                                <tr><td colspan="7" class="empty-state">Aucune position</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Historique cash -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>💰 Historique cash</h3>
+                    </div>
+                    <div class="cash-history" id="ctoCashHistory">
+                        <p class="empty-state">Aucune transaction cash</p>
+                    </div>
+                </div>
                 <div class="card">
                     <div class="card-header">
                         <h3>Historique des transactions</h3>
@@ -231,6 +295,70 @@
                     </div>
                     <canvas id="peaEvolutionChart"></canvas>
                 </div>
+                <!-- Dashboard Stats -->
+                <div class="investment-dashboard">
+                    <div class="card">
+                        <h3>💰 Cash disponible</h3>
+                        <div class="stat-value" id="ctoC ash">0,00 €</div>
+                        <button class="btn-secondary btn-sm" onclick="openCashModal('CTO')" style="margin-top: 12px;">
+                            ➕ Gérer le cash
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📈 Valorisation positions</h3>
+                        <div class="stat-value" id="ctoValeurActuelle">0,00 €</div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>💼 Total portefeuille</h3>
+                        <div class="stat-value" id="ctoTotalPortefeuille">0,00 €</div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📊 Performance</h3>
+                        <div class="stat-value" id="ctoPerformance">+0,00%</div>
+                        <div style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">
+                            <div>PV réalisée: <span id="ctoPvRealisee">0€</span></div>
+                            <div>PV latente: <span id="ctoPvLatente">0€</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tableau des positions actuelles -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📊 Positions actuelles</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="positions-table">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Nom</th>
+                                    <th>Quantité</th>
+                                    <th>PRU</th>
+                                    <th>Dernier prix</th>
+                                    <th>Valorisation</th>
+                                    <th>PV latente</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ctoPositionsTable">
+                                <tr><td colspan="7" class="empty-state">Aucune position</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Historique cash -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>💰 Historique cash</h3>
+                    </div>
+                    <div class="cash-history" id="ctoCashHistory">
+                        <p class="empty-state">Aucune transaction cash</p>
+                    </div>
+                </div>
                 <div class="card">
                     <div class="card-header">
                         <h3>Historique des transactions</h3>
@@ -261,6 +389,113 @@
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+        <!-- Page: CRYPTO -->
+        <div class="page" id="page-crypto">
+            <div class="page-header">
+                <h1>₿ Cryptomonnaies</h1>
+                <button class="btn-primary" onclick="openModal('modalAddTransaction', 'CRYPTO')">
+                    + Ajouter une transaction
+                </button>
+            </div>
+
+            <!-- Dashboard Stats (même structure que CTO/PEA) -->
+            <div class="investment-dashboard">
+                <div class="card">
+                    <h3>💰 Cash disponible</h3>
+                    <div class="stat-value" id="cryptoCash">0,00 €</div>
+                    <button class="btn-secondary btn-sm" onclick="openCashModal('CRYPTO')" style="margin-top: 12px;">
+                        ➕ Gérer le cash
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <h3>📈 Valorisation positions</h3>
+                    <div class="stat-value" id="cryptoValeurActuelle">0,00 €</div>
+                </div>
+                
+                <div class="card">
+                    <h3>💼 Total portefeuille</h3>
+                    <div class="stat-value" id="cryptoTotalPortefeuille">0,00 €</div>
+                </div>
+                
+                <div class="card">
+                    <h3>📊 Performance</h3>
+                    <div class="stat-value" id="cryptoPerformance">+0,00%</div>
+                    <div style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">
+                        <div>PV réalisée: <span id="cryptoPvRealisee">0€</span></div>
+                        <div>PV latente: <span id="cryptoPvLatente">0€</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphique positions -->
+            <div class="card">
+                <h3>Répartition du portefeuille</h3>
+                <canvas id="cryptoPositionsChart"></canvas>
+            </div>
+
+            <!-- Tableau positions -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>📊 Positions actuelles</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="positions-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Nom</th>
+                                <th>Quantité</th>
+                                <th>PRU</th>
+                                <th>Dernier prix</th>
+                                <th>Valorisation</th>
+                                <th>PV latente</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cryptoPositionsTable">
+                            <tr><td colspan="7" class="empty-state">Aucune position</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Historique transactions -->
+            <div class="card">
+                <h3>Historique des transactions</h3>
+                <div class="filters">
+                    <select id="cryptoFilterType">
+                        <option value="all">Tous les types</option>
+                        <option value="achat">Achats</option>
+                        <option value="vente">Ventes</option>
+                    </select>
+                    <input type="date" id="cryptoFilterDateDebut" placeholder="Date début">
+                    <input type="date" id="cryptoFilterDateFin" placeholder="Date fin">
+                    <button class="btn-secondary" onclick="filterTransactions('CRYPTO')">Filtrer</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Crypto</th>
+                            <th>Quantité</th>
+                            <th>Prix unitaire</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cryptoTransactionsTable">
+                        <tr><td colspan="7" class="empty-state">Aucune transaction</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Graphique évolution -->
+            <div class="card">
+                <h3>Évolution du portefeuille</h3>
+                <canvas id="cryptoEvolutionChart"></canvas>
             </div>
         </div>
 
@@ -593,6 +828,50 @@
     </main>
 
     <!-- Modals -->
+     <!-- Modal: Gérer le Cash -->
+    <div class="modal" id="modalGererCash">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💰 Gérer le cash</h2>
+                <button class="modal-close" onclick="closeModal('modalGererCash')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="formGererCash">
+                    <input type="hidden" id="cashAccountType" value="">
+                    
+                    <div class="form-group">
+                        <label>Type d'opération</label>
+                        <select id="cashType" required>
+                            <option value="depot">➕ Dépôt</option>
+                            <option value="retrait">➖ Retrait</option>
+                            <option value="dividende">💰 Dividende</option>
+                            <option value="frais">💳 Frais</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Montant (€)</label>
+                        <input type="number" id="cashMontant" step="0.01" required placeholder="1000">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="cashDescription" placeholder="Ex: Dépôt initial">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="cashDate" required>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal('modalGererCash')">Annuler</button>
+                        <button type="submit" class="btn-primary">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <!-- Modal: Add Transaction -->
     <div class="modal" id="modalAddTransaction">
         <div class="modal-content">
@@ -617,6 +896,13 @@
                     <div class="form-group">
                         <label>Titre / Action</label>
                         <input type="text" id="transactionTitre" placeholder="Ex: Apple Inc." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Code (libellé)</label>
+                        <input type="text" id="transactionLibelle" placeholder="AAPL, BTC, ETH..." required>
+                        <small style="color: var(--text-tertiary); font-size: 11px;">
+                            Exemples : AAPL (Apple), MSFT (Microsoft), BTC (Bitcoin), ETH (Ethereum)
+                        </small>
                     </div>
                     <div class="form-group">
                         <label>Quantité</label>

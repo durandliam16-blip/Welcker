@@ -52,19 +52,8 @@ class DataManager {
             avatar_url: profileData.avatar_url || null,
             updated_at: new Date().toISOString()
         });
-        if (error) { 
-            console.error('updateProfile:', error.message); 
-            showToast('Erreur profil : ' + error.message, 'error'); 
-            return;
-        }
-        
-        showToast('Profil enregistré !', 'success');
-        
-        // Rafraîchir le popup s'il est ouvert
-        if (document.getElementById('popupProfil')) {
-            document.getElementById('popupProfil').remove();
-            await toggleProfilPopup();
-        }
+        if (error) { console.error('updateProfile:', error.message); showToast('Erreur profil : ' + error.message, 'error'); }
+        else showToast('Profil enregistré !', 'success');
     }
 
     // ── Investissements CTO/PEA ───────────────────────────────────────────────
@@ -104,6 +93,111 @@ class DataManager {
         const table = mode === 'CTO' ? 'investment_transactions_cto' : 'investment_transactions_pea';
         const { error } = await sb.from(table).delete().eq('id', id).eq('user_id', user.id);
         if (error) { console.error(`deleteInvestment(${mode}):`, error.message); showToast('Erreur suppression : ' + error.message, 'error'); return false; }
+        showToast('Transaction supprimée', 'success');
+        return true;
+    }
+
+    // ── Cash Transactions ──────────────────────────────────────────
+    async getCashTransactions(mode) {
+        const user = await getUser(); if (!user) return [];
+        const { data, error } = await sb.from('cash_transactions').select('*')
+            .eq('user_id', user.id)
+            .eq('account_type', mode)
+            .order('date', { ascending: false });
+        if (error) { console.error(`getCashTransactions(${mode}):`, error.message); return []; }
+        return data || [];
+    }
+
+    async addCashTransaction(mode, transaction) {
+        const user = await getUser(); if (!user) return false;
+        const payload = {
+            user_id:      user.id,
+            account_type: mode,
+            type:         transaction.type,
+            montant:      parseFloat(transaction.montant),
+            description:  transaction.description || null,
+            date:         transaction.date
+        };
+        const { error } = await sb.from('cash_transactions').insert([payload]);
+        if (error) { console.error(`addCashTransaction(${mode}):`, error.message); showToast('Erreur : ' + error.message, 'error'); return false; }
+        showToast('Transaction cash ajoutée !', 'success');
+        return true;
+    }
+
+    async deleteCashTransaction(id) {
+        const user = await getUser(); if (!user) return false;
+        const { error } = await sb.from('cash_transactions').delete().eq('id', id).eq('user_id', user.id);
+        if (error) { console.error('deleteCashTransaction:', error.message); showToast('Erreur suppression : ' + error.message, 'error'); return false; }
+        showToast('Transaction supprimée', 'success');
+        return true;
+    }
+
+    // ── Crypto (identique à CTO/PEA) ──────────────────────────────
+    async getCryptoTransactions() {
+        const user = await getUser(); if (!user) return [];
+        const { data, error } = await sb.from('investment_transactions_crypto').select('*')
+            .eq('user_id', user.id).order('date', { ascending: false });
+        if (error) { console.error('getCryptoTransactions:', error.message); return []; }
+        return data || [];
+    }
+
+    async addCryptoTransaction(transaction) {
+        const user = await getUser(); if (!user) return null;
+        const payload = {
+            user_id:       user.id,
+            type:          Boolean(transaction.type),
+            titre:         transaction.titre,
+            libelle:       transaction.libelle || null,
+            quantite:      parseFloat(transaction.quantite),
+            prix_unitaire: parseFloat(transaction.prix_unitaire),
+            frais:         parseFloat(transaction.frais) || 0,
+            date:          transaction.date
+        };
+        const { data, error } = await sb.from('investment_transactions_crypto').insert([payload]).select();
+        if (error) { console.error('addCryptoTransaction:', error.message); showToast('Erreur : ' + error.message, 'error'); return null; }
+        showToast('Transaction ajoutée !', 'success');
+        return data;
+    }
+
+    async deleteCryptoTransaction(id) {
+        const user = await getUser(); if (!user) return false;
+        const { error } = await sb.from('investment_transactions_crypto').delete().eq('id', id).eq('user_id', user.id);
+        if (error) { console.error('deleteCryptoTransaction:', error.message); showToast('Erreur suppression : ' + error.message, 'error'); return false; }
+        showToast('Transaction supprimée', 'success');
+        return true;
+    }
+
+    // ── Cash Transactions (dépôts, retraits, dividendes) ──────────────────────
+    async getCashTransactions(mode) {
+        const user = await getUser(); if (!user) return [];
+        const { data, error } = await sb.from('cash_transactions').select('*')
+            .eq('user_id', user.id)
+            .eq('account_type', mode)
+            .order('date', { ascending: false });
+        if (error) { console.error(`getCashTransactions(${mode}):`, error.message); return []; }
+        return data || [];
+    }
+
+    async addCashTransaction(mode, transaction) {
+        const user = await getUser(); if (!user) return false;
+        const payload = {
+            user_id:      user.id,
+            account_type: mode,
+            type:         transaction.type,        // 'depot', 'retrait', 'dividende', 'frais'
+            montant:      parseFloat(transaction.montant),
+            description:  transaction.description || null,
+            date:         transaction.date
+        };
+        const { error } = await sb.from('cash_transactions').insert([payload]);
+        if (error) { console.error(`addCashTransaction(${mode}):`, error.message); showToast('Erreur : ' + error.message, 'error'); return false; }
+        showToast('Transaction cash ajoutée !', 'success');
+        return true;
+    }
+
+    async deleteCashTransaction(id) {
+        const user = await getUser(); if (!user) return false;
+        const { error } = await sb.from('cash_transactions').delete().eq('id', id).eq('user_id', user.id);
+        if (error) { console.error('deleteCashTransaction:', error.message); showToast('Erreur suppression : ' + error.message, 'error'); return false; }
         showToast('Transaction supprimée', 'success');
         return true;
     }
@@ -273,20 +367,97 @@ function fmt(amount) {
     return isNaN(v) ? '0,00 €' : new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(v);
 }
 
-function calcStats(transactions) {
-    let invested = 0;
-    (transactions || []).forEach(t => {
-        const total = parseFloat(t.quantite || 0) * parseFloat(t.prix_unitaire || 0);
-        const frais = parseFloat(t.frais || 0);
-        invested += (t.type === true || t.type === 'achat') ? (total + frais) : -(total - frais);
+// =============================================================================
+// CALCUL AVANCÉ DES STATISTIQUES INVESTISSEMENTS (avec libelle)
+// =============================================================================
+function calcStatsPro(transactions, cashTransactions = []) {
+    const positions = {}; 
+    let cashTotal = 0;
+    
+    // Calculer cash (dépôts - achats + ventes)
+    cashTransactions.forEach(ct => {
+        if (ct.type === 'depot' || ct.type === 'dividende') {
+            cashTotal += parseFloat(ct.montant || 0);
+        } else if (ct.type === 'retrait' || ct.type === 'frais') {
+            cashTotal -= parseFloat(ct.montant || 0);
+        }
     });
-    return { current: Math.max(0, invested) };
-}
-
-function destroyChart(ctxId) {
-    const ctx = document.getElementById(ctxId);
-    if (ctx && Chart.getChart(ctx)) Chart.getChart(ctx).destroy();
-    return ctx;
+    
+    // Grouper par libellé
+    (transactions || []).forEach(t => {
+        const libelle = t.libelle || t.titre || 'UNKNOWN';
+        
+        if (!positions[libelle]) {
+            positions[libelle] = {
+                libelle,
+                titre: t.titre || libelle,
+                quantite: 0,
+                capitalInvesti: 0,
+                pru: 0,
+                pvRealisee: 0,
+                dernierPrix: 0
+            };
+        }
+        
+        const pos = positions[libelle];
+        const montant = parseFloat(t.quantite || 0) * parseFloat(t.prix_unitaire || 0);
+        const frais = parseFloat(t.frais || 0);
+        const isAchat = (t.type === true || t.type === 'achat');
+        
+        if (isAchat) {
+            pos.quantite += parseFloat(t.quantite);
+            pos.capitalInvesti += montant + frais;
+            pos.pru = pos.quantite > 0 ? pos.capitalInvesti / pos.quantite : 0;
+            pos.dernierPrix = parseFloat(t.prix_unitaire);
+            cashTotal -= (montant + frais);
+        } else {
+            const pvSurVente = (parseFloat(t.prix_unitaire) - pos.pru) * parseFloat(t.quantite) - frais;
+            pos.pvRealisee += pvSurVente;
+            pos.quantite -= parseFloat(t.quantite);
+            const capitalVendu = pos.pru * parseFloat(t.quantite);
+            pos.capitalInvesti = Math.max(0, pos.capitalInvesti - capitalVendu);
+            pos.pru = pos.quantite > 0 ? pos.capitalInvesti / pos.quantite : 0;
+            pos.dernierPrix = parseFloat(t.prix_unitaire);
+            cashTotal += (montant - frais);
+        }
+    });
+    
+    // Calculer totaux
+    let valorisationTotale = 0;
+    let capitalTotalInvesti = 0;
+    let pvRealiseeTotal = 0;
+    let pvLatenteTotal = 0;
+    const positionsActives = [];
+    
+    Object.values(positions).forEach(pos => {
+        if (pos.quantite > 0.001) {
+            const valorisation = pos.quantite * pos.dernierPrix;
+            pos.valorisation = valorisation;
+            valorisationTotale += valorisation;
+            capitalTotalInvesti += pos.capitalInvesti;
+            const pvLatente = valorisation - pos.capitalInvesti;
+            pos.pvLatente = pvLatente;
+            pvLatenteTotal += pvLatente;
+            positionsActives.push(pos);
+        }
+        pvRealiseeTotal += pos.pvRealisee;
+    });
+    
+    const pvTotale = pvRealiseeTotal + pvLatenteTotal;
+    const totalPortefeuille = valorisationTotale + cashTotal;
+    const performance = capitalTotalInvesti > 0 ? (pvTotale / capitalTotalInvesti) * 100 : 0;
+    
+    return {
+        positions: positionsActives,
+        valorisation: valorisationTotale,
+        capitalInvesti: capitalTotalInvesti,
+        pvRealisee: pvRealiseeTotal,
+        pvLatente: pvLatenteTotal,
+        pvTotale,
+        performance,
+        cash: cashTotal,
+        totalPortefeuille
+    };
 }
 
 // =============================================================================
@@ -299,6 +470,7 @@ async function updatePageContent(page) {
         case 'comptes':      await updateComptes();              break;
         case 'cto':          await updateInvestmentPage('CTO');  break;
         case 'pea':          await updateInvestmentPage('PEA');  break;
+        case 'crypto':       await updateInvestmentPage('CRYPTO'); break;
         case 'autres-biens': await updateAutresBiens();          break;
         case 'flux':         await updateFlux();                 break;
         case 'entrees':      await updateCashFlowPage('entree'); break;
@@ -312,16 +484,21 @@ async function updatePageContent(page) {
 // PAGE ACCUEIL
 // =============================================================================
 async function updateAccueil() {
-    const [accounts, ctoT, peaT, entrees, sorties, biens] = await Promise.all([
-        dataManager.getBankAccounts(),       // liquidités = comptes bancaires uniquement
+    const [accounts, ctoT, peaT, entrees, sorties, biens, ctoCash, peaCash] = await Promise.all([
+        dataManager.getBankAccounts(),
         dataManager.getInvestments('CTO'),
         dataManager.getInvestments('PEA'),
         dataManager.getCashFlow('entree'),
         dataManager.getCashFlow('sortie'),
-        dataManager.getBiens()               // biens = accounts de type physique
+        dataManager.getBiens(),
+        dataManager.getCashTransactions('CTO'),
+        dataManager.getCashTransactions('PEA')
     ]);
-    const ctoVal   = calcStats(ctoT).current;
-    const peaVal   = calcStats(peaT).current;
+    
+    const ctoStats = calcStatsPro(ctoT, ctoCash);
+    const peaStats = calcStatsPro(peaT, peaCash);
+    const ctoVal = ctoStats.totalPortefeuille;
+    const peaVal = peaStats.totalPortefeuille;
     const accTotal = accounts.reduce((s, a) => s + parseFloat(a.solde || 0), 0);
     const biensVal = biens.reduce((s, b) => s + parseFloat(b.solde || 0), 0); // solde = valeur du bien
     const invTotal = ctoVal + peaVal;
@@ -363,12 +540,19 @@ async function updateAccueil() {
 // PAGE BILAN
 // =============================================================================
 async function updateBilan() {
-    const [accs, cto, pea, biens] = await Promise.all([
-        dataManager.getBankAccounts(), dataManager.getInvestments('CTO'),
-        dataManager.getInvestments('PEA'), dataManager.getBiens()
+    const [accs, cto, pea, biens, ctoCash, peaCash] = await Promise.all([
+        dataManager.getBankAccounts(), 
+        dataManager.getInvestments('CTO'),
+        dataManager.getInvestments('PEA'), 
+        dataManager.getBiens(),
+        dataManager.getCashTransactions('CTO'),
+        dataManager.getCashTransactions('PEA')
     ]);
-    const ctoVal   = calcStats(cto).current;
-    const peaVal   = calcStats(pea).current;
+    
+    const ctoStats = calcStatsPro(cto, ctoCash);
+    const peaStats = calcStatsPro(pea, peaCash);
+    const ctoVal = ctoStats.totalPortefeuille;
+    const peaVal = peaStats.totalPortefeuille;
     const accTotal = accs.reduce((s, a) => s + parseFloat(a.solde || 0), 0);
     const bTotal   = biens.reduce((s, b) => s + parseFloat(b.solde || 0), 0); // solde = valeur du bien
 
@@ -411,14 +595,28 @@ async function updateComptes() {
 // PAGE CTO / PEA
 // =============================================================================
 async function updateInvestmentPage(mode) {
-    const pfx  = mode.toLowerCase();
-    const data = await dataManager.getInvestments(mode);
-    const stats = calcStats(data);
-    document.getElementById(`${pfx}ValeurActuelle`).textContent = fmt(stats.current);
-    document.getElementById(`${pfx}Performance`).textContent   = '+0,00%';
-    document.getElementById(`${pfx}PlusMoinsValue`).textContent = fmt(0);
-    renderInvestTable(pfx, data, mode);
-    renderInvestChart(pfx, data);
+    const pfx = mode.toLowerCase();
+    const [transactions, cashTransactions] = await Promise.all([
+        mode === 'CRYPTO' ? dataManager.getCryptoTransactions() : dataManager.getInvestments(mode),
+        dataManager.getCashTransactions(mode)
+    ]);
+    
+    const stats = calcStatsPro(transactions, cashTransactions);
+    
+    // Stats principales
+    document.getElementById(`${pfx}Cash`).textContent = fmt(stats.cash);
+    document.getElementById(`${pfx}ValeurActuelle`).textContent = fmt(stats.valorisation);
+    document.getElementById(`${pfx}TotalPortefeuille`).textContent = fmt(stats.totalPortefeuille);
+    document.getElementById(`${pfx}Performance`).textContent = `${stats.performance >= 0 ? '+' : ''}${stats.performance.toFixed(2)}%`;
+    document.getElementById(`${pfx}PvRealisee`).textContent = fmt(stats.pvRealisee);
+    document.getElementById(`${pfx}PvLatente`).textContent = fmt(stats.pvLatente);
+    
+    // Tableaux et graphiques
+    renderPositionsTable(pfx, stats.positions);
+    renderCashHistory(pfx, cashTransactions);
+    renderPositionsChart(`${pfx}PositionsChart`, stats.positions);
+    renderInvestTable(pfx, transactions, mode, stats);
+    renderInvestChart(pfx, transactions);
 }
 
 function renderInvestTable(pfx, data, mode) {
@@ -594,40 +792,27 @@ let currentAvatarData = null; // Stocke temporairement l'avatar sélectionné
 
 async function updateProfil() {
     const p = await dataManager.getProfile();
-    console.log('updateProfil - profile data:', p);
-    
     document.getElementById('profilNom').value   = p.nom       || '';
     document.getElementById('profilEmail').value = p.email     || '';
     document.getElementById('profilTel').value   = p.telephone || '';
     
     // Charger l'avatar
     if (p.avatar_url) {
-        console.log('Loading avatar from DB:', p.avatar_url);
         displayAvatar(p.avatar_url);
     } else {
-        console.log('No avatar_url in profile, showing placeholder');
         // Afficher placeholder par défaut
-        const img = document.getElementById('profilAvatarImg');
-        const placeholder = document.getElementById('profilAvatarPlaceholder');
-        if (img) img.style.display = 'none';
-        if (placeholder) placeholder.style.display = 'flex';
+        document.getElementById('profilAvatarImg').style.display = 'none';
+        document.getElementById('profilAvatarPlaceholder').style.display = 'flex';
     }
 }
 
 function displayAvatar(url) {
-    console.log('displayAvatar called with:', url);
     const img = document.getElementById('profilAvatarImg');
     const placeholder = document.getElementById('profilAvatarPlaceholder');
-    
-    if (!img || !placeholder) {
-        console.error('Avatar elements not found in DOM');
-        return;
-    }
     
     img.src = url;
     img.style.display = 'block';
     placeholder.style.display = 'none';
-    console.log('Avatar displayed successfully');
 }
 
 // Sélection d'un avatar prédéfini
@@ -753,9 +938,6 @@ async function saveProfile() {
     
     // Réinitialiser le state temporaire
     currentAvatarData = null;
-    
-    // Rafraîchir l'affichage de la page profil pour montrer l'avatar sauvegardé
-    await updateProfil();
 }
 
 function updateParametres() {
@@ -900,10 +1082,6 @@ window._deleteAccount = async (id) => {
     const ok = await dataManager.deleteAccount(id);
     if (ok) await updateComptes();
 };
-
-// Exposer les fonctions avatar pour les onclick HTML
-window.selectPresetAvatar = selectPresetAvatar;
-window.handleAvatarUpload = handleAvatarUpload;
 
 window.filterEntrees      = () => updateCashFlowPage('entree');
 window.filterDepenses     = () => updateCashFlowPage('sortie');
@@ -1062,9 +1240,104 @@ async function toggleNotifsPopup() {
 }
 
 // =============================================================================
+// GESTION CASH & POSITIONS
+// =============================================================================
+
+function openCashModal(mode) {
+    document.getElementById('cashAccountType').value = mode;
+    openModal('modalGererCash');
+}
+
+async function submitCashTransaction(e) {
+    e.preventDefault();
+    const mode = document.getElementById('cashAccountType').value;
+    const ok = await dataManager.addCashTransaction(mode, {
+        type:        document.getElementById('cashType').value,
+        montant:     document.getElementById('cashMontant').value,
+        description: document.getElementById('cashDescription').value,
+        date:        document.getElementById('cashDate').value
+    });
+    if (ok) {
+        closeModal('modalGererCash');
+        await updateInvestmentPage(mode);
+    }
+}
+
+function renderPositionsTable(prefix, positions) {
+    const tbody = document.getElementById(`${prefix}PositionsTable`);
+    if (!tbody) return;
+    
+    if (!positions || positions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Aucune position</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = positions.map(p => `
+        <tr>
+            <td><strong>${p.libelle}</strong></td>
+            <td>${p.titre}</td>
+            <td>${p.quantite.toFixed(4)}</td>
+            <td>${fmt(p.pru)}</td>
+            <td>${fmt(p.dernierPrix)}</td>
+            <td>${fmt(p.valorisation)}</td>
+            <td class="${p.pvLatente >= 0 ? 'positive' : 'negative'}">${fmt(p.pvLatente)}</td>
+        </tr>
+    `).join('');
+}
+
+function renderCashHistory(prefix, cashTransactions) {
+    const container = document.getElementById(`${prefix}CashHistory`);
+    if (!container) return;
+    
+    if (!cashTransactions || cashTransactions.length === 0) {
+        container.innerHTML = '<p class="empty-state">Aucune transaction cash</p>';
+        return;
+    }
+    
+    const icons = { depot: '➕', retrait: '➖', dividende: '💰', frais: '💳' };
+    const colors = { depot: 'positive', retrait: 'negative', dividende: 'positive', frais: 'negative' };
+    
+    container.innerHTML = cashTransactions.slice(0, 10).map(ct => `
+        <div class="cash-item">
+            <span class="cash-icon">${icons[ct.type] || '💵'}</span>
+            <div class="cash-details">
+                <div class="cash-desc">${ct.description || ct.type}</div>
+                <div class="cash-date">${new Date(ct.date).toLocaleDateString('fr-FR')}</div>
+            </div>
+            <div class="cash-amount ${colors[ct.type]}">${fmt(ct.montant)}</div>
+        </div>
+    `).join('');
+}
+
+function renderPositionsChart(canvasId, positions) {
+    const ctx = destroyChart(canvasId);
+    if (!ctx || !positions || positions.length === 0) return;
+    
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: positions.map(p => p.libelle),
+            datasets: [{
+                data: positions.map(p => p.valorisation),
+                backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+}
+
+// Exposer globalement
+window.openCashModal = openCashModal;
+
+// =============================================================================
 // BOOTSTRAP
 // =============================================================================
 document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('formGererCash')?.addEventListener('submit', submitCashTransaction);
+    
     // Navigation
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', e => { e.preventDefault(); navigateTo(link.dataset.page); });
