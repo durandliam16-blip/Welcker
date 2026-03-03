@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcker - Wealth Tracker</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/utilities.css">
+    <link rel="stylesheet" href="css/profil_para.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
     <link rel="icon" href="icon-192.png">
@@ -194,28 +197,34 @@
                     </div>
                 </div>
 
-                <!-- Tableau des positions actuelles -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3>📊 Positions actuelles</h3>
+                <!-- All positions actuelles -->
+                <div class="dashboard-grid">
+                    <!-- Tableau des positions actuelles -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>📊 Positions actuelles</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="positions-table">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Qte</th>
+                                        <th>Dernier prix</th>
+                                        <th>Valorisation</th>
+                                        <th>Plus value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ctoPositionsTable">
+                                    <tr><td colspan="7" class="empty-state">Aucune position</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="positions-table">
-                            <thead>
-                                <tr>
-                                    <th>Code</th>
-                                    <th>Nom</th>
-                                    <th>Quantité</th>
-                                    <th>PRU</th>
-                                    <th>Dernier prix</th>
-                                    <th>Valorisation</th>
-                                    <th>PV latente</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ctoPositionsTable">
-                                <tr><td colspan="7" class="empty-state">Aucune position</td></tr>
-                            </tbody>
-                        </table>
+                    <!-- Graphique répartition positions -->
+                    <div class="card">
+                        <h3>Répartition du portefeuille</h3>
+                        <canvas id="ctoPositionsChart"></canvas>
                     </div>
                 </div>
 
@@ -227,12 +236,6 @@
                     <div class="cash-history" id="ctoCashHistory">
                         <p class="empty-state">Aucune transaction cash</p>
                     </div>
-                </div>
-
-                <!-- Graphique répartition positions -->
-                <div class="card">
-                    <h3>Répartition du portefeuille</h3>
-                    <canvas id="ctoPositionsChart"></canvas>
                 </div>
 
                 <div class="card">
@@ -298,54 +301,60 @@
                 <div class="investment-dashboard">
                     <div class="card">
                         <h3>💰 Cash disponible</h3>
-                        <div class="stat-value" id="ctoC ash">0,00 €</div>
-                        <button class="btn-secondary btn-sm" onclick="openCashModal('CTO')" style="margin-top: 12px;">
+                        <div class="stat-value" id="peaCash">0,00 €</div>
+                        <button class="btn-secondary btn-sm" onclick="openCashModal('PEA')" style="margin-top: 12px;">
                             ➕ Gérer le cash
                         </button>
                     </div>
                     
                     <div class="card">
                         <h3>📈 Valorisation positions</h3>
-                        <div class="stat-value" id="ctoValeurActuelle">0,00 €</div>
+                        <div class="stat-value" id="peaValeurActuelle">0,00 €</div>
                     </div>
                     
                     <div class="card">
                         <h3>💼 Total portefeuille</h3>
-                        <div class="stat-value" id="ctoTotalPortefeuille">0,00 €</div>
+                        <div class="stat-value" id="peaTotalPortefeuille">0,00 €</div>
                     </div>
                     
                     <div class="card">
                         <h3>📊 Performance</h3>
-                        <div class="stat-value" id="ctoPerformance">+0,00%</div>
+                        <div class="stat-value" id="peaPerformance">+0,00%</div>
                         <div style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">
-                            <div>PV réalisée: <span id="ctoPvRealisee">0€</span></div>
-                            <div>PV latente: <span id="ctoPvLatente">0€</span></div>
+                            <div>PV réalisée: <span id="peaPvRealisee">0€</span></div>
+                            <div>PV latente: <span id="peaPvLatente">0€</span></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tableau des positions actuelles -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3>📊 Positions actuelles</h3>
+                <!-- All positions actuelles -->
+                <div class="dashboard-grid">
+                    <!-- Tableau des positions actuelles -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>📊 Positions actuelles</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="positions-table">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Qte</th>
+                                        <th>Dernier prix</th>
+                                        <th>Valorisation</th>
+                                        <th>Plus value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="peaPositionsTable">
+                                    <tr><td colspan="7" class="empty-state">Aucune position</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="positions-table">
-                            <thead>
-                                <tr>
-                                    <th>Code</th>
-                                    <th>Nom</th>
-                                    <th>Quantité</th>
-                                    <th>PRU</th>
-                                    <th>Dernier prix</th>
-                                    <th>Valorisation</th>
-                                    <th>PV latente</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ctoPositionsTable">
-                                <tr><td colspan="7" class="empty-state">Aucune position</td></tr>
-                            </tbody>
-                        </table>
+                    <!-- Graphique répartition positions -->
+                    <div class="card">
+                        <h3>Répartition du portefeuille</h3>
+                        <canvas id="peaPositionsChart"></canvas>
                     </div>
                 </div>
 
@@ -354,7 +363,7 @@
                     <div class="card-header">
                         <h3>💰 Historique cash</h3>
                     </div>
-                    <div class="cash-history" id="ctoCashHistory">
+                    <div class="cash-history" id="peaCashHistory">
                         <p class="empty-state">Aucune transaction cash</p>
                     </div>
                 </div>
@@ -370,22 +379,6 @@
                             <input type="date" id="peaFilterDateDebut" onchange="filterTransactions('PEA')">
                             <input type="date" id="peaFilterDateFin" onchange="filterTransactions('PEA')">
                         </div>
-                    </div>
-                    <div class="table-container">
-                        <table class="transactions-table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Titre</th>
-                                    <th>Quantité</th>
-                                    <th>Prix unitaire</th>
-                                    <th>Montant total</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="peaTransactionsTable"></tbody>
-                        </table>
                     </div>
                 </div>
             </div>
@@ -429,36 +422,36 @@
                 </div>
             </div>
 
-            <!-- Graphique positions -->
-            <div class="card">
-                <h3>Répartition du portefeuille</h3>
-                <canvas id="cryptoPositionsChart"></canvas>
-            </div>
-
-            <!-- Tableau positions -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>📊 Positions actuelles</h3>
+            <!-- All positions actuelles -->
+                <div class="dashboard-grid">
+                    <!-- Tableau des positions actuelles -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>📊 Positions actuelles</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="positions-table">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Qte</th>
+                                        <th>Dernier prix</th>
+                                        <th>Valorisation</th>
+                                        <th>Plus value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cryptoPositionsTable">
+                                    <tr><td colspan="7" class="empty-state">Aucune position</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Graphique répartition positions -->
+                    <div class="card">
+                        <h3>Répartition du portefeuille</h3>
+                        <canvas id="cryptoPositionsChart"></canvas>
+                    </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="positions-table">
-                        <thead>
-                            <tr>
-                                <th>Code</th>
-                                <th>Nom</th>
-                                <th>Quantité</th>
-                                <th>PRU</th>
-                                <th>Dernier prix</th>
-                                <th>Valorisation</th>
-                                <th>PV latente</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cryptoPositionsTable">
-                            <tr><td colspan="7" class="empty-state">Aucune position</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
 
             <!-- Historique transactions -->
             <div class="card">
@@ -1107,6 +1100,11 @@
                 .catch(() => {});
         }
     </script>
-    <script src="app.js"></script>
+    <!-- Scripts modulaires (dans l'ordre) -->
+    <script src="js/config.js"></script>
+    <script src="js/dataManager.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/pages.js"></script>
+    <script src="js/others.js"></script>
 </body>
 </html>

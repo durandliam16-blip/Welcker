@@ -1369,3 +1369,9 @@ body[data-theme="dark"] {
     font-weight: 600;
     font-size: 16px;
 }
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+}
