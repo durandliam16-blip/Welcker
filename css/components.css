@@ -541,3 +541,26 @@
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 24px;
 }
+
+.positions-table {
+    font-size: 13px;
+}
+
+.positions-table th,
+.positions-table td {
+    padding: 8px 6px;
+    white-space: nowrap;
+}
+
+.positions-table th:first-child,
+.positions-table td:first-child {
+    padding-left: 12px;
+}
+
+.positions-table td:nth-child(n+2) {
+    text-align: right;
+}
+
+.positions-table th {
+    font-size: 11px;
+}
