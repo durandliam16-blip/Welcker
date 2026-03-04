@@ -55,7 +55,7 @@
         </div>
         <div class="sidebar-footer" style="padding: 16px; border-top: 1px solid var(--border-color);">
             <button class="btn-secondary" onclick="handleLogout()" style="width: 100%; justify-content: center;">
-                <span>🚪</span> Se déconnecter
+                <span>🚪</span> Déconnection
             </button>
         </div>
     </nav>
@@ -65,7 +65,7 @@
         <!-- Header with search bar -->
         <header class="header">
             <div class="search-container">
-                <input type="text" class="search-bar" placeholder="Bar de recherche d'onglets et pages">
+                <input type="text" class="search-bar" placeholder="Recherchez des transactions, items...">
             </div>
             <div class="header-actions">
                 <button class="btn-icon" id="notificationBtn">🔔</button>
@@ -87,12 +87,8 @@
                             <span class="amount-display" id="patrimoineTotal">0 €</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-label">Liquidités</span>
+                            <span class="stat-label">Cash</span>
                             <span class="stat-value" id="liquiditesTotal">0 €</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Investissements</span>
-                            <span class="stat-value" id="investissementsTotal">0 €</span>
                         </div>
                     </div>
                 </div>
@@ -103,17 +99,12 @@
                     </div>
                 </div>
                 <div class="card">
-                    <h3>Répartition du patrimoine</h3>
+                    <h3>Répartition par actifs</h3>
                     <canvas id="patrimoineChart"></canvas>
                 </div>
                 <div class="card">
-                    <h3>Évolution mensuelle</h3>
+                    <h3>Évolution mensuelle du patrimoine</h3>
                     <canvas id="evolutionChart"></canvas>
-                </div>
-                <div class="card">
-                    <h3>Comptes bancaires</h3>
-                    <div id="bilanComptes"></div>
-                    <button class="btn-secondary" onclick="navigateTo('comptes')">Voir détails</button>
                 </div>
             </div>
         </div>
@@ -137,7 +128,7 @@
                 </div>
                 <div class="card compte-card" onclick="navigateTo('pea')">
                     <div class="compte-header">
-                        <h3>Plan d'Épargne en Actions (PEA)</h3>
+                        <h3>Plan d'Épargne Actions (PEA)</h3>
                         <span class="compte-type">Investissement</span>
                     </div>
                     <div class="compte-amount" id="peaAmount">0 €</div>
@@ -147,7 +138,7 @@
                 </div>
                 <div class="card compte-card" onclick="navigateTo('crypto')">
                     <div class="compte-header">
-                        <h3>Compte de cryptomonnaies</h3>
+                        <h3>Cryptomonnaies (₿)</h3>
                         <span class="compte-type">Investissement</span>
                     </div>
                     <div class="compte-amount" id="cryptoAmount">0 €</div>
@@ -208,15 +199,13 @@
                             <table class="positions-table">
                                 <thead>
                                     <tr>
-                                        <th>Code</th>
-                                        <th>Qte</th>
-                                        <th>Dernier prix</th>
-                                        <th>Valorisation</th>
-                                        <th>Plus value</th>
+                                        <th>Position</th>
+                                        <th style="text-align: right;">Valorisation</th>
+                                        <th style="text-align: right;">Plus-value</th>
                                     </tr>
                                 </thead>
                                 <tbody id="ctoPositionsTable">
-                                    <tr><td colspan="7" class="empty-state">Aucune position</td></tr>
+                                    <tr><td colspan="3" class="empty-state">Aucune position</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -275,33 +264,15 @@
         <div class="page" id="page-pea">
             <div class="page-header">
                 <button class="btn-back" onclick="navigateTo('comptes')">← Retour</button>
-                <h1>Plan d'Épargne en Actions (PEA)</h1>
+                <h1>Compte-titres ordinaire (CTO)</h1>
                 <button class="btn-primary" onclick="openModal('modalAddTransaction', 'PEA')">+ Nouvelle transaction</button>
             </div>
             <div class="investment-layout">
-                <div class="card card-large">
-                    <h3>Évolution du portefeuille</h3>
-                    <div class="portfolio-stats">
-                        <div class="stat-item">
-                            <span class="stat-label">Valeur actuelle</span>
-                            <span class="stat-value" id="peaValeurActuelle">0 €</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Performance</span>
-                            <span class="stat-value" id="peaPerformance">+0%</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Plus/Moins-value</span>
-                            <span class="stat-value" id="peaPlusMoinsValue">0 €</span>
-                        </div>
-                    </div>
-                    <canvas id="peaEvolutionChart"></canvas>
-                </div>
                 <!-- Dashboard Stats -->
                 <div class="investment-dashboard">
                     <div class="card">
                         <h3>💰 Cash disponible</h3>
-                        <div class="stat-value" id="peaCash">0,00 €</div>
+                        <div class="stat-value" id="ctoCash">0,00 €</div>
                         <button class="btn-secondary btn-sm" onclick="openCashModal('PEA')" style="margin-top: 12px;">
                             ➕ Gérer le cash
                         </button>
@@ -338,15 +309,13 @@
                             <table class="positions-table">
                                 <thead>
                                     <tr>
-                                        <th>Code</th>
-                                        <th>Qte</th>
-                                        <th>Dernier prix</th>
-                                        <th>Valorisation</th>
-                                        <th>Plus value</th>
+                                        <th>Position</th>
+                                        <th style="text-align: right;">Valorisation</th>
+                                        <th style="text-align: right;">Plus-value</th>
                                     </tr>
                                 </thead>
                                 <tbody id="peaPositionsTable">
-                                    <tr><td colspan="7" class="empty-state">Aucune position</td></tr>
+                                    <tr><td colspan="3" class="empty-state">Aucune position</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -367,6 +336,7 @@
                         <p class="empty-state">Aucune transaction cash</p>
                     </div>
                 </div>
+
                 <div class="card">
                     <div class="card-header">
                         <h3>Historique des transactions</h3>
@@ -380,49 +350,65 @@
                             <input type="date" id="peaFilterDateFin" onchange="filterTransactions('PEA')">
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <!-- Page: CRYPTO -->
-        <div class="page" id="page-crypto">
-            <div class="page-header">
-                <h1>₿ Cryptomonnaies</h1>
-                <button class="btn-primary" onclick="openModal('modalAddTransaction', 'CRYPTO')">
-                    + Ajouter une transaction
-                </button>
-            </div>
-
-            <!-- Dashboard Stats (même structure que CTO/PEA) -->
-            <div class="investment-dashboard">
-                <div class="card">
-                    <h3>💰 Cash disponible</h3>
-                    <div class="stat-value" id="cryptoCash">0,00 €</div>
-                    <button class="btn-secondary btn-sm" onclick="openCashModal('CRYPTO')" style="margin-top: 12px;">
-                        ➕ Gérer le cash
-                    </button>
-                </div>
-                
-                <div class="card">
-                    <h3>📈 Valorisation positions</h3>
-                    <div class="stat-value" id="cryptoValeurActuelle">0,00 €</div>
-                </div>
-                
-                <div class="card">
-                    <h3>💼 Total portefeuille</h3>
-                    <div class="stat-value" id="cryptoTotalPortefeuille">0,00 €</div>
-                </div>
-                
-                <div class="card">
-                    <h3>📊 Performance</h3>
-                    <div class="stat-value" id="cryptoPerformance">+0,00%</div>
-                    <div style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">
-                        <div>PV réalisée: <span id="cryptoPvRealisee">0€</span></div>
-                        <div>PV latente: <span id="cryptoPvLatente">0€</span></div>
+                    <div class="table-container">
+                        <table class="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Titre</th>
+                                    <th>Quantité</th>
+                                    <th>Prix unitaire</th>
+                                    <th>Montant total</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="peaTransactionsTable"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- All positions actuelles -->
+        <!-- Page: Crypto -->
+        <div class="page" id="page-crypto">
+            <div class="page-header">
+                <button class="btn-back" onclick="navigateTo('comptes')">← Retour</button>
+                <h1>Compte-titres ordinaire (CTO)</h1>
+                <button class="btn-primary" onclick="openModal('modalAddTransaction', 'CRYPTO')">+ Nouvelle transaction</button>
+            </div>
+            <div class="investment-layout">
+                <!-- Dashboard Stats -->
+                <div class="investment-dashboard">
+                    <div class="card">
+                        <h3>💰 Cash disponible</h3>
+                        <div class="stat-value" id="cryptoCash">0,00 €</div>
+                        <button class="btn-secondary btn-sm" onclick="openCashModal('CRYPTO')" style="margin-top: 12px;">
+                            ➕ Gérer le cash
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📈 Valorisation positions</h3>
+                        <div class="stat-value" id="cryptoValeurActuelle">0,00 €</div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>💼 Total portefeuille</h3>
+                        <div class="stat-value" id="cryptoTotalPortefeuille">0,00 €</div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📊 Performance</h3>
+                        <div class="stat-value" id="cryptoPerformance">+0,00%</div>
+                        <div style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">
+                            <div>PV réalisée: <span id="cryptoPvRealisee">0€</span></div>
+                            <div>PV latente: <span id="cryptoPvLatente">0€</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All positions actuelles -->
                 <div class="dashboard-grid">
                     <!-- Tableau des positions actuelles -->
                     <div class="card">
@@ -433,15 +419,13 @@
                             <table class="positions-table">
                                 <thead>
                                     <tr>
-                                        <th>Code</th>
-                                        <th>Qte</th>
-                                        <th>Dernier prix</th>
-                                        <th>Valorisation</th>
-                                        <th>Plus value</th>
+                                        <th>Position</th>
+                                        <th style="text-align: right;">Valorisation</th>
+                                        <th style="text-align: right;">Plus-value</th>
                                     </tr>
                                 </thead>
                                 <tbody id="cryptoPositionsTable">
-                                    <tr><td colspan="7" class="empty-state">Aucune position</td></tr>
+                                    <tr><td colspan="3" class="empty-state">Aucune position</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -453,41 +437,46 @@
                     </div>
                 </div>
 
-            <!-- Historique transactions -->
-            <div class="card">
-                <h3>Historique des transactions</h3>
-                <div class="filters">
-                    <select id="cryptoFilterType">
-                        <option value="all">Tous les types</option>
-                        <option value="achat">Achats</option>
-                        <option value="vente">Ventes</option>
-                    </select>
-                    <input type="date" id="cryptoFilterDateDebut" placeholder="Date début">
-                    <input type="date" id="cryptoFilterDateFin" placeholder="Date fin">
-                    <button class="btn-secondary" onclick="filterTransactions('CRYPTO')">Filtrer</button>
+                <!-- Historique cash -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>💰 Historique cash</h3>
+                    </div>
+                    <div class="cash-history" id="cryptoCashHistory">
+                        <p class="empty-state">Aucune transaction cash</p>
+                    </div>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Type</th>
-                            <th>Crypto</th>
-                            <th>Quantité</th>
-                            <th>Prix unitaire</th>
-                            <th>Total</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cryptoTransactionsTable">
-                        <tr><td colspan="7" class="empty-state">Aucune transaction</td></tr>
-                    </tbody>
-                </table>
-            </div>
 
-            <!-- Graphique évolution -->
-            <div class="card">
-                <h3>Évolution du portefeuille</h3>
-                <canvas id="cryptoEvolutionChart"></canvas>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Historique des transactions</h3>
+                        <div class="filter-controls">
+                            <select id="cryptoFilterType" onchange="filterTransactions('CRYPTO')">
+                                <option value="all">Toutes</option>
+                                <option value="achat">Achats</option>
+                                <option value="vente">Ventes</option>
+                            </select>
+                            <input type="date" id="cryptoFilterDateDebut" onchange="filterTransactions('CRYPTO')">
+                            <input type="date" id="cryptoFilterDateFin" onchange="filterTransactions('CRYPTO')">
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Titre</th>
+                                    <th>Quantité</th>
+                                    <th>Prix unitaire</th>
+                                    <th>Montant total</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cryptoTransactionsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -519,7 +508,7 @@
                             <span class="flux-value negative" id="sortiesTotales">0 €</span>
                         </div>
                         <div class="flux-item">
-                            <span class="flux-label">Solde</span>
+                            <span class="flux-label">Economies</span>
                             <span class="flux-value" id="soldeFlux">0 €</span>
                         </div>
                     </div>
@@ -548,7 +537,7 @@
                 </div>
                 <div class="card card-full">
                     <div class="card-header">
-                        <h3>Liste des entrées</h3>
+                        <h3>Historique des entrées</h3>
                         <div class="filter-controls">
                             <select id="entreesFilterCategorie" onchange="filterEntrees()">
                                 <option value="all">Toutes catégories</option>
@@ -572,7 +561,7 @@
                                     <th>Catégorie</th>
                                     <th>Description</th>
                                     <th>Montant</th>
-                                    <th>Actions</th>
+                                    <th>Supprimer</th>
                                 </tr>
                             </thead>
                             <tbody id="entreesTable"></tbody>
@@ -599,7 +588,7 @@
                 </div>
                 <div class="card card-full">
                     <div class="card-header">
-                        <h3>Liste des dépenses</h3>
+                        <h3>Historique des dépenses</h3>
                         <div class="filter-controls">
                             <select id="depensesFilterCategorie" onchange="filterDepenses()">
                                 <option value="all">Toutes catégories</option>
@@ -625,7 +614,7 @@
                                     <th>Catégorie</th>
                                     <th>Description</th>
                                     <th>Montant</th>
-                                    <th>Actions</th>
+                                    <th>Supprimer</th>
                                 </tr>
                             </thead>
                             <tbody id="depensesTable"></tbody>
@@ -638,7 +627,7 @@
         <!-- Page: Profil -->
         <div class="page" id="page-profil">
             <div class="page-header">
-                <h1>Mon profil</h1>
+                <h1>Mes informations personnelles</h1>
             </div>
             <div class="profil-layout">
                 <div class="card profil-card">
@@ -648,7 +637,7 @@
                             <div id="profilAvatarPlaceholder" class="avatar-placeholder-large">👤</div>
                         </div>
                         <div class="profil-avatar-actions">
-                            <h4 style="margin-bottom: 12px; font-size: 14px; font-weight: 600; color: var(--text-primary);">Photo de profil</h4>
+                            <h4 style="margin-bottom: 12px; font-size: 14px; font-weight: 600; color: var(--text-primary);">Avatars</h4>
                             
                             <!-- Avatars par défaut -->
                             <div class="avatar-presets">
@@ -670,7 +659,7 @@
                             <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
                                 <input type="file" id="avatarUpload" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
                                 <button class="btn-secondary" onclick="document.getElementById('avatarUpload').click()" style="width: 100%; justify-content: center;">
-                                    📤 Upload une photo
+                                    📤 Importer une photo
                                 </button>
                                 <p style="font-size: 11px; color: var(--text-tertiary); margin-top: 8px; text-align: center;">
                                     PNG, JPG • Max 2MB
@@ -747,27 +736,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="card">
-                    <h3>Notifications</h3>
-                    <div class="settings-group">
-                        <div class="setting-item">
-                            <label>Alertes de transactions</label>
-                            <input type="checkbox" id="settingNotifTransactions" checked>
-                        </div>
-                        <div class="setting-item">
-                            <label>Rapport mensuel</label>
-                            <input type="checkbox" id="settingNotifRapport" checked>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <h3>Données</h3>
-                    <div class="settings-group">
-                        <button class="btn-secondary" onclick="exportData()">Exporter mes données</button>
-                        <button class="btn-secondary" onclick="importData()">Importer des données</button>
-                        <button class="btn-danger" onclick="confirmDeleteData()">Supprimer toutes les données</button>
-                    </div>
-                </div>
 
                 <!-- Bloc Améliorations possibles -->
                 <div class="card">
@@ -800,19 +768,19 @@
                             <span class="contact-icon">📧</span>
                             <div>
                                 <div class="contact-label">Email</div>
-                                <div class="contact-value"><span class="__cf_email__" data-cfemail="caa9a5a4beaba9be8abdafa6a9a1afb8e4abbaba">[email&#160;protected]</span></div>
+                                <div class="contact-value">diverse.app.dev@gmail.com</div>
                             </div>
                         </a>
                         <a href="https://twitter.com/welcker_app" class="contact-link" target="_blank">
                             <span class="contact-icon">🐦</span>
                             <div>
                                 <div class="contact-label">Twitter</div>
-                                <div class="contact-value">@welcker_app</div>
+                                <div class="contact-value">@Soon</div>
                             </div>
                         </a>
                     </div>
                     <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color); font-size: 12px; color: var(--text-tertiary); text-align: center;">
-                        Welcker v1.0 — Made with ❤️
+                        Welcker v1.0 - 2026
                     </div>
                 </div>
             </div>

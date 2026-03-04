@@ -1,63 +1,69 @@
 # MonPatrimoine - Guide
 
-- Voir *Notion* pour à faire 
-- Voir *Supabase* pour gestion DB
-- Voir *Google docs* pour idées et liens
-- Vor *Github* pour repo
-
 ## 📋 Description
-Application web complète de gestion financière personnelle avec suivi de patrimoine, investissements (CTO, PEA), comptes bancaires, biens, et analyse des flux financiers.
-+ 2 fonctionnalitées innovantes :
-Compte commun famille qui cumule les comptes dans une nouvelle page
+
+Application web complète de gestion financière personnelle avec suivi de patrimoine, investissements, comptes bancaires, biens, et analyse des flux financiers.
++ 2 fonctionnalitées innovantes :  
+Compte commun famille qui cumule les comptes dans une nouvelle page  
 Comme un réseau social avec suivi et amis
+
+Sites autres utilisés :  
+- *Notion* pour à faire 
+- *Supabase* pour gestion DB, clé API publique : 
+> eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrdGJjZ3VteXFqZ2J2Y3B5bmpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MDQ0MDYsImV4cCI6MjA4NjM4MDQwNn0.Bjv4bb2gnXKG8-UY4oSUQrjaJIzNWEG_zM8_XTQbwsY
+- *Google docs* pour idées et liens
+- *Github* pour repo
+- *Netlify* pour mise en production
 
 ## ✅ Pages implémentées
 
 - **Page 0** : Page de connexion/inscription
 - **Page 1** : Accueil avec vue d'ensemble et graphiques
 - **Page 2** : Suivi des comptes bancaires
-- **Page 3** : Page onvestissement cad resumé des transactions tout compte confondus
+- **Page 3** : Page investissement cad resumé des transactions pour différents types de comptes  
 - **Page 4** : Autres biens (immobilier, véhicules, etc.)
 - **Page 5** : Comparaison entrées/sorties
 - **Page 6** : Détails des entrées d'argent
 - **Page 7** : Détails des dépenses
-- **Page 8** : Profil utilisateur
+- **Page 8** : Profil de l'utilisateur
 - **Page 9** : Paramètres
+
+## 📁 Structure du code 
+
+```
+├── index.html                ← page principale  
+├── login.html                ← page de connexion/inscription   
+├── logo.png                  ← mon logo au fond blanc  
+├── manifest.json             ← Permet au navigateur d'ouvrir corréctement l'app  
+├── sw.js                     ← enregistre le cache pour quand hors-ligne
+├── js/  
+│   ├── config.js             ← Supabase config  
+│   ├── dataManager.js        ← Toutes les requêtes DB  
+│   ├── app.js                ← Fonctionnalitées principales   
+│   ├── pages.js              ← Toutes les pages   
+|   ├── utilities.css         ← Autres features   
+css/  
+|   ├── base.css              ← Variables + Reset + Layout  
+|   ├── components.css        ← Buttons + Cards + Forms + Modals  
+|   ├── utilities.css         ← Responsive + Dark mode  
+|   ├── profil_para.css       ← Majorité des élements de profil/para/pop-ups 
+DB/  
+|   ├── BD_access.sql         ← Ajout des règles d'accès par user  
+|   ├── config_avatar.sql     ← Code pour les photos de profil  
+|   ├── DB_auth.sql           ← Complément de BD_access.sql  
+|   ├── DB_schema.sql         ← Structure initiale de la DB   
+|   ├── suggestions.sql       ← Ajout de la feature récupérant les suggestions
+|   ├── supabase.sql          ← Code complet de la DB de la V1
+```
+
 
 ## 🚀 Hébergement
 
-### Option 1 : Activer GitHub Pages
-1. Allez dans "Settings" (en haut du repository)
-2. Dans le menu de gauche, cliquez sur "Pages"
-3. Sous "Source", sélectionnez "main" branch
-4. Cliquez sur "Save"
-5. Attendez 2-3 minutes
-6. Votre site sera accessible à : `https://votre-username.github.io/monpatrimoine/`
-
-### Option 2 : Netlify (ACTIVE)
-1. Allez sur https://www.netlify.com
-2. Créez un compte gratuit (avec GitHub, email, etc.)
-3. Une fois connecté, cliquez sur "Add new site" → "Deploy manually"
-4. Glissez-déposez le dossier contenant vos 3 fichiers
-5. Attendez quelques secondes
-6. Netlify génère automatiquement une URL : `https://random-name-123456.netlify.app`
-Vous pouvez la personnaliser dans les paramètres du site.
-
-### Option 3 : Vercel 
-1. Allez sur https://vercel.com
-2. Inscrivez-vous gratuitement (de préférence avec GitHub)
-3. Cliquez sur "Add New" → "Project"
-4. Si vous avez mis vos fichiers sur GitHub, importez le repository
-5. Sinon, glissez-déposez vos fichiers
-6. Cliquez sur "Deploy"
-7. URL automatique : `https://monpatrimoine-xxx.vercel.app`
-
-### Option 4 : Hébergement payant traditionnel
-
-#### Hébergeurs recommandés
 - **OVH** (français) : à partir de 2€/mois
 - **Hostinger** : à partir de 1€/mois
 - **O2Switch** (français) : environ 5€/mois
+
+Pour l'instant sur Netlify en gratuit
 
 #### Étapes générales
 1. Achetez un hébergement web + nom de domaine
@@ -65,32 +71,7 @@ Vous pouvez la personnaliser dans les paramètres du site.
 3. Utilisez le gestionnaire de fichiers ou FTP
 4. Uploadez les 3 fichiers dans le dossier `public_html` ou `www`
 5. Accédez à votre domaine : `https://votredomaine.com`
-
-## 📱 Pour créer une application mobile (étape future)
-
-### iOS (App Store)
-Outils recommandés :
-- **Capacitor** (par Ionic)
-- **Cordova**
-- Ou utilisez un service comme **PWABuilder** pour convertir votre site en PWA
-
-### Android (Play Store)
-Mêmes outils que pour iOS, ou :
-- **Android Studio** avec WebView
-- **Flutter** (nécessite de recoder)
-- **React Native** (nécessite de recoder)
-
-### Solution la plus simple : Progressive Web App (PWA)
-Votre site peut déjà fonctionner comme une application sur mobile !
-1. Sur Android : Chrome → Menu → "Ajouter à l'écran d'accueil"
-2. Sur iOS : Safari → Partager → "Sur l'écran d'accueil"
-
-Pour améliorer l'expérience PWA, vous aurez besoin d'ajouter :
-- Un fichier `manifest.json`
-- Un Service Worker
-- Des icônes d'application
-
-## 🔧 Configuration avancée (optionnel)
+6. Mettre le nouveau lien dans Supabase
 
 ### Ajouter un nom de domaine personnalisé
 1. Achetez un domaine chez OVH, Namecheap, Google Domains, etc.
@@ -98,16 +79,8 @@ Pour améliorer l'expérience PWA, vous aurez besoin d'ajouter :
    - Pour GitHub Pages : un enregistrement CNAME vers `votre-username.github.io`
    - Pour Netlify/Vercel : suivez leurs instructions dans les paramètres
 
-### Base de données en ligne (pour synchronisation)
-Pour synchroniser entre appareils, vous pouvez utiliser :
-- **Firebase** (Google) - gratuit pour commencer
-- **Supabase** - alternative open-source à Firebase
-- **MongoDB Atlas** - base de données NoSQL gratuite
-
-Cela nécessitera de modifier le code JavaScript pour remplacer `localStorage` par des appels API.
-
 ---
 
-**Version** : 2.0.0  
-**Date** : Février 2026  
-**Licence** : Usage personnel
+**Version** : 1.0.0  
+**Date** : Mars 2026  
+**Licence** : Partage aux proches

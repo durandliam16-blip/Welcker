@@ -491,19 +491,37 @@ function renderPositionsTable(prefix, positions) {
     if (!tbody) return;
     
     if (!positions || positions.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Aucune position</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="3" class="empty-state">Aucune position</td></tr>';
         return;
     }
     
-    tbody.innerHTML = positions.map(p => `
+    // Top 5 par valorisation
+    const top5 = positions
+        .sort((a, b) => (b.valorisation || 0) - (a.valorisation || 0))
+        .slice(0, 5);
+    
+    tbody.innerHTML = top10.map(p => `
         <tr>
-            <td><strong>${p.libelle}</strong></td>
-            <td>${p.titre}</td>
-            <td>${p.quantite.toFixed(4)}</td>
-            <td>${fmt(p.pru)}</td>
-            <td>${fmt(p.dernierPrix)}</td>
-            <td>${fmt(p.valorisation)}</td>
-            <td class="${p.pvLatente >= 0 ? 'positive' : 'negative'}">${fmt(p.pvLatente)}</td>
+            <td>
+                <strong style="color: var(--text-primary); font-size: 14px;">
+                    ${p.libelle || p.titre}
+                </strong>
+                <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                    ${p.quantite.toFixed(4)} × ${fmt(p.dernierPrix)}
+                </div>
+            </td>
+            <td style="text-align: right; font-weight: 600; font-size: 15px;">
+                ${fmt(p.valorisation)}
+            </td>
+            <td style="text-align: right;">
+                <span class="${p.pvLatente >= 0 ? 'positive' : 'negative'}" 
+                      style="font-weight: 600; font-size: 14px;">
+                    ${p.pvLatente >= 0 ? '+' : ''}${fmt(p.pvLatente)}
+                </span>
+                <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                    ${p.pvLatente >= 0 ? '+' : ''}${((p.pvLatente / p.capitalInvesti) * 100).toFixed(1)}%
+                </div>
+            </td>
         </tr>
     `).join('');
 }
