@@ -94,6 +94,14 @@
                             <span class="stat-label">Investissements</span>
                             <span class="stat-value" id="investissementsTotal">0 €</span>
                         </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Autres biens</span>
+                            <span class="stat-value" id="autresBiens">0 €</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Bénéfice flux</span>
+                            <span class="stat-value" id="beneficeFlux">0 €</span>
+                        </div>
                     </div>
                 </div>
                 <div class="card">
@@ -113,51 +121,61 @@
             </div>
         </div>
 
-        <!-- Page: Comptes bancaires -->
         <div class="page" id="page-comptes">
             <div class="page-header">
-                <h1>Mes comptes bancaires</h1>
-                <button class="btn-primary" onclick="openModal('modalAddCompte')">+ Ajouter un compte</button>
+                <h1>💼 Mes comptes</h1>
+                <button class="btn-primary" onclick="openModal('modalAddCompte')">
+                    + Ajouter un compte
+                </button>
+            </div>
+            
+            <!-- Section Investissements -->
+            <div class="section-header">
+                <span class="section-icon">📈</span>
+                <h2>Investissements</h2>
             </div>
             <div class="comptes-grid">
                 <div class="card compte-card" onclick="navigateTo('cto')">
                     <div class="compte-header">
-                        <h3>Compte-titres ordinaire (CTO)</h3>
-                        <span class="compte-type">Investissement</span>
+                        <h3>Compte-titres ordinaire</h3>
+                        <span class="compte-type">CTO</span>
                     </div>
-                    <div class="compte-amount" id="ctoAmount">0 €</div>
+                    <div class="compte-amount" id="ctoAmount">0,00 €</div>
                     <div class="compte-evolution">
-                        <span id="ctoEvolution">+0%</span>
+                        <span id="ctoEvolution">+0,00%</span>
                     </div>
                 </div>
+                
                 <div class="card compte-card" onclick="navigateTo('pea')">
                     <div class="compte-header">
-                        <h3>Plan d'Épargne Actions (PEA)</h3>
-                        <span class="compte-type">Investissement</span>
+                        <h3>Plan d'Épargne Actions</h3>
+                        <span class="compte-type">PEA</span>
                     </div>
-                    <div class="compte-amount" id="peaAmount">0 €</div>
+                    <div class="compte-amount" id="peaAmount">0,00 €</div>
                     <div class="compte-evolution">
-                        <span id="peaEvolution">+0%</span>
+                        <span id="peaEvolution">+0,00%</span>
                     </div>
                 </div>
+                
                 <div class="card compte-card" onclick="navigateTo('crypto')">
                     <div class="compte-header">
-                        <h3>Cryptomonnaies (₿)</h3>
-                        <span class="compte-type">Investissement</span>
+                        <h3>Cryptomonnaies</h3>
+                        <span class="compte-type">₿</span>
                     </div>
-                    <div class="compte-amount" id="cryptoAmount">0 €</div>
+                    <div class="compte-amount" id="cryptoAmount">0,00 €</div>
                     <div class="compte-evolution">
-                        <span id="cryptoEvolution">+0%</span>
+                        <span id="cryptoEvolution">+0,00%</span>
                     </div>
                 </div>
-                <div>
-                    <h2 style="margin: 32px 0 16px; font-size: 20px; color: var(--text-secondary);">
-                        🏦 Comptes bancaires
-                    </h2>
-                    <div class="comptes-grid" id="comptesContainer">
-                        <p class="empty-state">Aucun compte bancaire</p>
-                    </div>
-                </div>
+            </div>
+            
+            <!-- Section Comptes bancaires -->
+            <div class="section-header">
+                <span class="section-icon">🏦</span>
+                <h2>Comptes bancaires</h2>
+            </div>
+            <div class="comptes-grid" id="autresComptesContainer">
+                <p class="empty-state">Aucun compte bancaire</p>
             </div>
         </div>
 

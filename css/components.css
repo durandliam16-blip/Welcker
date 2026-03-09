@@ -570,3 +570,74 @@
     transform: scale(1.01);
     transition: all 0.15s;
 }
+
+/* Page Comptes - Section headers */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 32px 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.section-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.section-icon {
+    font-size: 24px;
+}
+
+/* Améliorer les cards de comptes */
+.compte-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.compte-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--primary-color), var(--success-color));
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.compte-card:hover::before {
+    opacity: 1;
+}
+
+.compte-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Badge type amélioré */
+.compte-type {
+    font-size: 11px;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, var(--primary-color), #7c3aed);
+    color: white;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Montant mis en valeur */
+.compte-amount {
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-color), #7c3aed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 16px 0;
+}

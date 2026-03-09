@@ -6,42 +6,92 @@ async function updateAccueil() {
         dataManager.getBankAccounts(),
         dataManager.getInvestments('CTO'),
         dataManager.getInvestments('PEA'),
-        dataManager.getCryptoTransactions(),  // ← AJOUTÉ
+        dataManager.getCryptoTransactions(),
         dataManager.getCashFlow('entree'),
         dataManager.getCashFlow('sortie'),
         dataManager.getBiens(),
         dataManager.getCashTransactions('CTO'),
         dataManager.getCashTransactions('PEA'),
-        dataManager.getCashTransactions('CRYPTO')  // ← AJOUTÉ
+        dataManager.getCashTransactions('CRYPTO')
     ]);
     
     const ctoStats = calcStatsPro(ctoT, ctoCash);
     const peaStats = calcStatsPro(peaT, peaCash);
-    const cryptoStats = calcStatsPro(cryptoT, cryptoCash);  // ← AJOUTÉ
-    
-    const ctoVal = ctoStats.totalPortefeuille;
-    const peaVal = peaStats.totalPortefeuille;
-    const cryptoVal = cryptoStats.totalPortefeuille;  // ← AJOUTÉ
+    const cryptoStats = calcStatsPro(cryptoT, cryptoCash);
     
     const accTotal = accounts.reduce((s, a) => s + parseFloat(a.solde || 0), 0);
     const biensVal = biens.reduce((s, b) => s + parseFloat(b.solde || 0), 0);
     
-    const invTotal = ctoVal + peaVal + cryptoVal;  // ← MODIFIÉ (+ cryptoVal)
-    
-    // ✅ NOUVEAU CALCUL : Cash total = comptes bancaires + cash CTO + cash PEA + cash Crypto
+    const invTotal = ctoStats.valorisation + peaStats.valorisation + cryptoStats.valorisation;    
     const cashTotal = accTotal + ctoStats.cash + peaStats.cash + cryptoStats.cash;
+   
+    // Calculer bénéfice flux
+    const totalEntrees = entrees.reduce((s, e) => s + parseFloat(e.montant || 0), 0);
+    const totalSorties = sorties.reduce((s, s) => s + parseFloat(s.montant || 0), 0);
+    const beneficeFlux = totalEntrees - totalSorties;
 
-    document.getElementById('patrimoineTotal').textContent = fmt(accTotal + invTotal + biensVal);
-    document.getElementById('liquiditesTotal').textContent = fmt(cashTotal);  // ← MODIFIÉ
+    // Patrimoine total = Cash + Investissements + Biens
+    const patrimoineTotal = cashTotal + invTotal + biensVal + beneficeFlux;
+    // Afficher
+    document.getElementById('beneficeFlux').textContent = fmt(beneficeFlux);
+    document.getElementById('autresBiens').textContent = fmt(biensVal);
+    document.getElementById('patrimoineTotal').textContent = fmt(patrimoineTotal);
+    document.getElementById('liquiditesTotal').textContent = fmt(cashTotal);
     document.getElementById('investissementsTotal').textContent = fmt(invTotal);
 
-    const recent = [...entrees, ...sorties].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+    // ✅ AJOUT : Dernières transactions (TOUTES sources)
+    const allTransactions = [
+        // Entrées/Sorties cash flow
+        ...entrees.map(e => ({ ...e, source: 'entree', type: 'cashflow' })),
+        ...sorties.map(s => ({ ...s, source: 'sortie', type: 'cashflow' })),
+        // Transactions CTO
+        ...ctoT.map(t => ({ 
+            ...t, 
+            source: 'CTO', 
+            type: 'investment',
+            description: `${t.type === true || t.type === 'achat' ? 'Achat' : 'Vente'} ${t.titre || t.libelle}`
+        })),
+        // Transactions PEA
+        ...peaT.map(t => ({ 
+            ...t, 
+            source: 'PEA', 
+            type: 'investment',
+            description: `${t.type === true || t.type === 'achat' ? 'Achat' : 'Vente'} ${t.titre || t.libelle}`
+        })),
+        // Transactions Crypto
+        ...cryptoT.map(t => ({ 
+            ...t, 
+            source: 'CRYPTO', 
+            type: 'investment',
+            description: `${t.type === true || t.type === 'achat' ? 'Achat' : 'Vente'} ${t.titre || t.libelle}`
+        })),
+        // Mouvements cash CTO/PEA/Crypto
+        ...ctoCash.map(c => ({ ...c, source: 'CTO', type: 'cash', description: c.description || c.type })),
+        ...peaCash.map(c => ({ ...c, source: 'PEA', type: 'cash', description: c.description || c.type })),
+        ...cryptoCash.map(c => ({ ...c, source: 'CRYPTO', type: 'cash', description: c.description || c.type }))
+    ];
+    
+    const recent = allTransactions
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 10);
+    
     const cont = document.getElementById('dernieresTransactions');
     cont.innerHTML = recent.length
-        ? recent.map(t => `<div class="transaction-item">
-            <div><strong>${t.description || 'Transaction'}</strong>
-            <div style="font-size:12px;color:var(--text-secondary)">${new Date(t.date).toLocaleDateString('fr-FR')}</div></div>
-            <div style="font-weight:600">${fmt(t.montant)}</div></div>`).join('')
+        ? recent.map(t => {
+            const montant = t.montant || (parseFloat(t.quantite || 0) * parseFloat(t.prix_unitaire || 0));
+            const isPositive = t.source === 'entree' || (t.type === 'investment' && (t.type === true || t.type === 'achat'));
+            return `<div class="transaction-item">
+                <div>
+                    <strong>${t.description || 'Transaction'}</strong>
+                    <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">
+                        ${new Date(t.date).toLocaleDateString('fr-FR')} · ${t.source}
+                    </div>
+                </div>
+                <div style="font-weight:600;color:${isPositive ? 'var(--success-color)' : 'var(--danger-color)'}">
+                    ${isPositive ? '+' : ''}${fmt(montant)}
+                </div>
+            </div>`;
+        }).join('')
         : '<p class="empty-state">Aucune transaction</p>';
 
     // Graphiques
@@ -51,17 +101,23 @@ async function updateAccueil() {
         data: { 
             labels: ['Liquidités','Investissements','Biens'],
             datasets: [{ 
-                data: [cashTotal, invTotal, biensVal],  // ← MODIFIÉ (cashTotal au lieu de accTotal)
+                data: [cashTotal, invTotal, biensVal],
                 backgroundColor: ['#10b981','#2563eb','#f59e0b'] 
             }] 
         },
         options: { 
             responsive: true, 
-            plugins: { legend: { position: 'bottom' } } 
+            plugins: { 
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => `${ctx.label}: ${fmt(ctx.parsed)}`
+                    }
+                }
+            } 
         }
     });
 
-    // Graphique évolution mensuelle
     renderFluxChart(entrees, sorties);
 }
 
@@ -101,29 +157,40 @@ async function updateBilan() {
 // PAGE COMPTES
 // =============================================================================
 async function updateComptes() {
-    const [accs, cto, pea, ctoCash, peaCash] = await Promise.all([
+    const [accs, cto, pea, crypto, ctoCash, peaCash, cryptoCash] = await Promise.all([
         dataManager.getBankAccounts(),
         dataManager.getInvestments('CTO'),
         dataManager.getInvestments('PEA'),
+        dataManager.getCryptoTransactions(),  // ← AJOUTÉ
         dataManager.getCashTransactions('CTO'),
-        dataManager.getCashTransactions('PEA')
+        dataManager.getCashTransactions('PEA'),
+        dataManager.getCashTransactions('CRYPTO')  // ← AJOUTÉ
     ]);
     
     const ctoStats = calcStatsPro(cto, ctoCash);
     const peaStats = calcStatsPro(pea, peaCash);
+    const cryptoStats = calcStatsPro(crypto, cryptoCash);  // ← AJOUTÉ
     
     document.getElementById('ctoAmount').textContent = fmt(ctoStats.totalPortefeuille);
     document.getElementById('peaAmount').textContent = fmt(peaStats.totalPortefeuille);
-    document.getElementById('ctoEvolution').innerHTML = `<span>${ctoStats.performance >= 0 ? '+' : ''}${ctoStats.performance.toFixed(2)}%</span>`;
-    document.getElementById('peaEvolution').innerHTML = `<span>${peaStats.performance >= 0 ? '+' : ''}${peaStats.performance.toFixed(2)}%</span>`;
+    document.getElementById('cryptoAmount').textContent = fmt(cryptoStats.totalPortefeuille);  // ← AJOUTÉ
     
-    const cont = document.getElementById('comptesContainer');
+    document.getElementById('ctoEvolution').innerHTML = `<span class="${ctoStats.performance >= 0 ? 'positive' : 'negative'}">${ctoStats.performance >= 0 ? '+' : ''}${ctoStats.performance.toFixed(2)}%</span>`;
+    document.getElementById('peaEvolution').innerHTML = `<span class="${peaStats.performance >= 0 ? 'positive' : 'negative'}">${peaStats.performance >= 0 ? '+' : ''}${peaStats.performance.toFixed(2)}%</span>`;
+    document.getElementById('cryptoEvolution').innerHTML = `<span class="${cryptoStats.performance >= 0 ? 'positive' : 'negative'}">${cryptoStats.performance >= 0 ? '+' : ''}${cryptoStats.performance.toFixed(2)}%</span>`;  // ← AJOUTÉ
+    
+    const cont = document.getElementById('autresComptesContainer');
     cont.innerHTML = accs.length
         ? accs.map(a => `
             <div class="card compte-card">
-                <div class="compte-header"><h3>${a.nom}</h3><span class="compte-type">${a.type || 'compte'}</span></div>
+                <div class="compte-header">
+                    <h3>${a.nom}</h3>
+                    <span class="compte-type">${a.type || 'Compte'}</span>
+                </div>
                 <div class="compte-amount">${fmt(a.solde)}</div>
-                <button class="btn-danger" style="margin-top:12px;width:100%;font-size:12px;padding:6px" onclick="window._deleteAccount('${a.id}')">Supprimer</button>
+                <button class="btn-danger" style="margin-top:12px;width:100%;font-size:12px;padding:8px" onclick="window._deleteAccount('${a.id}')">
+                    🗑️ Supprimer
+                </button>
             </div>`).join('')
         : '<p class="empty-state">Aucun compte bancaire</p>';
 }
