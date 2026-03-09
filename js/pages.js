@@ -314,6 +314,7 @@ async function updateFlux() {
             { label:'Sorties', data: Array.from({length:6},(_,i)=>sumByOffset(s,i)), backgroundColor:'#ef4444' }
         ]}, options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
     });
+    renderSankeyDiagram(entrees, sorties);
 }
 
 // =============================================================================

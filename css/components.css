@@ -641,3 +641,16 @@
     background-clip: text;
     margin: 16px 0;
 }
+
+/* Sankey diagram container */
+#sankeyDiagram {
+    background: transparent;
+    border-radius: var(--radius-md);
+}
+
+/* Responsive Sankey */
+@media (max-width: 768px) {
+    #sankeyDiagram {
+        height: 400px !important;
+    }
+}

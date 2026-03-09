@@ -75,6 +75,6 @@ Pour l'instant sur GitHub pages en gratuit
 
 ---
 
-**Version** : 1.0.0  
+**Version** : 1.1.0  
 **Date** : Mars 2026  
 **Licence** : Partage aux proches

@@ -604,3 +604,154 @@ document.addEventListener('DOMContentLoaded', () => {
     // Charger la page d'accueil
     navigateTo('accueil');
 });
+
+// =============================================================================
+// SANKEY DIAGRAM - FLUX FINANCIERS
+// =============================================================================
+
+function renderSankeyDiagram(entrees, sorties) {
+    const container = document.getElementById('sankeyDiagram');
+    if (!container) return;
+    
+    // Grouper par catégorie
+    const entreesParCategorie = {};
+    const sortiesParCategorie = {};
+    
+    entrees.forEach(e => {
+        const cat = e.categorie || 'Autres entrées';
+        entreesParCategorie[cat] = (entreesParCategorie[cat] || 0) + parseFloat(e.montant || 0);
+    });
+    
+    sorties.forEach(s => {
+        const cat = s.categorie || 'Autres dépenses';
+        sortiesParCategorie[cat] = (sortiesParCategorie[cat] || 0) + parseFloat(s.montant || 0);
+    });
+    
+    const totalEntrees = Object.values(entreesParCategorie).reduce((sum, v) => sum + v, 0);
+    const totalSorties = Object.values(sortiesParCategorie).reduce((sum, v) => sum + v, 0);
+    const economies = totalEntrees - totalSorties;
+    
+    // Créer les nœuds (nodes)
+    const nodes = [];
+    const nodeLabels = [];
+    const nodeColors = [];
+    
+    // Index des nœuds
+    let nodeIndex = 0;
+    const nodeMap = {};
+    
+    // 1. Nœuds d'entrée (gauche)
+    Object.keys(entreesParCategorie).forEach(cat => {
+        nodeMap[`entree_${cat}`] = nodeIndex;
+        nodeLabels.push(`${cat}<br>${fmt(entreesParCategorie[cat])}`);
+        nodeColors.push('#10b981'); // Vert pour entrées
+        nodeIndex++;
+    });
+    
+    // 2. Nœud central "Budget"
+    const budgetIndex = nodeIndex;
+    nodeLabels.push(`💰 Budget<br>${fmt(totalEntrees)}`);
+    nodeColors.push('#2563eb'); // Bleu pour budget
+    nodeIndex++;
+    
+    // 3. Nœuds de sortie (droite)
+    Object.keys(sortiesParCategorie).forEach(cat => {
+        nodeMap[`sortie_${cat}`] = nodeIndex;
+        nodeLabels.push(`${cat}<br>${fmt(sortiesParCategorie[cat])}`);
+        nodeColors.push('#ef4444'); // Rouge pour dépenses
+        nodeIndex++;
+    });
+    
+    // 4. Nœud économies (si positif)
+    let economiesIndex = -1;
+    if (economies > 0) {
+        economiesIndex = nodeIndex;
+        nodeLabels.push(`💎 Économies<br>${fmt(economies)}`);
+        nodeColors.push('#f59e0b'); // Orange pour économies
+        nodeIndex++;
+    }
+    
+    // Créer les liens (links)
+    const sources = [];
+    const targets = [];
+    const values = [];
+    const linkColors = [];
+    
+    // Liens : Entrées → Budget
+    Object.entries(entreesParCategorie).forEach(([cat, montant]) => {
+        sources.push(nodeMap[`entree_${cat}`]);
+        targets.push(budgetIndex);
+        values.push(montant);
+        linkColors.push('rgba(16, 185, 129, 0.4)'); // Vert transparent
+    });
+    
+    // Liens : Budget → Dépenses
+    Object.entries(sortiesParCategorie).forEach(([cat, montant]) => {
+        sources.push(budgetIndex);
+        targets.push(nodeMap[`sortie_${cat}`]);
+        values.push(montant);
+        linkColors.push('rgba(239, 68, 68, 0.4)'); // Rouge transparent
+    });
+    
+    // Lien : Budget → Économies
+    if (economies > 0) {
+        sources.push(budgetIndex);
+        targets.push(economiesIndex);
+        values.push(economies);
+        linkColors.push('rgba(245, 158, 11, 0.6)'); // Orange transparent
+    }
+    
+    // Configuration Plotly
+    const data = [{
+        type: 'sankey',
+        orientation: 'h',
+        node: {
+            pad: 15,
+            thickness: 20,
+            line: {
+                color: 'white',
+                width: 2
+            },
+            label: nodeLabels,
+            color: nodeColors,
+            customdata: nodeLabels.map((label, i) => label.split('<br>')[0]),
+            hovertemplate: '%{customdata}<br>%{value:,.2f} €<extra></extra>'
+        },
+        link: {
+            source: sources,
+            target: targets,
+            value: values,
+            color: linkColors,
+            hovertemplate: '%{source.customdata} → %{target.customdata}<br>%{value:,.2f} €<extra></extra>'
+        }
+    }];
+    
+    const layout = {
+        font: {
+            family: 'Inter, sans-serif',
+            size: 12,
+            color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim()
+        },
+        plot_bgcolor: 'transparent',
+        paper_bgcolor: 'transparent',
+        margin: { l: 10, r: 10, t: 10, b: 10 },
+        hoverlabel: {
+            font: {
+                family: 'Inter, sans-serif',
+                size: 13
+            }
+        }
+    };
+    
+    const config = {
+        displayModeBar: true,
+        displaylogo: false,
+        modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d'],
+        responsive: true
+    };
+    
+    Plotly.newPlot('sankeyDiagram', data, layout, config);
+}
+
+// Exposer globalement
+window.renderSankeyDiagram = renderSankeyDiagram;

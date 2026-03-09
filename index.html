@@ -545,6 +545,12 @@
                     <h3>Évolution mensuelle</h3>
                     <canvas id="fluxChart"></canvas>
                 </div>
+                <div class="card" style="margin-top: 32px;">
+    <div class="card-header">
+        <h3>Sankey Diagram</h3>
+            </div>
+            <div id="sankeyDiagram" style="width: 100%; height: 600px;"></div>
+        </div>
             </div>
         </div>
 
@@ -1074,6 +1080,7 @@
     <!-- CDN en premier -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.27.0/plotly.min.js"></script>
 
     <!-- Vérification auth -->
     <script>
