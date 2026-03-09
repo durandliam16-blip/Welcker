@@ -138,7 +138,6 @@ async function updateInvestmentPage(mode) {
     renderCashHistory(pfx, cashTransactions);
     renderPositionsChart(`${pfx}PositionsChart`, stats.positions);
     renderInvestTable(pfx, transactions, mode, stats);
-    renderPositionsChart(`${pfx}PositionsChart`, stats.positions);
     renderInvestChart(pfx, transactions);
 }
 

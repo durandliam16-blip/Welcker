@@ -495,10 +495,10 @@ function renderPositionsTable(prefix, positions) {
         return;
     }
     
-    // Top 5 par valorisation
-    const top5 = positions
+    // Top 10 par valorisation
+    const top10 = positions
         .sort((a, b) => (b.valorisation || 0) - (a.valorisation || 0))
-        .slice(0, 5);
+        .slice(0, 10);
     
     tbody.innerHTML = top10.map(p => `
         <tr>
@@ -548,26 +548,6 @@ function renderCashHistory(prefix, cashTransactions) {
             <div class="cash-amount ${colors[ct.type]}">${fmt(ct.montant)}</div>
         </div>
     `).join('');
-}
-
-function renderPositionsChart(canvasId, positions) {
-    const ctx = destroyChart(canvasId);
-    if (!ctx || !positions || positions.length === 0) return;
-    
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: positions.map(p => p.libelle),
-            datasets: [{
-                data: positions.map(p => p.valorisation),
-                backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { position: 'bottom' } }
-        }
-    });
 }
 
 // Exposer globalement
