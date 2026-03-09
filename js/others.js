@@ -85,6 +85,24 @@ window._deleteAccount = async (id) => {
     if (ok) await updateComptes();
 };
 
+// Supprimer transaction cash
+window._deleteCashTransaction = async (id) => {
+    if (!confirm('Supprimer cette transaction cash ?')) return;
+    try {
+        await dataManager.deleteCashTransaction(id);
+        showToast('Transaction supprimée', 'success');
+        // Rafraîchir la page actuelle
+        const activePage = document.querySelector('.page.active');
+        if (activePage) {
+            const pageId = activePage.id.replace('page-', '');
+            await updatePageContent(pageId);
+        }
+    } catch (err) {
+        showToast('Erreur lors de la suppression', 'error');
+        console.error(err);
+    }
+};
+
 window.filterEntrees      = () => updateCashFlowPage('entree');
 window.filterDepenses     = () => updateCashFlowPage('sortie');
 window.filterTransactions = async (mode) => {
@@ -546,6 +564,9 @@ function renderCashHistory(prefix, cashTransactions) {
                 <div class="cash-date">${new Date(ct.date).toLocaleDateString('fr-FR')}</div>
             </div>
             <div class="cash-amount ${colors[ct.type]}">${fmt(ct.montant)}</div>
+            <button class="btn-icon" onclick="window._deleteCashTransaction('${ct.id}')" title="Supprimer" style="margin-left: 8px;">
+                🗑️
+            </button>
         </div>
     `).join('');
 }
@@ -613,16 +634,40 @@ function renderSankeyDiagram(entrees, sorties) {
     const container = document.getElementById('sankeyDiagram');
     if (!container) return;
     
+    // Filtrer par période sélectionnée
+    const filterSelect = document.getElementById('sankeyMonthFilter');
+    const filterValue = filterSelect ? filterSelect.value : 'all';
+    
+    let filteredEntrees = [...entrees];
+    let filteredSorties = [...sorties];
+    
+    if (filterValue !== 'all') {
+        const now = new Date();
+        const monthsToInclude = parseInt(filterValue);
+        
+        const filterByMonths = (items) => {
+            return items.filter(item => {
+                const itemDate = new Date(item.date);
+                const monthsDiff = (now.getFullYear() - itemDate.getFullYear()) * 12 + 
+                                   (now.getMonth() - itemDate.getMonth());
+                return monthsDiff >= 0 && monthsDiff < monthsToInclude;
+            });
+        };
+        
+        filteredEntrees = filterByMonths(entrees);
+        filteredSorties = filterByMonths(sorties);
+    }
+    
     // Grouper par catégorie
     const entreesParCategorie = {};
     const sortiesParCategorie = {};
     
-    entrees.forEach(e => {
+    filteredEntrees.forEach(e => {
         const cat = e.categorie || 'Autres entrées';
         entreesParCategorie[cat] = (entreesParCategorie[cat] || 0) + parseFloat(e.montant || 0);
     });
     
-    sorties.forEach(s => {
+    filteredSorties.forEach(s => {
         const cat = s.categorie || 'Autres dépenses';
         sortiesParCategorie[cat] = (sortiesParCategorie[cat] || 0) + parseFloat(s.montant || 0);
     });
@@ -631,12 +676,17 @@ function renderSankeyDiagram(entrees, sorties) {
     const totalSorties = Object.values(sortiesParCategorie).reduce((sum, v) => sum + v, 0);
     const economies = totalEntrees - totalSorties;
     
+    // Si pas de données, afficher message
+    if (totalEntrees === 0 && totalSorties === 0) {
+        container.innerHTML = '<p class="empty-state" style="padding: 100px 20px; text-align: center; color: var(--text-secondary);">Aucune donnée pour la période sélectionnée</p>';
+        return;
+    }
+    
     // Créer les nœuds (nodes)
     const nodes = [];
     const nodeLabels = [];
     const nodeColors = [];
     
-    // Index des nœuds
     let nodeIndex = 0;
     const nodeMap = {};
     
@@ -644,21 +694,21 @@ function renderSankeyDiagram(entrees, sorties) {
     Object.keys(entreesParCategorie).forEach(cat => {
         nodeMap[`entree_${cat}`] = nodeIndex;
         nodeLabels.push(`${cat}<br>${fmt(entreesParCategorie[cat])}`);
-        nodeColors.push('#10b981'); // Vert pour entrées
+        nodeColors.push('#10b981');
         nodeIndex++;
     });
     
     // 2. Nœud central "Budget"
     const budgetIndex = nodeIndex;
     nodeLabels.push(`💰 Budget<br>${fmt(totalEntrees)}`);
-    nodeColors.push('#2563eb'); // Bleu pour budget
+    nodeColors.push('#2563eb');
     nodeIndex++;
     
     // 3. Nœuds de sortie (droite)
     Object.keys(sortiesParCategorie).forEach(cat => {
         nodeMap[`sortie_${cat}`] = nodeIndex;
         nodeLabels.push(`${cat}<br>${fmt(sortiesParCategorie[cat])}`);
-        nodeColors.push('#ef4444'); // Rouge pour dépenses
+        nodeColors.push('#ef4444');
         nodeIndex++;
     });
     
@@ -667,7 +717,7 @@ function renderSankeyDiagram(entrees, sorties) {
     if (economies > 0) {
         economiesIndex = nodeIndex;
         nodeLabels.push(`💎 Économies<br>${fmt(economies)}`);
-        nodeColors.push('#f59e0b'); // Orange pour économies
+        nodeColors.push('#f59e0b');
         nodeIndex++;
     }
     
@@ -682,7 +732,7 @@ function renderSankeyDiagram(entrees, sorties) {
         sources.push(nodeMap[`entree_${cat}`]);
         targets.push(budgetIndex);
         values.push(montant);
-        linkColors.push('rgba(16, 185, 129, 0.4)'); // Vert transparent
+        linkColors.push('rgba(16, 185, 129, 0.4)');
     });
     
     // Liens : Budget → Dépenses
@@ -690,7 +740,7 @@ function renderSankeyDiagram(entrees, sorties) {
         sources.push(budgetIndex);
         targets.push(nodeMap[`sortie_${cat}`]);
         values.push(montant);
-        linkColors.push('rgba(239, 68, 68, 0.4)'); // Rouge transparent
+        linkColors.push('rgba(239, 68, 68, 0.4)');
     });
     
     // Lien : Budget → Économies
@@ -698,7 +748,7 @@ function renderSankeyDiagram(entrees, sorties) {
         sources.push(budgetIndex);
         targets.push(economiesIndex);
         values.push(economies);
-        linkColors.push('rgba(245, 158, 11, 0.6)'); // Orange transparent
+        linkColors.push('rgba(245, 158, 11, 0.6)');
     }
     
     // Configuration Plotly
@@ -708,10 +758,7 @@ function renderSankeyDiagram(entrees, sorties) {
         node: {
             pad: 15,
             thickness: 20,
-            line: {
-                color: 'white',
-                width: 2
-            },
+            line: { color: 'white', width: 2 },
             label: nodeLabels,
             color: nodeColors,
             customdata: nodeLabels.map((label, i) => label.split('<br>')[0]),

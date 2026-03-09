@@ -39,7 +39,7 @@ async function updateAccueil() {
     document.getElementById('liquiditesTotal').textContent = fmt(cashTotal);
     document.getElementById('investissementsTotal').textContent = fmt(invTotal);
 
-    // ✅ AJOUT : Dernières transactions (TOUTES sources)
+    // Dernières transactions (TOUTES sources)
     const allTransactions = [
         // Entrées/Sorties cash flow
         ...entrees.map(e => ({ ...e, source: 'entree', type: 'cashflow' })),
@@ -73,7 +73,7 @@ async function updateAccueil() {
     
     const recent = allTransactions
         .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .slice(0, 10);
+        .slice(0, 5);
     
     const cont = document.getElementById('dernieresTransactions');
     cont.innerHTML = recent.length
@@ -315,6 +315,12 @@ async function updateFlux() {
         ]}, options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
     });
     renderSankeyDiagram(e, s);
+    
+    // Maj le Sankey quand on change de mois
+    const filterSelect = document.getElementById('sankeyMonthFilter');
+    if (filterSelect) {
+        filterSelect.onchange = () => renderSankeyDiagram(e, s);
+    }
 }
 
 // =============================================================================
