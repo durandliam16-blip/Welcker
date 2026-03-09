@@ -2,27 +2,37 @@
 // PAGE ACCUEIL
 // =============================================================================
 async function updateAccueil() {
-    const [accounts, ctoT, peaT, entrees, sorties, biens, ctoCash, peaCash] = await Promise.all([
+    const [accounts, ctoT, peaT, cryptoT, entrees, sorties, biens, ctoCash, peaCash, cryptoCash] = await Promise.all([
         dataManager.getBankAccounts(),
         dataManager.getInvestments('CTO'),
         dataManager.getInvestments('PEA'),
+        dataManager.getCryptoTransactions(),  // ← AJOUTÉ
         dataManager.getCashFlow('entree'),
         dataManager.getCashFlow('sortie'),
         dataManager.getBiens(),
         dataManager.getCashTransactions('CTO'),
-        dataManager.getCashTransactions('PEA')
+        dataManager.getCashTransactions('PEA'),
+        dataManager.getCashTransactions('CRYPTO')  // ← AJOUTÉ
     ]);
     
     const ctoStats = calcStatsPro(ctoT, ctoCash);
     const peaStats = calcStatsPro(peaT, peaCash);
+    const cryptoStats = calcStatsPro(cryptoT, cryptoCash);  // ← AJOUTÉ
+    
     const ctoVal = ctoStats.totalPortefeuille;
     const peaVal = peaStats.totalPortefeuille;
+    const cryptoVal = cryptoStats.totalPortefeuille;  // ← AJOUTÉ
+    
     const accTotal = accounts.reduce((s, a) => s + parseFloat(a.solde || 0), 0);
-    const biensVal = biens.reduce((s, b) => s + parseFloat(b.solde || 0), 0); // solde = valeur du bien
-    const invTotal = ctoVal + peaVal;
+    const biensVal = biens.reduce((s, b) => s + parseFloat(b.solde || 0), 0);
+    
+    const invTotal = ctoVal + peaVal + cryptoVal;  // ← MODIFIÉ (+ cryptoVal)
+    
+    // ✅ NOUVEAU CALCUL : Cash total = comptes bancaires + cash CTO + cash PEA + cash Crypto
+    const cashTotal = accTotal + ctoStats.cash + peaStats.cash + cryptoStats.cash;
 
-    document.getElementById('patrimoineTotal').textContent      = fmt(accTotal + invTotal + biensVal);
-    document.getElementById('liquiditesTotal').textContent      = fmt(accTotal);
+    document.getElementById('patrimoineTotal').textContent = fmt(accTotal + invTotal + biensVal);
+    document.getElementById('liquiditesTotal').textContent = fmt(cashTotal);  // ← MODIFIÉ
     document.getElementById('investissementsTotal').textContent = fmt(invTotal);
 
     const recent = [...entrees, ...sorties].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
@@ -36,16 +46,21 @@ async function updateAccueil() {
 
     // Graphiques
     const ctx1 = destroyChart('patrimoineChart');
-    if (ctx1) new Chart(ctx1, { type: 'doughnut',
-        data: { labels: ['Liquidités','Investissements','Biens'],
-                datasets: [{ data: [accTotal, invTotal, biensVal], backgroundColor: ['#10b981','#2563eb','#f59e0b'] }] },
-        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    if (ctx1) new Chart(ctx1, { 
+        type: 'doughnut',
+        data: { 
+            labels: ['Liquidités','Investissements','Biens'],
+            datasets: [{ 
+                data: [cashTotal, invTotal, biensVal],  // ← MODIFIÉ (cashTotal au lieu de accTotal)
+                backgroundColor: ['#10b981','#2563eb','#f59e0b'] 
+            }] 
+        },
+        options: { 
+            responsive: true, 
+            plugins: { legend: { position: 'bottom' } } 
+        }
     });
 
-    const allItems = [...entrees, ...sorties].sort((a, b) => new Date(a.date) - new Date(b.date));
-    let cumul = 0;
-    const evLabels = allItems.map(i => new Date(i.date).toLocaleDateString('fr-FR'));
-    const evVals   = allItems.map(i => { cumul += parseFloat(i.montant || 0); return cumul; });
     // Graphique évolution mensuelle
     renderFluxChart(entrees, sorties);
 }
