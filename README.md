@@ -63,7 +63,7 @@ DB/
 - **Hostinger** : à partir de 1€/mois
 - **O2Switch** (français) : environ 5€/mois
 
-Pour l'instant sur Netlify en gratuit
+Pour l'instant sur GitHub pages en gratuit
 
 #### Étapes générales
 1. Achetez un hébergement web + nom de domaine
@@ -72,12 +72,6 @@ Pour l'instant sur Netlify en gratuit
 4. Uploadez les 3 fichiers dans le dossier `public_html` ou `www`
 5. Accédez à votre domaine : `https://votredomaine.com`
 6. Mettre le nouveau lien dans Supabase
-
-### Ajouter un nom de domaine personnalisé
-1. Achetez un domaine chez OVH, Namecheap, Google Domains, etc.
-2. Dans les paramètres DNS, ajoutez :
-   - Pour GitHub Pages : un enregistrement CNAME vers `votre-username.github.io`
-   - Pour Netlify/Vercel : suivez leurs instructions dans les paramètres
 
 ---
 

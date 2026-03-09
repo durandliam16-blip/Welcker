@@ -27,7 +27,7 @@ async function updateAccueil() {
    
     // Calculer bénéfice flux
     const totalEntrees = entrees.reduce((s, e) => s + parseFloat(e.montant || 0), 0);
-    const totalSorties = sorties.reduce((s, s) => s + parseFloat(s.montant || 0), 0);
+    const totalSorties = sorties.reduce((total, depense) => total + parseFloat(depense.montant || 0), 0);
     const beneficeFlux = totalEntrees - totalSorties;
 
     // Patrimoine total = Cash + Investissements + Biens
