@@ -1071,31 +1071,55 @@
         </div>
     </div>
 
+    <!-- CDN en premier -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- Guard : redirige vers login.html si l'utilisateur n'est pas connecté -->
+
+    <!-- Vérification auth -->
     <script>
-        (async () => {
-            const { createClient } = window.supabase;
-            const _sb = createClient(
-                'https://qktbcgumyqjgbvcpynjo.supabase.co',
-                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrdGJjZ3VteXFqZ2J2Y3B5bmpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MDQ0MDYsImV4cCI6MjA4NjM4MDQwNn0.Bjv4bb2gnXKG8-UY4oSUQrjaJIzNWEG_zM8_XTQbwsY' // ← même clé que dans login.html
-            );
-            const { data: { session } } = await _sb.auth.getSession();
-            if (!session) window.location.replace('login.html');
-        })();
-    </script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js')
-                .then(() => console.log('Service Worker enregistré'))
-                .catch(() => {});
+    (async () => {
+        if (!window.supabase) {
+            console.error('Supabase non chargé !');
+            window.location.replace('login.html');
+            return;
         }
+        const { createClient } = window.supabase;
+        const _sb = createClient(
+            'https://qktbcgumyqjgbvcpynjo.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrdGJjZ3VteXFqZ2J2Y3B5bmpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MDQ0MDYsImV4cCI6MjA4NjM4MDQwNn0.Bjv4bb2gnXKG8-UY4oSUQrjaJIzNWEG_zM8_XTQbwsY'
+        );
+        const { data: { session } } = await _sb.auth.getSession();
+        if (!session) {
+            window.location.replace('login.html');
+            return;
+        }
+        console.log('✅ Session active:', session.user.email);
+    })();
     </script>
-    <!-- Scripts modulaires (dans l'ordre) -->
+
+    <!-- Tes fichiers JS (dans l'ordre !) -->
     <script src="js/config.js"></script>
     <script src="js/dataManager.js"></script>
     <script src="js/app.js"></script>
     <script src="js/pages.js"></script>
     <script src="js/others.js"></script>
+
+    <!-- Initialisation -->
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        console.log('🚀 App démarrée');
+        
+        // Setup navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                navigateTo(link.dataset.page);
+            });
+        });
+        
+        // Charger page d'accueil
+        await navigateTo('accueil');
+    });
+    </script>
 </body>
 </html>
