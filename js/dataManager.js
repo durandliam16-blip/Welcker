@@ -308,6 +308,90 @@ class DataManager {
     // ── Paramètres (localStorage uniquement, pas de table dédiée) ────────────
     getSettings() { return JSON.parse(localStorage.getItem('welcker_settings') || '{"theme":"light","devise":"EUR"}'); }
     saveSettings(s) { localStorage.setItem('welcker_settings', JSON.stringify(s)); }
+
+    // =============================================================================
+    // HISTORIQUE DU PATRIMOINE (MENSUEL)
+    // =============================================================================
+
+    async getPatrimoineHistory(months = 12) {
+        const user = await getUser();
+        const startDate = new Date();
+        startDate.setMonth(startDate.getMonth() - months);
+        
+        const { data, error } = await sb
+            .from('patrimoine_history')
+            .select('*')
+            .eq('user_id', user.id)
+            .gte('date', startDate.toISOString().split('T')[0])
+            .order('date', { ascending: true });
+        
+        if (error) {
+            console.error('getPatrimoineHistory:', error);
+            return [];
+        }
+        return data || [];
+    }
+
+    async savePatrimoineSnapshot(patrimoineData) {
+        const user = await getUser();
+        
+        // Utiliser le 1er jour du mois actuel comme date de snapshot
+        const today = new Date();
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const dateKey = firstDayOfMonth.toISOString().split('T')[0];
+        
+        const payload = {
+            user_id: user.id,
+            date: dateKey,
+            patrimoine_total: patrimoineData.total,
+            cash_total: patrimoineData.cash,
+            investissements_total: patrimoineData.investissements,
+            biens_total: patrimoineData.biens
+        };
+        
+        // Upsert : Insert ou Update si existe déjà pour ce mois
+        const { data, error } = await sb
+            .from('patrimoine_history')
+            .upsert(payload, { onConflict: 'user_id,date' })
+            .select();
+        
+        if (error) {
+            console.error('savePatrimoineSnapshot:', error);
+            return false;
+        }
+        return true;
+    }
+
+    async getSP500History(months = 12) {
+        const startDate = new Date();
+        startDate.setMonth(startDate.getMonth() - months);
+        
+        const { data, error } = await sb
+            .from('sp500_history')
+            .select('*')
+            .gte('date', startDate.toISOString().split('T')[0])
+            .order('date', { ascending: true });
+        
+        if (error) {
+            console.error('getSP500History:', error);
+            return [];
+        }
+        return data || [];
+    }
+
+    async deletePatrimoineHistory(id) {
+        const { error } = await sb
+            .from('patrimoine_history')
+            .delete()
+            .eq('id', id);
+        
+        if (error) {
+            console.error('deletePatrimoineHistory:', error);
+            return false;
+        }
+        return true;
+    }
+
 }
 
 const dataManager = new DataManager();

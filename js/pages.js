@@ -125,6 +125,26 @@ async function updateAccueil() {
     });
 
     renderFluxChart(entrees, sorties);
+
+    // Graphique évolution patrimoine
+    await renderPatrimoineEvolutionChart();
+    
+    // Event listener pour changement de période
+    const periodSelect = document.getElementById('patrimoineChartPeriod');
+    if (periodSelect) {
+        periodSelect.onchange = () => renderPatrimoineEvolutionChart();
+    }
+
+    // Sauvegarder snapshot automatiquement (1 fois par mois)
+    const lastSave = localStorage.getItem('lastPatrimoineSnapshot');
+    const today = new Date();
+    const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+
+    if (lastSave !== currentMonth) {
+        await window.saveCurrentPatrimoine();
+        localStorage.setItem('lastPatrimoineSnapshot', currentMonth);
+        console.log('✅ Snapshot mensuel sauvegardé automatiquement');
+    }
 }
 
 // =============================================================================

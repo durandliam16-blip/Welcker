@@ -669,6 +669,260 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // =============================================================================
+// GRAPHIQUE ÉVOLUTION PATRIMOINE (historique réel)
+// =============================================================================
+
+// =============================================================================
+// GRAPHIQUE ÉVOLUTION PATRIMOINE vs S&P 500 (BASE 100)
+// =============================================================================
+
+async function renderPatrimoineEvolutionChart() {
+    const canvas = document.getElementById('patrimoineChart');
+    if (!canvas) return;
+    
+    const ctx = destroyChart('patrimoineChart');
+    if (!ctx) return;
+    
+    // Récupérer période sélectionnée
+    const periodSelect = document.getElementById('patrimoineChartPeriod');
+    const period = periodSelect ? periodSelect.value : '12';
+    const months = period === 'all' ? 120 : parseInt(period); // 120 = 10 ans
+    
+    // Récupérer l'historique du patrimoine ET du S&P 500
+    const [patrimoineHistory, sp500History] = await Promise.all([
+        dataManager.getPatrimoineHistory(months),
+        dataManager.getSP500History(months)
+    ]);
+    
+    if (!patrimoineHistory || patrimoineHistory.length === 0) {
+        canvas.parentElement.innerHTML = `
+            <div style="text-align:center;color:var(--text-secondary);padding:100px 20px;">
+                <p style="font-size:16px;margin-bottom:12px;">📊 Aucun historique disponible</p>
+                <p style="font-size:14px;opacity:0.8;">Utilisez le bouton "💾 Sauvegarder snapshot" pour commencer à enregistrer l'évolution mensuelle de votre patrimoine.</p>
+                <p style="font-size:13px;opacity:0.6;margin-top:8px;">💡 Un snapshot par mois suffit pour suivre votre évolution !</p>
+            </div>`;
+        return;
+    }
+    
+    // Normaliser les données en base 100
+    const normalizeToBase100 = (data, valueKey) => {
+        if (!data || data.length === 0) return [];
+        const baseValue = parseFloat(data[0][valueKey]);
+        return data.map(item => {
+            const value = parseFloat(item[valueKey]);
+            return baseValue > 0 ? (value / baseValue) * 100 : 100;
+        });
+    };
+    
+    // Préparer les labels (dates)
+    const labels = patrimoineHistory.map(h => 
+        new Date(h.date).toLocaleDateString('fr-FR', { 
+            month: 'short',
+            year: '2-digit'
+        })
+    );
+    
+    // Normaliser patrimoine en base 100
+    const patrimoineNormalized = normalizeToBase100(patrimoineHistory, 'patrimoine_total');
+    
+    // Aligner S&P 500 sur les mêmes dates que le patrimoine
+    const sp500Aligned = patrimoineHistory.map(ph => {
+        const phDate = new Date(ph.date);
+        // Trouver la donnée S&P 500 la plus proche
+        const closest = sp500History.reduce((prev, curr) => {
+            const prevDiff = Math.abs(new Date(prev.date) - phDate);
+            const currDiff = Math.abs(new Date(curr.date) - phDate);
+            return currDiff < prevDiff ? curr : prev;
+        }, sp500History[0]);
+        return closest ? parseFloat(closest.close_price) : null;
+    });
+    
+    // Normaliser S&P 500 en base 100 (même base que patrimoine)
+    const sp500Normalized = sp500Aligned[0] > 0 
+        ? sp500Aligned.map(v => v ? (v / sp500Aligned[0]) * 100 : null)
+        : [];
+    
+    // Calculer la performance actuelle
+    const patrimoinePerf = patrimoineNormalized.length > 0 
+        ? (patrimoineNormalized[patrimoineNormalized.length - 1] - 100).toFixed(1)
+        : 0;
+    const sp500Perf = sp500Normalized.length > 0 
+        ? (sp500Normalized[sp500Normalized.length - 1] - 100).toFixed(1)
+        : 0;
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: `📊 Mon patrimoine (${patrimoinePerf > 0 ? '+' : ''}${patrimoinePerf}%)`,
+                    data: patrimoineNormalized,
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: patrimoineHistory.length > 24 ? 0 : 4,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: '#2563eb',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                },
+                {
+                    label: `📈 S&P 500 (${sp500Perf > 0 ? '+' : ''}${sp500Perf}%)`,
+                    data: sp500Normalized,
+                    borderColor: '#10b981',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: [8, 4],
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: { size: 13, weight: '600' },
+                        generateLabels: function(chart) {
+                            const datasets = chart.data.datasets;
+                            return datasets.map((dataset, i) => ({
+                                text: dataset.label,
+                                fillStyle: dataset.borderColor,
+                                strokeStyle: dataset.borderColor,
+                                lineWidth: dataset.borderWidth,
+                                hidden: false,
+                                index: i,
+                                pointStyle: i === 0 ? 'circle' : 'line'
+                            }));
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            return context[0].label;
+                        },
+                        label: function(context) {
+                            const label = context.dataset.label.split('(')[0].trim();
+                            const value = context.parsed.y;
+                            const perf = (value - 100).toFixed(2);
+                            return `${label}: ${value.toFixed(2)} (${perf > 0 ? '+' : ''}${perf}%)`;
+                        }
+                    },
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: { size: 13, weight: 'bold' },
+                    bodyFont: { size: 12 }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Performance (Base 100)',
+                        font: { size: 12, weight: '600' }
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value.toFixed(0);
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 0,
+                        autoSkip: true,
+                        maxTicksLimit: 12,
+                        font: { size: 11 }
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Sauvegarder snapshot actuel
+window.saveCurrentPatrimoine = async function() {
+    try {
+        // Récupérer toutes les données actuelles
+        const [accounts, ctoT, peaT, cryptoT, biens, ctoCash, peaCash, cryptoCash] = await Promise.all([
+            dataManager.getBankAccounts(),
+            dataManager.getInvestments('CTO'),
+            dataManager.getInvestments('PEA'),
+            dataManager.getCryptoTransactions(),
+            dataManager.getBiens(),
+            dataManager.getCashTransactions('CTO'),
+            dataManager.getCashTransactions('PEA'),
+            dataManager.getCashTransactions('CRYPTO')
+        ]);
+        
+        const ctoStats = calcStatsPro(ctoT, ctoCash);
+        const peaStats = calcStatsPro(peaT, peaCash);
+        const cryptoStats = calcStatsPro(cryptoT, cryptoCash);
+        
+        // Séparer comptes cash et investissements passifs
+        const comptesCash = accounts.filter(a => a.type !== 'investissement_passif');
+        const comptesInvestPassif = accounts.filter(a => a.type === 'investissement_passif');
+        
+        const accTotal = comptesCash.reduce((s, a) => s + parseFloat(a.solde || 0), 0);
+        const investPassifTotal = comptesInvestPassif.reduce((s, a) => s + parseFloat(a.solde || 0), 0);
+        const biensVal = biens.reduce((s, b) => s + parseFloat(b.solde || 0), 0);
+        
+        const invTotal = ctoStats.valorisation + peaStats.valorisation + cryptoStats.valorisation + investPassifTotal;
+        const cashTotal = accTotal + ctoStats.cash + peaStats.cash + cryptoStats.cash;
+        const patrimoineTotal = cashTotal + invTotal + biensVal;
+        
+        // Sauvegarder dans Supabase
+        const success = await dataManager.savePatrimoineSnapshot({
+            total: patrimoineTotal,
+            cash: cashTotal,
+            investissements: invTotal,
+            biens: biensVal
+        });
+        
+        if (success) {
+            showToast('Snapshot sauvegardé !', 'success');
+            // Rafraîchir le graphique
+            await renderPatrimoineEvolutionChart();
+        } else {
+            showToast('Erreur lors de la sauvegarde', 'error');
+        }
+    } catch (err) {
+        console.error('saveCurrentPatrimoine:', err);
+        showToast('Erreur : ' + err.message, 'error');
+    }
+};
+
+// Exposer globalement
+window.renderPatrimoineEvolutionChart = renderPatrimoineEvolutionChart;
+
+
+// =============================================================================
 // SANKEY DIAGRAM - FLUX FINANCIERS
 // =============================================================================
 
