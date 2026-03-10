@@ -643,19 +643,39 @@ function renderSankeyDiagram(entrees, sorties) {
     
     if (filterValue !== 'all') {
         const now = new Date();
-        const monthsToInclude = parseInt(filterValue);
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth();
         
-        const filterByMonths = (items) => {
-            return items.filter(item => {
-                const itemDate = new Date(item.date);
-                const monthsDiff = (now.getFullYear() - itemDate.getFullYear()) * 12 + 
-                                   (now.getMonth() - itemDate.getMonth());
-                return monthsDiff >= 0 && monthsDiff < monthsToInclude;
-            });
+        const filterByPeriod = (items) => {
+            if (filterValue === '0') {
+                // Ce mois-ci uniquement
+                return items.filter(item => {
+                    const d = new Date(item.date);
+                    return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+                });
+            } else if (filterValue === '1') {
+                // Mois dernier uniquement
+                const lastMonth = new Date(currentYear, currentMonth - 1, 1);
+                const lastMonthYear = lastMonth.getFullYear();
+                const lastMonthIndex = lastMonth.getMonth();
+                return items.filter(item => {
+                    const d = new Date(item.date);
+                    return d.getFullYear() === lastMonthYear && d.getMonth() === lastMonthIndex;
+                });
+            } else {
+                // X derniers mois (3, 6, 12)
+                const monthsBack = parseInt(filterValue);
+                return items.filter(item => {
+                    const itemDate = new Date(item.date);
+                    const monthsDiff = (currentYear - itemDate.getFullYear()) * 12 + 
+                                    (currentMonth - itemDate.getMonth());
+                    return monthsDiff >= 0 && monthsDiff < monthsBack;
+                });
+            }
         };
         
-        filteredEntrees = filterByMonths(entrees);
-        filteredSorties = filterByMonths(sorties);
+        filteredEntrees = filterByPeriod(entrees);
+        filteredSorties = filterByPeriod(sorties);
     }
     
     // Grouper par catégorie
