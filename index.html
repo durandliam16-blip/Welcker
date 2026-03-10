@@ -114,28 +114,9 @@
                     <h3>Répartition par actifs</h3>
                     <canvas id="patrimoineChart"></canvas>
                 </div>
-                <!-- Graphique en pleine largeur -->
-                <div class="card" style="grid-column: 1 / -1; margin-top: 24px;">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3>📈 Évolution du patrimoine</h3>
-                        <div style="display: flex; gap: 12px;">
-                            <select id="patrimoineChartPeriod">
-                                <option value="3">3 derniers mois</option>
-                                <option value="6">6 derniers mois</option>
-                                <option value="12" selected>1 an</option>
-                                <option value="24">2 ans</option>
-                                <option value="36">3 ans</option>
-                                <option value="60">5 ans</option>
-                                <option value="all">Depuis le début</option>
-                            </select>
-                            <button class="btn-secondary btn-sm" onclick="saveCurrentPatrimoine()" title="Enregistrer l'état actuel">
-                                💾 Sauvegarder snapshot
-                            </button>
-                        </div>
-                    </div>
-                    <div style="height: 300px; position: relative;">
-                        <canvas id="patrimoineChart"></canvas>
-                    </div>
+                <div class="card">
+                    <h3>Évolution mensuelle du patrimoine</h3>
+                    <canvas id="evolutionChart"></canvas>
                 </div>
             </div>
         </div>

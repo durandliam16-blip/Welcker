@@ -13,14 +13,7 @@ Sites autres utilisés :
 > eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrdGJjZ3VteXFqZ2J2Y3B5bmpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MDQ0MDYsImV4cCI6MjA4NjM4MDQwNn0.Bjv4bb2gnXKG8-UY4oSUQrjaJIzNWEG_zM8_XTQbwsY
 - *Google docs* pour idées et liens
 - *Github* pour repo
-- *Github pages* pour mise en production
-
---> Chaque mois faire l'ajout du S&P500 par : 
-```sql
-INSERT INTO sp500_history (date, close_price) VALUES
-  ('2025-04-01', 6305.50)  -- ← Valeur du S&P 500 au 1er avril
-ON CONFLICT (date) DO UPDATE SET close_price = EXCLUDED.close_price;
-```
+- *Netlify* pour mise en production
 
 ## ✅ Pages implémentées
 
@@ -82,6 +75,6 @@ Pour l'instant sur GitHub pages en gratuit
 
 ---
 
-**Version** : 1.2.0  
+**Version** : 1.1.1  
 **Date** : Mars 2026  
 **Licence** : Partage aux proches
