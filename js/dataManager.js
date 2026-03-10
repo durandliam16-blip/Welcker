@@ -281,7 +281,6 @@ class DataManager {
         };
         const { error } = await sb.from('accounts').insert([payload]);
         if (error) { console.error('addAccount:', error.message); showToast('Erreur : ' + error.message, 'error'); return false; }
-        showToast('Compte ajouté !', 'success');
         return true;
     }
 

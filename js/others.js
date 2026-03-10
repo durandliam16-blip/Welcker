@@ -8,6 +8,8 @@ async function addTransaction(e) {
         type:          document.getElementById('transactionType').value === 'achat',
         date:          document.getElementById('transactionDate').value,
         titre:         document.getElementById('transactionTitre').value,
+        libelle:       document.getElementById('transactionLibelle').value,
+        categorie:     document.getElementById('transactionCategorie').value,    
         quantite:      parseFloat(document.getElementById('transactionQuantite').value),
         prix_unitaire: parseFloat(document.getElementById('transactionPrix').value),
         frais:         parseFloat(document.getElementById('transactionFrais').value) || 0
@@ -23,7 +25,11 @@ async function addBienForm(e) {
         valeur: parseFloat(document.getElementById('bienValeur').value),  // → solde dans DB
         notes:  document.getElementById('bienNotes').value || null        // → fournisseur dans DB
     });
-    if (ok) { closeModal('modalAddBien'); await updateAutresBiens(); }
+    if (ok) { 
+        showToast('Bien ajouté', 'success');
+        closeModal('modalAddBien'); 
+        await updateAutresBiens(); 
+    }
 }
 
 async function addEntreeForm(e) {
@@ -55,7 +61,11 @@ async function addCompteForm(e) {
         type:  document.getElementById('compteType').value,
         solde: parseFloat(document.getElementById('compteSolde').value)
     });
-    if (ok) { closeModal('modalAddCompte'); await updateComptes(); }
+    if (ok) { 
+        showToast('Compte ajouté', 'success');
+        closeModal('modalAddCompte'); 
+        await updateComptes(); 
+    }
 }
 
 // =============================================================================
@@ -278,7 +288,6 @@ function destroyChart(canvasId) {
 function renderPositionsChart(canvasId, positions) {
     const ctx = destroyChart(canvasId);
     if (!ctx || !positions || positions.length === 0) {
-        // Pas de graphique si pas de positions
         const canvas = document.getElementById(canvasId);
         if (canvas) {
             canvas.parentElement.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:40px;">Aucune position</p>';
@@ -286,26 +295,59 @@ function renderPositionsChart(canvasId, positions) {
         return;
     }
     
+    // Grouper par catégorie
+    const parCategorie = {};
+    positions.forEach(p => {
+        const cat = p.categorie || 'Autres';
+        if (!parCategorie[cat]) {
+            parCategorie[cat] = 0;
+        }
+        parCategorie[cat] += p.valorisation || 0;
+    });
+    
+    // Icônes par catégorie
+    const icons = {
+        'Tech': '🖥️',
+        'Santé': '🧬',
+        'ETF pays': '💰',
+        'Industrie': '🏭',
+        'Transports': '🚗',
+        'Luxe': '💎',
+        'Autres': '📦'
+    };
+    
+    const labels = Object.keys(parCategorie).map(cat => `${icons[cat] || ''} ${cat}`);
+    const data = Object.values(parCategorie);
+    
     new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: positions.map(p => p.libelle || p.titre),
+            labels: labels,
             datasets: [{
-                data: positions.map(p => p.valorisation),
-                backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16']
+                data: data,
+                backgroundColor: [
+                    '#2563eb', // Bleu
+                    '#f59e0b', // Orange
+                    '#ef4444', // Rouge
+                    '#06b6d4', // Cyan
+                    '#14b8a6', // Teal
+                    '#a855f7', // Violet foncé
+                    '#64748b'  // Gris
+                ]
             }]
         },
         options: {
             responsive: true,
-            plugins: { 
+            plugins: {
                 legend: { position: 'bottom' },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            const value = context.parsed;
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = ((value / total) * 100).toFixed(1);
-                            return `${context.label}: ${fmt(value)} (${percentage}%)`;
+                            return `${label}: ${fmt(value)} (${percentage}%)`;
                         }
                     }
                 }

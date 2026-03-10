@@ -19,10 +19,16 @@ async function updateAccueil() {
     const peaStats = calcStatsPro(peaT, peaCash);
     const cryptoStats = calcStatsPro(cryptoT, cryptoCash);
     
-    const accTotal = accounts.reduce((s, a) => s + parseFloat(a.solde || 0), 0);
+    // Séparer comptes cash et investissements passifs
+    const comptesCash = accounts.filter(a => a.type !== 'investissement_passif');
+    const comptesInvestPassif = accounts.filter(a => a.type === 'investissement_passif');
+
+    const accTotal = comptesCash.reduce((s, a) => s + parseFloat(a.solde || 0), 0);
+    const investPassifTotal = comptesInvestPassif.reduce((s, a) => s + parseFloat(a.solde || 0), 0);
+    
     const biensVal = biens.reduce((s, b) => s + parseFloat(b.solde || 0), 0);
     
-    const invTotal = ctoStats.valorisation + peaStats.valorisation + cryptoStats.valorisation;    
+    const invTotal = ctoStats.valorisation + peaStats.valorisation + cryptoStats.valorisation + investPassifTotal;
     const cashTotal = accTotal + ctoStats.cash + peaStats.cash + cryptoStats.cash;
    
     // Calculer bénéfice flux
@@ -181,17 +187,25 @@ async function updateComptes() {
     
     const cont = document.getElementById('autresComptesContainer');
     cont.innerHTML = accs.length
-        ? accs.map(a => `
+        ? accs.map(a => {
+            const typeLabels = {
+                'courant': '💳 Courant',
+                'epargne': '💰 Épargne',
+                'livret': '📘 Livret',
+                'investissement_passif': '📊 Inv. passif'
+            };
+            return `
             <div class="card compte-card">
                 <div class="compte-header">
                     <h3>${a.nom}</h3>
-                    <span class="compte-type">${a.type || 'Compte'}</span>
+                    <span class="compte-type">${typeLabels[a.type] || a.type || 'Compte'}</span>
                 </div>
                 <div class="compte-amount">${fmt(a.solde)}</div>
                 <button class="btn-danger" style="margin-top:12px;width:100%;font-size:12px;padding:8px" onclick="window._deleteAccount('${a.id}')">
                     🗑️ Supprimer
                 </button>
-            </div>`).join('')
+            </div>`;
+        }).join('')
         : '<p class="empty-state">Aucun compte bancaire</p>';
 }
 

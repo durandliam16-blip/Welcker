@@ -221,7 +221,7 @@
                     <!-- Tableau des positions actuelles -->
                     <div class="card">
                         <div class="card-header">
-                            <h3>📊 Positions actuelles</h3>
+                            <h3>Positions principales :</h3>
                         </div>
                         <div class="table-responsive">
                             <table class="positions-table">
@@ -331,7 +331,7 @@
                     <!-- Tableau des positions actuelles -->
                     <div class="card">
                         <div class="card-header">
-                            <h3>📊 Positions actuelles</h3>
+                            <h3>Positions principales :</h3>
                         </div>
                         <div class="table-responsive">
                             <table class="positions-table">
@@ -441,7 +441,7 @@
                     <!-- Tableau des positions actuelles -->
                     <div class="card">
                         <div class="card-header">
-                            <h3>📊 Positions actuelles</h3>
+                            <h3>Positions principales :</h3>
                         </div>
                         <div class="table-responsive">
                             <table class="positions-table">
@@ -910,6 +910,19 @@
                         <input type="text" id="transactionLibelle" placeholder="AAPL, BTC, ETH..." required>
                     </div>
                     <div class="form-group">
+                        <label>Catégorie</label>
+                        <select id="transactionCategorie" required>
+                            <option value="">-- Choisir une catégorie --</option>
+                            <option value="Tech">🖥️ Tech</option>
+                            <option value="Bio">🧬 Santé</option>
+                            <option value="Finance">💰 ETF pays</option>
+                            <option value="Industrie">🏭 Industrie</option>
+                            <option value="Transports">🚗 Transports</option>
+                            <option value="Luxe">💎 Luxe</option>
+                            <option value="Autres">📦 Autres</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>Quantité</label>
                         <input type="number" id="transactionQuantite" step="0.01" required>
                     </div>
@@ -1070,12 +1083,12 @@
                         <input type="text" id="compteNom" placeholder="Ex: Livret A" required>
                     </div>
                     <div class="form-group">
-                        <label>Type</label>
+                        <label>Type de compte</label>
                         <select id="compteType" required>
-                            <option value="courant">Compte courant</option>
-                            <option value="epargne">Compte épargne</option>
-                            <option value="livret">Livret</option>
-                            <option value="autre">Autre</option>
+                            <option value="courant">💳 Compte courant</option>
+                            <option value="epargne">💰 Compte épargne</option>
+                            <option value="livret">📘 Livret</option>
+                            <option value="investissement_passif">📊 Investissement passif</option>
                         </select>
                     </div>
                     <div class="form-group">

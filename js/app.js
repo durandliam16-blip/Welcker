@@ -82,6 +82,7 @@ function calcStatsPro(transactions, cashTransactions = []) {
             positions[libelle] = {
                 libelle,
                 titre: t.titre || libelle,
+                categorie: t.categorie || 'Autres',
                 quantite: 0,
                 capitalInvesti: 0,
                 pru: 0,
