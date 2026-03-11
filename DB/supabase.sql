@@ -66,6 +66,7 @@ CREATE TABLE public.investment_transactions_crypto (
   prix_unitaire numeric NOT NULL,
   frais numeric DEFAULT 0,
   date date DEFAULT CURRENT_DATE,
+  categorie text,
   CONSTRAINT investment_transactions_crypto_pkey PRIMARY KEY (id),
   CONSTRAINT investment_transactions_crypto_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );
@@ -79,6 +80,7 @@ CREATE TABLE public.investment_transactions_cto (
   prix_unitaire numeric NOT NULL,
   frais numeric DEFAULT 0,
   date date DEFAULT CURRENT_DATE,
+  categorie text,
   CONSTRAINT investment_transactions_cto_pkey PRIMARY KEY (id),
   CONSTRAINT investment_transactions_cto_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );
@@ -92,8 +94,21 @@ CREATE TABLE public.investment_transactions_pea (
   prix_unitaire numeric NOT NULL,
   frais numeric DEFAULT 0,
   date date DEFAULT CURRENT_DATE,
+  categorie text,
   CONSTRAINT investment_transactions_pea_pkey PRIMARY KEY (id),
   CONSTRAINT investment_transactions_pea_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.patrimoine_history (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL,
+  date date NOT NULL,
+  patrimoine_total numeric NOT NULL,
+  cash_total numeric DEFAULT 0,
+  investissements_total numeric DEFAULT 0,
+  biens_total numeric DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT patrimoine_history_pkey PRIMARY KEY (id),
+  CONSTRAINT patrimoine_history_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );
 CREATE TABLE public.profiles (
   id uuid NOT NULL,

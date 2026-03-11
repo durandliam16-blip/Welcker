@@ -295,12 +295,12 @@ function renderInvestTable(pfx, data, mode) {
         const isAchat = t.type === true || t.type === 'achat';
         const total   = parseFloat(t.quantite || 0) * parseFloat(t.prix_unitaire || 0);
         return `<tr>
-            <td>${new Date(t.date).toLocaleDateString('fr-FR')}</td>
+            <td>${escapeHTML(new Date(t.date).toLocaleDateString('fr-FR'))}</td>
             <td><span class="compte-type" style="background:${isAchat?'#10b981':'#ef4444'};color:#fff">${isAchat?'Achat':'Vente'}</span></td>
-            <td>${t.titre || '—'}</td>
-            <td>${t.quantite || 0}</td>
-            <td>${fmt(t.prix_unitaire)}</td>
-            <td>${fmt(total)}</td>
+            <td>${escapeHTML(t.titre || '—')}</td>
+            <td>${escapeHTML(t.quantite || 0)}</td>
+            <td>${escapeHTML(fmt(t.prix_unitaire))}</td>
+            <td>${escapeHTML(fmt(total))}</td>
             <td><button class="btn-icon" onclick="window._deleteInvestment('${mode}','${t.id}')" title="Supprimer">🗑️</button></td>
         </tr>`;
     }).join('');
@@ -392,10 +392,10 @@ async function updateCashFlowPage(type) {
 
     tbody.innerHTML = rows.length
         ? rows.map(i => `<tr>
-            <td>${new Date(i.date).toLocaleDateString('fr-FR')}</td>
-            <td><span class="compte-type">${i.categorie}</span></td>
-            <td>${i.description || '—'}</td>
-            <td class="${isE?'positive':'negative'}">${fmt(i.montant)}</td>
+            <td>${escapeHTML(new Date(i.date).toLocaleDateString('fr-FR'))}</td>
+            <td><span class="compte-type">${escapeHTML(i.categorie)}</span></td>
+            <td>${escapeHTML(i.description || '—')}</td>
+            <td class="${isE?'positive':'negative'}">${escapeHTML(fmt(i.montant))}</td>
             <td><button class="btn-icon" onclick="window._deleteCashFlow('${type}','${i.id}')" title="Supprimer">🗑️</button></td>
         </tr>`).join('')
         : `<tr><td colspan="5" class="empty-state">Aucune donnée</td></tr>`;
