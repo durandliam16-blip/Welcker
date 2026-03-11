@@ -125,6 +125,24 @@ async function updateAccueil() {
     });
 
     renderFluxChart(entrees, sorties);
+
+    // Graphique évolution patrimoine
+    await renderPatrimoineEvolutionChart();
+    
+    // Event listener pour changement de période
+    const periodSelect = document.getElementById('patrimoineChartPeriod');
+    if (periodSelect) {
+        periodSelect.onchange = () => renderPatrimoineEvolutionChart();
+    }
+
+    // Sauvegarder snapshot automatiquement (1 fois par jour)
+    const lastSave = localStorage.getItem('lastPatrimoineSnapshot');
+    const today = new Date().toISOString().split('T')[0];
+
+    if (lastSave !== today) {
+        await window.saveCurrentPatrimoine();
+        localStorage.setItem('lastPatrimoineSnapshot', today);
+    }
 }
 
 // =============================================================================

@@ -864,3 +864,198 @@ function renderSankeyDiagram(entrees, sorties) {
 
 // Exposer globalement
 window.renderSankeyDiagram = renderSankeyDiagram;
+
+// =============================================================================
+// GRAPHIQUE ÉVOLUTION PATRIMOINE (historique réel)
+// =============================================================================
+
+async function renderPatrimoineEvolutionChart() {
+    const canvas = document.getElementById('patrimoineChart');
+    if (!canvas) return;
+    
+    const ctx = destroyChart('patrimoineChart');
+    if (!ctx) return;
+    
+    // Récupérer période sélectionnée
+    const periodSelect = document.getElementById('patrimoineChartPeriod');
+    const period = periodSelect ? periodSelect.value : '365';
+    const days = period === 'all' ? 3650 : parseInt(period); // 3650 = ~10 ans
+    
+    // Récupérer l'historique
+    const history = await dataManager.getPatrimoineHistory(days);
+    
+    if (!history || history.length === 0) {
+        canvas.parentElement.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:100px 20px;">Aucun historique disponible. Utilisez le bouton "💾 Sauvegarder snapshot" pour commencer à enregistrer l\'évolution de votre patrimoine.</p>';
+        return;
+    }
+    
+    // Préparer les données
+    const labels = history.map(h => new Date(h.date).toLocaleDateString('fr-FR', { 
+        day: 'numeric', 
+        month: 'short',
+        year: history.length > 90 ? 'numeric' : undefined // Afficher année si > 3 mois
+    }));
+    
+    const patrimoineData = history.map(h => parseFloat(h.patrimoine_total));
+    const cashData = history.map(h => parseFloat(h.cash_total || 0));
+    const investData = history.map(h => parseFloat(h.investissements_total || 0));
+    const biensData = history.map(h => parseFloat(h.biens_total || 0));
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Patrimoine total',
+                    data: patrimoineData,
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: history.length > 100 ? 0 : 3,
+                    pointHoverRadius: 6
+                },
+                {
+                    label: 'Cash',
+                    data: cashData,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 4
+                },
+                {
+                    label: 'Investissements',
+                    data: investData,
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 4
+                },
+                {
+                    label: 'Biens',
+                    data: biensData,
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: { size: 12 }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + fmt(context.parsed.y);
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return new Intl.NumberFormat('fr-FR', { 
+                                style: 'currency', 
+                                currency: 'EUR',
+                                maximumFractionDigits: 0
+                            }).format(value);
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 0,
+                        autoSkip: true,
+                        maxTicksLimit: 20
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Sauvegarder snapshot actuel
+window.saveCurrentPatrimoine = async function() {
+    try {
+        // Récupérer toutes les données actuelles
+        const [accounts, ctoT, peaT, cryptoT, biens, ctoCash, peaCash, cryptoCash] = await Promise.all([
+            dataManager.getBankAccounts(),
+            dataManager.getInvestments('CTO'),
+            dataManager.getInvestments('PEA'),
+            dataManager.getCryptoTransactions(),
+            dataManager.getBiens(),
+            dataManager.getCashTransactions('CTO'),
+            dataManager.getCashTransactions('PEA'),
+            dataManager.getCashTransactions('CRYPTO')
+        ]);
+        
+        const ctoStats = calcStatsPro(ctoT, ctoCash);
+        const peaStats = calcStatsPro(peaT, peaCash);
+        const cryptoStats = calcStatsPro(cryptoT, cryptoCash);
+        
+        // Séparer comptes cash et investissements passifs
+        const comptesCash = accounts.filter(a => a.type !== 'investissement_passif');
+        const comptesInvestPassif = accounts.filter(a => a.type === 'investissement_passif');
+        
+        const accTotal = comptesCash.reduce((s, a) => s + parseFloat(a.solde || 0), 0);
+        const investPassifTotal = comptesInvestPassif.reduce((s, a) => s + parseFloat(a.solde || 0), 0);
+        const biensVal = biens.reduce((s, b) => s + parseFloat(b.solde || 0), 0);
+        
+        const invTotal = ctoStats.valorisation + peaStats.valorisation + cryptoStats.valorisation + investPassifTotal;
+        const cashTotal = accTotal + ctoStats.cash + peaStats.cash + cryptoStats.cash;
+        const patrimoineTotal = cashTotal + invTotal + biensVal;
+        
+        // Sauvegarder dans Supabase
+        const success = await dataManager.savePatrimoineSnapshot({
+            total: patrimoineTotal,
+            cash: cashTotal,
+            investissements: invTotal,
+            biens: biensVal
+        });
+        
+        if (success) {
+            showToast('Snapshot sauvegardé !', 'success');
+            // Rafraîchir le graphique
+            await renderPatrimoineEvolutionChart();
+        } else {
+            showToast('Erreur lors de la sauvegarde', 'error');
+        }
+    } catch (err) {
+        console.error('saveCurrentPatrimoine:', err);
+        showToast('Erreur : ' + err.message, 'error');
+    }
+};
+
+// Exposer globalement
+window.renderPatrimoineEvolutionChart = renderPatrimoineEvolutionChart;
