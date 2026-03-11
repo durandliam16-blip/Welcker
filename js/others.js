@@ -876,13 +876,16 @@ async function renderPatrimoineEvolutionChart() {
     const ctx = destroyChart('patrimoineChart');
     if (!ctx) return;
     
-    // Récupérer période sélectionnée
+    /// Récupérer période sélectionnée
     const periodSelect = document.getElementById('patrimoineChartPeriod');
-    const period = periodSelect ? periodSelect.value : '365';
-    const days = period === 'all' ? 3650 : parseInt(period); // 3650 = ~10 ans
-    
+    const period = periodSelect ? periodSelect.value : '12';
+
+    // Limiter la période maximale pour éviter la surcharge
+    const maxMonths = 36; // 3 ans max
+    const months = period === 'all' ? maxMonths : Math.min(parseInt(period), maxMonths);
+
     // Récupérer l'historique
-    const history = await dataManager.getPatrimoineHistory(days);
+    const history = await dataManager.getPatrimoineHistory(months);
     
     if (!history || history.length === 0) {
         canvas.parentElement.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:100px 20px;">Aucun historique disponible. Utilisez le bouton "💾 Sauvegarder snapshot" pour commencer à enregistrer l\'évolution de votre patrimoine.</p>';

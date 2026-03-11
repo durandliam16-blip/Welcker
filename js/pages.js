@@ -135,13 +135,32 @@ async function updateAccueil() {
         periodSelect.onchange = () => renderPatrimoineEvolutionChart();
     }
 
-    // Sauvegarder snapshot automatiquement (1 fois par jour)
+    // Sauvegarder snapshot automatiquement (hebdomadaire par défaut)
+    const snapshotFrequency = localStorage.getItem('snapshotFrequency') || 'weekly';
     const lastSave = localStorage.getItem('lastPatrimoineSnapshot');
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date();
 
-    if (lastSave !== today) {
+    let shouldSave = false;
+    let currentKey = '';
+
+    if (snapshotFrequency === 'weekly') {
+        // Snapshot hebdomadaire (tous les lundis)
+        const mondayOfWeek = new Date(today);
+        const dayOfWeek = today.getDay();
+        const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Lundi de cette semaine
+        mondayOfWeek.setDate(diff);
+        currentKey = mondayOfWeek.toISOString().split('T')[0]; // Format: 2025-03-10
+        shouldSave = lastSave !== currentKey;
+    } else if (snapshotFrequency === 'monthly') {
+        // Snapshot mensuel (1er du mois)
+        currentKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`;
+        shouldSave = lastSave !== currentKey;
+    }
+
+    if (shouldSave) {
         await window.saveCurrentPatrimoine();
-        localStorage.setItem('lastPatrimoineSnapshot', today);
+        localStorage.setItem('lastPatrimoineSnapshot', currentKey);
+        console.log(`✅ Snapshot ${snapshotFrequency === 'weekly' ? 'hebdomadaire' : 'mensuel'} sauvegardé`);
     }
 }
 
