@@ -101,7 +101,7 @@ async function updateAccueil() {
         : '<p class="empty-state">Aucune transaction</p>';
 
     // Graphiques
-    const ctx1 = destroyChart('patrimoineChart');
+    const ctx1 = destroyChart('patrimoineRepartition');
     if (ctx1) new Chart(ctx1, { 
         type: 'doughnut',
         data: { 

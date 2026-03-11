@@ -75,69 +75,67 @@
 
         <!-- Page: Accueil -->
         <div class="page active" id="page-accueil">
-            <div class="page-header">
-                <h1>Accueil</h1>
+
+            <!-- 1. Vue d'ensemble -->
+            <div class="card">
+                <h3>💼 Vue d'ensemble</h3>
+                <div class="overview-content">
+                    <div class="stat-item">
+                        <span class="stat-label">Patrimoine total</span>
+                        <span class="amount-display" id="patrimoineTotal">0 €</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Cash</span>
+                        <span class="stat-value" id="liquiditesTotal">0 €</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Investissements</span>
+                        <span class="stat-value" id="investissementsTotal">0 €</span>
+                    </div>
+                </div>
             </div>
+
+            <!-- 2. Grid 2 colonnes : Dernières transactions + Répartition actifs -->
             <div class="dashboard-grid">
-                <div class="card card-large">
-                    <h3>Vue d'ensemble</h3>
-                    <div class="overview-content">
-                        <div class="stat-item">
-                            <span class="stat-label">Patrimoine total</span>
-                            <span class="amount-display" id="patrimoineTotal">0 €</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Cash</span>
-                            <span class="stat-value" id="liquiditesTotal">0 €</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Investissements</span>
-                            <span class="stat-value" id="investissementsTotal">0 €</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Autres biens</span>
-                            <span class="stat-value" id="autresBiens">0 €</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Bénéfice flux</span>
-                            <span class="stat-value" id="beneficeFlux">0 €</span>
-                        </div>
+                <!-- 2A. Dernières transactions -->
+                <div class="card">
+                    <h3>🕐 Dernières transactions</h3>
+                    <div id="recentTransactions"></div>
+                </div>
+
+                <!-- 2B. Répartition actifs (CAMEMBERT) -->
+                <div class="card">
+                    <h3>📊 Répartition par actifs</h3>
+                    <canvas id="patrimoineRepartition" height="200"></canvas>
+                </div>
+            </div>
+            <!-- FIN du dashboard-grid -->
+
+            <!-- 3. Graphique évolution (EN DESSOUS, pleine largeur) -->
+            <div class="card" style="margin-top: 32px;">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3>📈 Évolution du patrimoine vs S&P 500</h3>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <label style="font-size: 14px; color: var(--text-secondary);">Période :</label>
+                        <select id="patrimoineChartPeriod" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit;">
+                            <option value="3">3 mois</option>
+                            <option value="6">6 mois</option>
+                            <option value="12" selected>1 an</option>
+                            <option value="24">2 ans</option>
+                            <option value="36">3 ans</option>
+                            <option value="60">5 ans</option>
+                            <option value="all">Tout</option>
+                        </select>
+                        <button class="btn-secondary btn-sm" onclick="saveCurrentPatrimoine()" title="Enregistrer snapshot">
+                            💾 Snapshot
+                        </button>
                     </div>
                 </div>
-                <div class="card">
-                    <h3>Dernières transactions</h3>
-                    <div id="dernieresTransactions" class="transaction-list">
-                        <p class="empty-state">Aucune transaction</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <h3>Répartition par actifs</h3>
+                <div style="height: 350px; width: 100%; position: relative;">
                     <canvas id="patrimoineChart"></canvas>
                 </div>
-                <!-- Graphique patrimoine (section séparée) -->
-                <div class="card" style="margin-top: 32px;">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3>📈 Évolution du patrimoine</h3>
-                        <div style="display: flex; gap: 12px;">
-                            <select id="patrimoineChartPeriod" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit;">
-                                <option value="30">30 derniers jours</option>
-                                <option value="90">3 derniers mois</option>
-                                <option value="180">6 derniers mois</option>
-                                <option value="365" selected>1 an</option>
-                                <option value="730">2 ans</option>
-                                <option value="all">Depuis le début</option>
-                            </select>
-                            <button class="btn-secondary btn-sm" onclick="saveCurrentPatrimoine()" title="Enregistrer l'état actuel">
-                                💾 Sauvegarder snapshot
-                            </button>
-                        </div>
-                    </div>
-                    <div style="height: 300px; position: relative;">
-                        <canvas id="patrimoineChart"></canvas>
-                    </div>
-                </div>
             </div>
-        </div>
+        </div> <!-- Fermeture page-accueil -->
 
         <div class="page" id="page-comptes">
             <div class="page-header">
@@ -145,7 +143,6 @@
                     + Ajouter un compte
                 </button>
             </div>
-            
             <!-- Section Investissements -->
             <div class="section-header">
                 <span class="section-icon">📈</span>
