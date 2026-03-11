@@ -37,7 +37,7 @@ async function updateAccueil() {
     const beneficeFlux = totalEntrees - totalSorties;
 
     // Patrimoine total = Cash + Investissements + Biens
-    const patrimoineTotal = cashTotal + invTotal + biensVal + beneficeFlux;
+    const patrimoineTotal = cashTotal + invTotal + biensVal;
     // Afficher
     document.getElementById('beneficeFlux').textContent = fmt(beneficeFlux);
     document.getElementById('autresBiens').textContent = fmt(biensVal);
@@ -81,7 +81,7 @@ async function updateAccueil() {
         .sort((a, b) => new Date(b.date) - new Date(a.date))
         .slice(0, 5);
     
-    const cont = document.getElementById('dernieresTransactions');
+    const cont = document.getElementById('recentTransactions');
     cont.innerHTML = recent.length
         ? recent.map(t => {
             const montant = t.montant || (parseFloat(t.quantite || 0) * parseFloat(t.prix_unitaire || 0));

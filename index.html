@@ -92,6 +92,14 @@
                         <span class="stat-label">Investissements</span>
                         <span class="stat-value" id="investissementsTotal">0 €</span>
                     </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total des posessions</span>
+                        <span class="stat-value" id="autresBiens">0 €</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total des économies</span>
+                        <span class="stat-value" id="beneficeFlux">0 €</span>
+                    </div>
                 </div>
             </div>
 
@@ -114,7 +122,7 @@
             <!-- 3. Graphique évolution (EN DESSOUS, pleine largeur) -->
             <div class="card" style="margin-top: 32px;">
                 <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <h3>📈 Évolution du patrimoine vs S&P 500</h3>
+                    <h3>📈 Évolution du patrimoine total</h3>
                     <div style="display: flex; gap: 12px; align-items: center;">
                         <label style="font-size: 14px; color: var(--text-secondary);">Période :</label>
                         <select id="patrimoineChartPeriod" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit;">
@@ -126,9 +134,6 @@
                             <option value="60">5 ans</option>
                             <option value="all">Tout</option>
                         </select>
-                        <button class="btn-secondary btn-sm" onclick="saveCurrentPatrimoine()" title="Enregistrer snapshot">
-                            💾 Snapshot
-                        </button>
                     </div>
                 </div>
                 <div style="height: 350px; width: 100%; position: relative;">
