@@ -660,3 +660,14 @@ async function submitFeatureSuggestion() {
         status.style.color = 'var(--danger-color)';
     }
 }
+
+// =============================================================================
+// EXPOSER LES FONCTIONS GLOBALEMENT (pour onclick dans HTML)
+// =============================================================================
+
+window.selectPresetAvatar = selectPresetAvatar;
+window.handleAvatarUpload = handleAvatarUpload;
+window.displayAvatar = displayAvatar;
+window.saveProfile = saveProfile;
+window.updateParametres = updateParametres;
+window.changeTheme = changeTheme;
