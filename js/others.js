@@ -138,18 +138,10 @@ async function toggleProfilPopup() {
         return;
     }
 
-    const [profile, bankAccs, cto, pea, biens] = await Promise.all([
-        dataManager.getProfile(),
-        dataManager.getBankAccounts(),
-        dataManager.getInvestments('CTO'),
-        dataManager.getInvestments('PEA'),
-        dataManager.getBiens()
-    ]);
-
-    const accTotal = bankAccs.reduce((s,a) => s + parseFloat(a.solde||0), 0);
-    const invTotal = calcStats(cto).current + calcStats(pea).current;
-    const biensVal = biens.reduce((s,b) => s + parseFloat(b.solde||0), 0);
-    const patrimoine = accTotal + invTotal + biensVal;
+    const profile = await dataManager.getProfile();
+    
+    // ✅ UTILISER les valeurs déjà calculées
+    const patrimoine = window.patrimoineGlobal?.total || 0;
 
     const initiale = (profile.nom || 'U')[0].toUpperCase();
     
@@ -173,10 +165,6 @@ async function toggleProfilPopup() {
       <div class="popup-stat">
         <span class="popup-stat-label">💰 Patrimoine total</span>
         <span class="popup-stat-value">${fmt(patrimoine)}</span>
-      </div>
-      <div class="popup-stat">
-        <span class="popup-stat-label">📞 Téléphone</span>
-        <span class="popup-stat-value">${profile.telephone || '—'}</span>
       </div>
       <div class="popup-divider"></div>
       <button class="popup-action-btn" onclick="navigateTo('profil');document.getElementById('popupProfil')?.remove()">✏️ Modifier le profil</button>

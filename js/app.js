@@ -192,3 +192,11 @@ function escapeHTML(str) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+
+// Définit une variale pour le réutiliser
+window.patrimoineGlobal = {
+    total: 0,
+    cash: 0,
+    investissements: 0,
+    biens: 0
+};

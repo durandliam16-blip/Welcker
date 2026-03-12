@@ -38,6 +38,15 @@ async function updateAccueil() {
 
     // Patrimoine total = Cash + Investissements + Biens
     const patrimoineTotal = cashTotal + invTotal + biensVal;
+
+    // Stocker dans variable globale pour réutilisation
+    window.patrimoineGlobal = {
+        total: patrimoineTotal,
+        cash: cashTotal,
+        investissements: invTotal,
+        biens: biensVal
+    };
+
     // Afficher
     document.getElementById('beneficeFlux').textContent = fmt(beneficeFlux);
     document.getElementById('autresBiens').textContent = fmt(biensVal);
@@ -484,7 +493,7 @@ function displayAvatar(url) {
 function selectPresetAvatar(avatarId) {
     // Avatars encodés en data URL (petits gradients + emoji)
     const presets = {
-        '1': 'data:image/svg+xml;base64,' + btoa(`
+        '1': 'data:image/svg+xml;charset=utf8,' + encodeURIComponent(`
             <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -496,7 +505,7 @@ function selectPresetAvatar(avatarId) {
                 <text x="100" y="130" font-size="80" text-anchor="middle" fill="white">💼</text>
             </svg>
         `),
-        '2': 'data:image/svg+xml;base64,' + btoa(`
+        '2': 'data:image/svg+xml;charset=utf8,' + encodeURIComponent(`
             <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -508,7 +517,7 @@ function selectPresetAvatar(avatarId) {
                 <text x="100" y="130" font-size="80" text-anchor="middle" fill="white">🚀</text>
             </svg>
         `),
-        '3': 'data:image/svg+xml;base64,' + btoa(`
+        '3': 'data:image/svg+xml;charset=utf8,' + encodeURIComponent(`
             <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -520,7 +529,7 @@ function selectPresetAvatar(avatarId) {
                 <text x="100" y="130" font-size="80" text-anchor="middle" fill="white">🌟</text>
             </svg>
         `),
-        '4': 'data:image/svg+xml;base64,' + btoa(`
+        '4': 'data:image/svg+xml;charset=utf8,' + encodeURIComponent(`
             <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
