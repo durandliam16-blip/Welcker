@@ -493,52 +493,25 @@ function displayAvatar(url) {
 function selectPresetAvatar(avatarId) {
     // Avatars encodés en data URL (petits gradients + emoji)
     const presets = {
-        '1': 'data:image/svg+xml;charset=utf8,' + encodeURIComponent(`
-            <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
-                <circle cx="100" cy="100" r="100" fill="url(#grad1)" />
-                <text x="100" y="130" font-size="80" text-anchor="middle" fill="white">💼</text>
-            </svg>
-        `),
-        '2': 'data:image/svg+xml;charset=utf8,' + encodeURIComponent(`
-            <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#f093fb;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#f5576c;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
-                <circle cx="100" cy="100" r="100" fill="url(#grad2)" />
-                <text x="100" y="130" font-size="80" text-anchor="middle" fill="white">🚀</text>
-            </svg>
-        `),
-        '3': 'data:image/svg+xml;charset=utf8,' + encodeURIComponent(`
-            <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
-                <circle cx="100" cy="100" r="100" fill="url(#grad3)" />
-                <text x="100" y="130" font-size="80" text-anchor="middle" fill="white">🌟</text>
-            </svg>
-        `),
+        '1': './images/logo.png',
+        '2': './images/mascotte.png',
+        '3': 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Warren_Buffett_at_the_2015_SelectUSA_Investment_Summit_%28cropped%29.jpg',
+        // 4. Graphique de Trading (Généré en code SVG pur, chandeliers japonais)
         '4': 'data:image/svg+xml;charset=utf8,' + encodeURIComponent(`
-            <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#43e97b;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#38f9d7;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
-                <circle cx="100" cy="100" r="100" fill="url(#grad4)" />
-                <text x="100" y="130" font-size="80" text-anchor="middle" fill="white">💎</text>
+            <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+                <rect width="200" height="200" fill="#0f172a"/>
+                <path d="M0 150 L200 150" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+                <path d="M0 100 L200 100" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+                <path d="M0 50 L200 50" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+                <line x1="40" y1="80" x2="40" y2="160" stroke="#ef4444" stroke-width="2"/>
+                <rect x="30" y="100" width="20" height="40" fill="#ef4444" rx="2"/>
+                <line x1="80" y1="30" x2="80" y2="130" stroke="#10b981" stroke-width="2"/>
+                <rect x="70" y="50" width="20" height="60" fill="#10b981" rx="2"/>
+                <line x1="120" y1="70" x2="120" y2="140" stroke="#ef4444" stroke-width="2"/>
+                <rect x="110" y="80" width="20" height="30" fill="#ef4444" rx="2"/>
+                <line x1="160" y1="20" x2="160" y2="100" stroke="#10b981" stroke-width="2"/>
+                <rect x="150" y="40" width="20" height="50" fill="#10b981" rx="2"/>
+                <path d="M40 120 L80 80 L120 95 L160 65" fill="none" stroke="#3b82f6" stroke-width="4" stroke-linecap="round"/>
             </svg>
         `)
     };

@@ -33,7 +33,6 @@ Sites autres utilisés :
 ```
 ├── index.html                ← page principale  
 ├── login.html                ← page de connexion/inscription   
-├── logo.png                  ← mon logo au fond blanc  
 ├── manifest.json             ← Permet au navigateur d'ouvrir corréctement l'app  
 ├── sw.js                     ← enregistre le cache pour quand hors-ligne
 ├── js/  
@@ -54,6 +53,10 @@ DB/
 |   ├── DB_schema.sql         ← Structure initiale de la DB   
 |   ├── suggestions.sql       ← Ajout de la feature récupérant les suggestions
 |   ├── supabase.sql          ← Code complet de la DB de la V1
+Images/  
+|   ├── logo.png              ← Mon logo au fond blanc 
+|   ├── bandeau.png           ← Image d'acceuil et présentation de mon site 
+|   ├── mascotte.png          ← Ma mascotte présente sur le bandeau
 ```
 
 

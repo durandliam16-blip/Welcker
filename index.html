@@ -17,7 +17,7 @@
     <!-- Navigation -->
     <nav class="sidebar" id="sidebar">
         <div class="logo-container">
-            <img src="logo.png" alt="Logo" class="logo">
+            <img src="images/logo.png" alt="Logo" class="logo">
             <h2 class="app-name">Welcker</h2>
         </div>
         <div class="nav-links">
@@ -709,18 +709,18 @@
                             <h4 style="margin-bottom: 12px; font-size: 14px; font-weight: 600; color: var(--text-primary);">Avatars</h4>
                             
                             <!-- Avatars par défaut -->
-                            <div class="avatar-presets">
-                                <div class="avatar-preset" data-avatar="1" onclick="selectPresetAvatar('1')">
-                                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">💼</div>
+                            <div class="avatar-presets" style="display: flex; gap: 12px; margin-bottom: 16px;">
+                                <div class="avatar-preset" data-avatar="1" onclick="selectPresetAvatar('1')" style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid transparent; background: #f3f4f6;">
+                                    <img src="images/mascotte.png" alt="Mascotte" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>                                
+                                <div class="avatar-preset" data-avatar="2" onclick="selectPresetAvatar('2')" style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid transparent; background: #ffffff;">
+                                    <img src="images/logo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;">
+                                </div>                              
+                                <div class="avatar-preset" data-avatar="3" onclick="selectPresetAvatar('3')" style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid transparent; background: #f3f4f6;">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/Warren_Buffett_at_the_2015_SelectUSA_Investment_Summit_%28cropped%29.jpg" alt="Warren Buffett" style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>
-                                <div class="avatar-preset" data-avatar="2" onclick="selectPresetAvatar('2')">
-                                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">🚀</div>
-                                </div>
-                                <div class="avatar-preset" data-avatar="3" onclick="selectPresetAvatar('3')">
-                                    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">🌟</div>
-                                </div>
-                                <div class="avatar-preset" data-avatar="4" onclick="selectPresetAvatar('4')">
-                                    <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">💎</div>
+                                <div class="avatar-preset" data-avatar="4" onclick="selectPresetAvatar('4')" style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid transparent; background: #0f172a; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                                    📈
                                 </div>
                             </div>
 
