@@ -38,14 +38,6 @@
                 <span class="icon">💰</span>
                 <span>Flux financiers</span>
             </a>
-            <a href="#" class="nav-link" data-page="entrees">
-                <span class="icon">📈</span>
-                <span>Entrées</span>
-            </a>
-            <a href="#" class="nav-link" data-page="depenses">
-                <span class="icon">📉</span>
-                <span>Dépenses</span>
-            </a>
             <a href="#" class="nav-link" data-page="profil">
                 <span class="icon">👤</span>
                 <span>Profil</span>
@@ -543,8 +535,22 @@
 
         <!-- Page: Flux financiers -->
         <div class="page" id="page-flux">
-            <div class="page-header">
+            <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <h1>Comparaison des flux financiers</h1>
+                <div style="display: flex; gap: 12px;">
+                    <button class="flux-action-btn flux-entrees-btn" onclick="navigateTo('entrees')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+                            <path d="M12 19V5M5 12l7-7 7 7"/>
+                        </svg>
+                        Entrées
+                    </button>
+                    <button class="flux-action-btn flux-depenses-btn" onclick="navigateTo('depenses')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+                            <path d="M12 5v14M5 12l7 7 7-7"/>
+                        </svg>
+                        Dépenses
+                    </button>
+                </div>
             </div>
             <class class="flux-layout">
                 <div class="card card-summary">

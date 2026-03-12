@@ -641,3 +641,61 @@
     background-clip: text;
     margin: 16px 0;
 }
+
+/* Boutons flux financiers */
+.flux-action-btn {
+    display: flex;
+    align-items: center;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.flux-entrees-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.flux-entrees-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.flux-entrees-btn:active {
+    transform: translateY(0);
+}
+
+.flux-depenses-btn {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.flux-depenses-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+.flux-depenses-btn:active {
+    transform: translateY(0);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .flux-action-btn {
+        font-size: 13px;
+        padding: 8px 14px;
+    }
+    
+    .flux-action-btn svg {
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+    }
+}
