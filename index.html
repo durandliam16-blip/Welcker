@@ -7,6 +7,7 @@
     <title>Welcker - Wealth Tracker</title>
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/graphs.css">
     <link rel="stylesheet" href="css/utilities.css">
     <link rel="stylesheet" href="css/profil_para.css">
     <link rel="manifest" href="manifest.json">
@@ -711,10 +712,10 @@
                             <!-- Avatars par défaut -->
                             <div class="avatar-presets" style="display: flex; gap: 12px; margin-bottom: 16px;">
                                 <div class="avatar-preset" data-avatar="1" onclick="selectPresetAvatar('1')" style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid transparent; background: #f3f4f6;">
-                                    <img src="images/mascotte.png" alt="Mascotte" style="width: 100%; height: 100%; object-fit: cover;">
+                                    <img src="images/logo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>                                
                                 <div class="avatar-preset" data-avatar="2" onclick="selectPresetAvatar('2')" style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid transparent; background: #ffffff;">
-                                    <img src="images/logo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;">
+                                    <img src="images/mascotte.png" alt="Mascotte" style="width: 100%; height: 100%; object-fit: contain;">
                                 </div>                              
                                 <div class="avatar-preset" data-avatar="3" onclick="selectPresetAvatar('3')" style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid transparent; background: #f3f4f6;">
                                     <img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/Warren_Buffett_at_the_2015_SelectUSA_Investment_Summit_%28cropped%29.jpg" alt="Warren Buffett" style="width: 100%; height: 100%; object-fit: cover;">
@@ -1158,11 +1159,12 @@
     <script src="js/app.js"></script>
     <script src="js/pages.js"></script>
     <script src="js/others.js"></script>
+    <script src="js/graphs.js"></script>
 
     <!-- Initialisation -->
     <script>
     document.addEventListener('DOMContentLoaded', async () => {
-        console.log('🚀 App démarrée');
+        console.log('App démarrée');
         
         // Setup navigation
         document.querySelectorAll('.nav-link').forEach(link => {

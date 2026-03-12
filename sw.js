@@ -6,6 +6,7 @@ const ASSETS = [
   // CSS
   './css/base.css',
   './css/components.css',
+  './css/graphs.css',
   './css/profil_para.css',
   './css/utilities.css',
   // JS
@@ -14,6 +15,7 @@ const ASSETS = [
   './js/app.js',
   './js/pages.js',
   './js/others.js',
+  './js/graphs.js',
   // CDN (ne pas cacher Supabase !)
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'
 ];

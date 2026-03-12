@@ -1,0 +1,51 @@
+/* Sankey diagram container */
+#sankeyDiagram {
+    background: transparent;
+    border-radius: var(--radius-md);
+}
+
+/* Responsive Sankey */
+@media (max-width: 768px) {
+    #sankeyDiagram {
+        height: 400px !important;
+    }
+}
+
+/* Graphique patrimoine pleine largeur */
+#patrimoineChart {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+/* Graphique patrimoine - hauteur fixe */
+#patrimoineChart {
+    max-height: 350px;
+}
+
+/* Dashboard grid (2 colonnes) */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+}
