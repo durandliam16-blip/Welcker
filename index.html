@@ -542,13 +542,13 @@
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
                             <path d="M12 19V5M5 12l7-7 7 7"/>
                         </svg>
-                        Entrées
+                        Détail des entrées d'argent
                     </button>
                     <button class="flux-action-btn flux-depenses-btn" onclick="navigateTo('depenses')">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
                             <path d="M12 5v14M5 12l7 7 7-7"/>
                         </svg>
-                        Dépenses
+                        Détail des dépenses
                     </button>
                 </div>
             </div>
@@ -721,7 +721,7 @@
                                     <img src="images/logo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>                                
                                 <div class="avatar-preset" data-avatar="2" onclick="selectPresetAvatar('2')" style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid transparent; background: #ffffff;">
-                                    <img src="images/mascotte.png" alt="Mascotte" style="width: 100%; height: 100%; object-fit: contain;">
+                                    <img src="images/avatar.png" alt="avatar" style="width: 100%; height: 100%; object-fit: contain;">
                                 </div>                              
                                 <div class="avatar-preset" data-avatar="3" onclick="selectPresetAvatar('3')" style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid transparent; background: #f3f4f6;">
                                     <img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/Warren_Buffett_at_the_2015_SelectUSA_Investment_Summit_%28cropped%29.jpg" alt="Warren Buffett" style="width: 100%; height: 100%; object-fit: cover;">
@@ -1045,6 +1045,39 @@
                         <label>Montant (€)</label>
                         <input type="number" id="entreeMontant" step="0.01" required>
                     </div>
+                    <div class="form-group">
+                        <label>Montant (€)</label>
+                        <input type="number" id="entreeMontant" step="0.01" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="entreeRecurrent" onchange="toggleRecurrenceFields('entree')" style="width: 20px; height: 20px; cursor: pointer;">
+                            <span style="font-weight: 600;">📆 Transaction récurrente</span>
+                        </label>
+                    </div>
+                    
+                    <!-- Section récurrence (cachée par défaut) -->
+                    <div id="entreeRecurrenceFields" style="display: none; margin-top: 16px; padding: 16px; background: var(--background-secondary); border-radius: 10px; border: 2px dashed var(--border-color);">
+                        <div class="form-group">
+                            <label>Fréquence</label>
+                            <select id="entreeFrequence">
+                                <option value="daily">Quotidien (tous les jours)</option>
+                                <option value="weekly">Hebdomadaire (toutes les semaines)</option>
+                                <option value="monthly" selected>Mensuel (tous les mois)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Jusqu'au</label>
+                            <input type="date" id="entreeRecurrentEndDate" onchange="updateRecurrencePreview('entree')">
+                        </div>
+                        <div class="form-group">
+                            <div style="padding: 12px; background: var(--info-light); border-radius: 8px; font-size: 13px; color: var(--text-secondary);">
+                                <strong id="entreeRecurrencePreview">Sélectionnez une date de fin</strong>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="modal-actions">
                         <button type="button" class="btn-secondary" onclick="closeModal('modalAddEntree')">Annuler</button>
                         <button type="submit" class="btn-primary">Ajouter</button>
@@ -1088,6 +1121,38 @@
                         <label>Montant (€)</label>
                         <input type="number" id="depenseMontant" step="0.01" required>
                     </div>
+                    <div class="form-group">
+                        <label>Montant (€)</label>
+                        <input type="number" id="depenseMontant" step="0.01" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="depenseRecurrent" onchange="toggleRecurrenceFields('depense')" style="width: 20px; height: 20px; cursor: pointer;">
+                            <span style="font-weight: 600;">📆 Transaction récurrente</span>
+                        </label>
+                    </div>
+                    <!-- Section récurrence (cachée par défaut) -->
+                    <div id="depenseRecurrenceFields" style="display: none; margin-top: 16px; padding: 16px; background: var(--background-secondary); border-radius: 10px; border: 2px dashed var(--border-color);">
+                        <div class="form-group">
+                            <label>Fréquence</label>
+                            <select id="depenseFrequence">
+                                <option value="daily">Quotidien (tous les jours)</option>
+                                <option value="weekly">Hebdomadaire (toutes les semaines)</option>
+                                <option value="monthly" selected>Mensuel (tous les mois)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Jusqu'au</label>
+                            <input type="date" id="depenseRecurrentEndDate" onchange="updateRecurrencePreview('depense')">
+                        </div>
+                        <div class="form-group">
+                            <div style="padding: 12px; background: var(--info-light); border-radius: 8px; font-size: 13px; color: var(--text-secondary);">
+                                <strong id="depenseRecurrencePreview">Sélectionnez une date de fin</strong>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="modal-actions">
                         <button type="button" class="btn-secondary" onclick="closeModal('modalAddDepense')">Annuler</button>
                         <button type="submit" class="btn-primary">Ajouter</button>

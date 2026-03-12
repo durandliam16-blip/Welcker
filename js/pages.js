@@ -494,7 +494,7 @@ function selectPresetAvatar(avatarId) {
     // Avatars encodés en data URL (petits gradients + emoji)
     const presets = {
         '1': './images/logo.png',
-        '2': './images/mascotte.png',
+        '2': './images/avatar.png',
         '3': 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Warren_Buffett_at_the_2015_SelectUSA_Investment_Summit_%28cropped%29.jpg',
         // 4. Graphique de Trading (Généré en code SVG pur, chandeliers japonais)
         '4': 'data:image/svg+xml;charset=utf8,' + encodeURIComponent(`

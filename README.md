@@ -57,6 +57,7 @@ Images/
 |   ├── logo.png              ← Mon logo au fond blanc 
 |   ├── bandeau.png           ← Image d'acceuil et présentation de mon site 
 |   ├── mascotte.png          ← Ma mascotte présente sur le bandeau
+|   ├── avatar.png            ← Zoom de la mascotte
 ```
 
 
@@ -78,6 +79,6 @@ Pour l'instant sur GitHub pages en gratuit
 
 ---
 
-**Version** : 1.1.2  
+**Version** : 1.1.3  
 **Date** : Mars 2026  
 **Licence** : Partage aux proches

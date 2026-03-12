@@ -1,4 +1,105 @@
 // =============================================================================
+// FONCTIONS HELPER POUR RÉCURRENCE
+// =============================================================================
+
+// Calculer toutes les dates de récurrence
+function calculateRecurrentDates(startDate, endDate, frequency) {
+    const dates = [];
+    let currentDate = new Date(startDate);
+    
+    while (currentDate <= endDate) {
+        dates.push(new Date(currentDate));
+        
+        if (frequency === 'daily') {
+            currentDate.setDate(currentDate.getDate() + 1);
+        } else if (frequency === 'weekly') {
+            currentDate.setDate(currentDate.getDate() + 7);
+        } else if (frequency === 'monthly') {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+        }
+    }
+    
+    return dates;
+}
+
+// Créer des transactions récurrentes
+async function createRecurrentTransactions(type, data, dates) {
+    const total = dates.length;
+    let created = 0;
+    
+    showToast(`Création de ${total} transactions...`, 'info');
+    
+    for (const date of dates) {
+        try {
+            const transactionData = {
+                ...data,
+                date: date.toISOString().split('T')[0]
+            };
+            
+            await dataManager.addCashFlow(type, transactionData);
+            created++;
+        } catch (error) {
+            console.error('Erreur:', error);
+        }
+    }
+    
+    showToast(`✅ ${created} transactions créées !`, 'success');
+    
+    // Rafraîchir la page appropriée
+    if (type === 'entree') {
+        await updateCashFlowPage('entree');
+    } else {
+        await updateCashFlowPage('sortie');
+    }
+}
+
+// Afficher/cacher les champs de récurrence
+window.toggleRecurrenceFields = function(type) {
+    const checkbox = document.getElementById(`${type}Recurrent`);
+    const fields = document.getElementById(`${type}RecurrenceFields`);
+    const endDateInput = document.getElementById(`${type}RecurrentEndDate`);
+    
+    if (checkbox.checked) {
+        fields.style.display = 'block';
+        // Définir date de fin par défaut : dans 1 an
+        const today = new Date();
+        const oneYearLater = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+        endDateInput.value = oneYearLater.toISOString().split('T')[0];
+        updateRecurrencePreview(type);
+    } else {
+        fields.style.display = 'none';
+    }
+};
+
+// Mettre à jour l'aperçu du nombre de transactions
+window.updateRecurrencePreview = function(type) {
+    const startDate = new Date(document.getElementById(`${type}Date`).value);
+    const endDate = new Date(document.getElementById(`${type}RecurrentEndDate`).value);
+    const frequency = document.getElementById(`${type}Frequence`).value;
+    const preview = document.getElementById(`${type}RecurrencePreview`);
+    
+    if (!startDate || !endDate || isNaN(startDate) || isNaN(endDate)) {
+        preview.textContent = 'Sélectionnez une date de début et de fin';
+        return;
+    }
+    
+    if (endDate < startDate) {
+        preview.innerHTML = '⚠️ <strong style="color: var(--danger-color);">La date de fin doit être après la date de début</strong>';
+        return;
+    }
+    
+    const dates = calculateRecurrentDates(startDate, endDate, frequency);
+    const count = dates.length;
+    
+    let frequencyText = '';
+    if (frequency === 'daily') frequencyText = 'jours';
+    else if (frequency === 'weekly') frequencyText = 'semaines';
+    else if (frequency === 'monthly') frequencyText = 'mois';
+    
+    preview.innerHTML = `✅ <strong>${count} transaction${count > 1 ? 's' : ''}</strong> sera${count > 1 ? 'ont' : ''} créée${count > 1 ? 's' : ''} (tous les ${frequencyText})`;
+};
+
+// =============================================================================
 // HANDLERS FORMULAIRES
 // =============================================================================
 async function addTransaction(e) {
@@ -34,24 +135,82 @@ async function addBienForm(e) {
 
 async function addEntreeForm(e) {
     e.preventDefault();
-    const ok = await dataManager.addCashFlow('entree', {
+    
+    const data = {
         date:        document.getElementById('entreeDate').value,
         categorie:   document.getElementById('entreeCategorie').value,
         description: document.getElementById('entreeDescription').value,
         montant:     parseFloat(document.getElementById('entreeMontant').value)
-    });
-    if (ok) { closeModal('modalAddEntree'); await updateCashFlowPage('entree'); }
+    };
+    
+    // Vérifier si c'est une transaction récurrente
+    const isRecurrent = document.getElementById('entreeRecurrent')?.checked;
+    
+    if (isRecurrent) {
+        const startDate = new Date(data.date);
+        const endDate = new Date(document.getElementById('entreeRecurrentEndDate').value);
+        const frequency = document.getElementById('entreeFrequence').value;
+        
+        if (endDate < startDate) {
+            showToast('La date de fin doit être après la date de début', 'error');
+            return;
+        }
+        
+        // Calculer toutes les dates
+        const dates = calculateRecurrentDates(startDate, endDate, frequency);
+        
+        if (confirm(`Créer ${dates.length} transactions récurrentes ?`)) {
+            closeModal('modalAddEntree');
+            await createRecurrentTransactions('entree', data, dates);
+        }
+    } else {
+        // Transaction simple (non récurrente)
+        const ok = await dataManager.addCashFlow('entree', data);
+        if (ok) { 
+            closeModal('modalAddEntree'); 
+            await updateCashFlowPage('entree'); 
+        }
+    }
 }
 
 async function addDepenseForm(e) {
     e.preventDefault();
-    const ok = await dataManager.addCashFlow('sortie', {
+    
+    const data = {
         date:        document.getElementById('depenseDate').value,
         categorie:   document.getElementById('depenseCategorie').value,
         description: document.getElementById('depenseDescription').value,
         montant:     parseFloat(document.getElementById('depenseMontant').value)
-    });
-    if (ok) { closeModal('modalAddDepense'); await updateCashFlowPage('sortie'); }
+    };
+    
+    // Vérifier si c'est une transaction récurrente
+    const isRecurrent = document.getElementById('depenseRecurrent')?.checked;
+    
+    if (isRecurrent) {
+        const startDate = new Date(data.date);
+        const endDate = new Date(document.getElementById('depenseRecurrentEndDate').value);
+        const frequency = document.getElementById('depenseFrequence').value;
+        
+        if (endDate < startDate) {
+            showToast('La date de fin doit être après la date de début', 'error');
+            return;
+        }
+        
+        // Calculer toutes les dates
+        const dates = calculateRecurrentDates(startDate, endDate, frequency);
+        
+        if (confirm(`Créer ${dates.length} transactions récurrentes ?`)) {
+            closeModal('modalAddDepense');
+            await createRecurrentTransactions('sortie', data, dates);
+        }
+    } else {
+        // Transaction simple (non récurrente)
+        const ok = await dataManager.addCashFlow('sortie', data);
+        if (ok) { 
+            closeModal('modalAddDepense'); 
+            await updateCashFlowPage('sortie'); 
+        }
+    }
 }
 
 async function addCompteForm(e) {
