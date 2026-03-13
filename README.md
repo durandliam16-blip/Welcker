@@ -3,6 +3,7 @@
 ## 📋 Description
 
 Application web complète de gestion financière personnelle avec suivi de patrimoine, investissements, comptes bancaires, biens, et analyse des flux financiers.
+> Attention : A chaque ajout de fichier ou version, vérifier les fichiers "README.md", "sw.js" et "index.html".
 + 2 fonctionnalitées innovantes :  
 Compte commun famille qui cumule les comptes dans une nouvelle page  
 Comme un réseau social avec suivi et amis
@@ -40,12 +41,14 @@ Sites autres utilisés :
 │   ├── dataManager.js        ← Toutes les requêtes DB  
 │   ├── app.js                ← Fonctionnalitées principales   
 │   ├── pages.js              ← Toutes les pages   
-|   ├── utilities.css         ← Autres features   
+|   ├── utilities.css         ← Autres features
+|   ├── social.css            ← Tout les fonctions de la page social 
 css/  
 |   ├── base.css              ← Variables + Reset + Layout  
 |   ├── components.css        ← Buttons + Cards + Forms + Modals  
 |   ├── utilities.css         ← Responsive + Dark mode  
 |   ├── profil_para.css       ← Majorité des élements de profil/para/pop-ups 
+|   ├── social.css            ← Tout le css de la page social
 DB/  
 |   ├── BD_access.sql         ← Ajout des règles d'accès par user  
 |   ├── config_avatar.sql     ← Code pour les photos de profil  
@@ -53,6 +56,7 @@ DB/
 |   ├── DB_schema.sql         ← Structure initiale de la DB   
 |   ├── suggestions.sql       ← Ajout de la feature récupérant les suggestions
 |   ├── supabase.sql          ← Code complet de la DB de la V1
+|   |── social.sql            ← Code complet de la création de la page social
 Images/  
 |   ├── logo.png              ← Mon logo au fond blanc 
 |   ├── bandeau.png           ← Image d'acceuil et présentation de mon site 
@@ -79,6 +83,6 @@ Pour l'instant sur GitHub pages en gratuit
 
 ---
 
-**Version** : 1.1.3  
+**Version** : 2.0.0
 **Date** : Mars 2026  
 **Licence** : Partage aux proches

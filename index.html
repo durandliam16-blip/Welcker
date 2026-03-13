@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="css/graphs.css">
     <link rel="stylesheet" href="css/utilities.css">
     <link rel="stylesheet" href="css/profil_para.css">
+    <link rel="stylesheet" href="css/social.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
     <link rel="icon" href="icon-192.png">
@@ -37,6 +38,10 @@
             <a href="#" class="nav-link" data-page="flux">
                 <span class="icon">💰</span>
                 <span>Flux financiers</span>
+            </a>
+            <a href="#" class="nav-link" data-page="social">
+                <span class="icon">🌐</span>
+                <span>Social</span>
             </a>
             <a href="#" class="nav-link" data-page="profil">
                 <span class="icon">👤</span>
@@ -700,6 +705,91 @@
             </div>
         </div>
 
+        <!-- Page Social -->  
+        <div class="page" id="page-social">
+            <div class="page-header">
+                <h1>🌐 Social</h1>
+            </div>
+        
+            <!-- Introduction -->
+            <div class="social-intro">
+                <p>Deux fonctionnalités exclusives pour partager votre suivi financier avec vos proches.</p>
+            </div>
+        
+            <!-- Grid des deux features -->
+            <div class="social-grid">
+        
+                <!-- ── CARTE FAMILLE ─────────────────────────────────── -->
+                <div class="feature-card feature-famille" id="social-card-famille">
+                    <div class="feature-card-bg"></div>
+        
+                    <!-- Contenu visible derrière le flou -->
+                    <div class="feature-card-content">
+                        <span class="feature-badge">Exclusif</span>
+                        <div class="feature-card-icon">👨‍👩‍👧‍👦</div>
+                        <div class="feature-card-title">Famille</div>
+                        <div class="feature-card-desc">
+                            Regroupez les comptes de votre foyer et consultez le patrimoine combiné de votre famille.
+                        </div>
+                    </div>
+        
+                    <!-- Contenu déverrouillé -->
+                    <div class="famille-content" id="famille-content-inner">
+                        <!-- Chargé dynamiquement par loadFamilleContent() -->
+                    </div>
+        
+                    <!-- Overlay flou + cadenas -->
+                    <div class="feature-card-blur">
+                        <button class="lock-btn" onclick="openUnlockModal('famille')" title="Débloquer la fonctionnalité Famille">
+                            🔒
+                        </button>
+                        <span class="lock-label">Fonctionnalité verrouillée</span>
+                    </div>
+                </div>
+        
+                <!-- ── CARTE RÉSEAU ──────────────────────────────────── -->
+                <div class="feature-card feature-reseau" id="social-card-reseau">
+                    <div class="feature-card-bg"></div>
+        
+                    <!-- Contenu visible derrière le flou -->
+                    <div class="feature-card-content">
+                        <span class="feature-badge">Exclusif</span>
+                        <div class="feature-card-icon">🤝</div>
+                        <div class="feature-card-title">Suivis</div>
+                        <div class="feature-card-desc">
+                            Ajoutez des amis, suivez leur activité et comparez vos habitudes financières.
+                        </div>
+                    </div>
+        
+                    <!-- Contenu déverrouillé réseau -->
+                    <div class="reseau-content" id="reseau-content-inner">
+                        <div class="reseau-tabs">
+                            <button class="reseau-tab active" data-tab="amis"
+                                onclick="showReseauTab('amis')">Amis</button>
+                            <button class="reseau-tab" data-tab="demandes"
+                                onclick="showReseauTab('demandes')">
+                                Demandes
+                                <span class="reseau-tab-badge" style="display:none">0</span>
+                            </button>
+                            <button class="reseau-tab" data-tab="activite"
+                                onclick="showReseauTab('activite')">Activité</button>
+                        </div>
+                        <div id="reseau-tab-content">
+                            <!-- Chargé dynamiquement -->
+                        </div>
+                    </div>
+        
+                    <!-- Overlay flou + cadenas -->
+                    <div class="feature-card-blur">
+                        <button class="lock-btn" onclick="openUnlockModal('reseau')" title="Débloquer le Réseau Social">
+                            🔒
+                        </button>
+                        <span class="lock-label">Fonctionnalité verrouillée</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Page: Profil -->
         <div class="page" id="page-profil">
             <div class="page-header">
@@ -864,7 +954,7 @@
     </main>
 
     <!-- Modals -->
-     <!-- Modal: Gérer le Cash -->
+    <!-- Modal: Gérer le Cash -->
     <div class="modal" id="modalGererCash">
         <div class="modal-content">
             <div class="modal-header">
@@ -1189,6 +1279,59 @@
         </div>
     </div>
 
+    <!-- Modals Social-->
+    <!-- Modal : Déverrouillage d'une feature -->
+    <div class="modal unlock-modal" id="modalUnlockSocial">
+        <div class="modal-content">
+            <!-- Icône flottante (positionnée en dehors du modal-body par CSS) -->
+            <div style="height: 48px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 16px 16px 0 0; display:flex; align-items:center; padding:0 24px;">
+                <span style="color:white; font-weight:700; font-size:15px;">✨ Nouvelle fonctionnalité</span>
+            </div>
+            <div class="unlock-modal-body">
+                <div class="unlock-modal-icon famille" style="margin: -36px auto 20px; z-index:10; position:relative;">👨‍👩‍👧‍👦</div>
+                <h2 class="unlock-modal-title">Activer la fonctionnalité</h2>
+                <p>Souhaitez-vous activer cette fonctionnalité ?<br>Cette action est <strong>définitive</strong> et ne peut pas être annulée.</p>
+                <ul class="unlock-features-list">
+                    <!-- Rempli dynamiquement par openUnlockModal() -->
+                </ul>
+                <div class="unlock-actions">
+                    <button class="btn-unlock btn-unlock-cancel" onclick="closeUnlockModal()">
+                        Non, plus tard
+                    </button>
+                    <button class="btn-unlock btn-unlock-confirm famille" onclick="confirmUnlock('famille')">
+                        Oui, activer !
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal : Inviter un membre famille -->
+    <div class="modal" id="modalInviteFamille">
+        <div class="modal-content" style="max-width: 420px;">
+            <div class="modal-header">
+                <h2>👨‍👩‍👧‍👦 Inviter un membre</h2>
+                <button class="modal-close" onclick="closeInviteFamilleModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="formInviteFamille" onsubmit="submitInviteFamille(event)">
+                    <div class="form-group">
+                        <label>Email du membre à inviter</label>
+                        <input type="email" id="inviteEmail"
+                            placeholder="exemple@email.com" required>
+                        <small style="color:var(--text-secondary);font-size:12px;margin-top:6px;display:block;">
+                            La personne doit déjà avoir un compte Welcker.
+                        </small>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeInviteFamilleModal()">Annuler</button>
+                        <button type="submit" class="btn-primary">Envoyer l'invitation</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- CDN en premier -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -1223,6 +1366,7 @@
     <script src="js/pages.js"></script>
     <script src="js/others.js"></script>
     <script src="js/graphs.js"></script>
+    <script src="js/social.js"></script>
 
     <!-- Initialisation -->
     <script>

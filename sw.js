@@ -1,4 +1,4 @@
-const CACHE_NAME = 'monpatrimoine-v113'; // v113 pour forcer la mise à jour
+const CACHE_NAME = 'monpatrimoine-v200'; // new version pour forcer la mise à jour
 const ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const ASSETS = [
   './css/graphs.css',
   './css/profil_para.css',
   './css/utilities.css',
+  './css/social.css',
   // JS
   './js/config.js',
   './js/dataManager.js',
@@ -16,6 +17,7 @@ const ASSETS = [
   './js/pages.js',
   './js/others.js',
   './js/graphs.js',
+  './js/social.js',
   // CDN (ne pas cacher Supabase !)
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'
 ];

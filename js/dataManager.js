@@ -48,7 +48,7 @@ class DataManager {
             type:          Boolean(transaction.type),   // boolean NOT NULL
             titre:         transaction.titre,
             libelle:       transaction.libelle || null,
-            categorie: transaction.categorie || null,
+            categorie:     transaction.categorie || null,
             quantite:      parseFloat(transaction.quantite),
             prix_unitaire: parseFloat(transaction.prix_unitaire),
             frais:         parseFloat(transaction.frais) || 0,
@@ -85,7 +85,7 @@ class DataManager {
             type:          Boolean(transaction.type),
             titre:         transaction.titre,
             libelle:       transaction.libelle || null,
-            categorie: transaction.categorie || null,
+            categorie:     transaction.categorie || null,
             quantite:      parseFloat(transaction.quantite),
             prix_unitaire: parseFloat(transaction.prix_unitaire),
             frais:         parseFloat(transaction.frais) || 0,
@@ -371,6 +371,186 @@ class DataManager {
             return false;
         }
         return true;
+    }
+
+    // ── Social : déverrouillage feature ──────────────────────────────────────
+    // Passe famille=true ou reseau=true dans la table profiles
+    async unlockSocialFeature(feature) {
+        const user = await getUser(); if (!user) return false;
+        const field = feature === 'famille' ? 'famille' : 'reseau';
+        const { error } = await sb
+            .from('profiles')
+            .update({ [field]: true, updated_at: new Date().toISOString() })
+            .eq('id', user.id);
+        if (error) { console.error('unlockSocialFeature:', error.message); return false; }
+        return true;
+    }
+ 
+    // ── Famille : membres du foyer ────────────────────────────────────────────
+    // Table suggérée : famille_members (id, user_id, membre_id, role, created_at)
+    // + join profiles pour nom/email + patrimoine_total (vue ou colonne calculée)
+    async getFamilleMembers() {
+        const user = await getUser(); if (!user) return [];
+        const { data, error } = await sb
+            .from('famille_members')
+            .select(`
+                id,
+                role,
+                membre:profiles!famille_members_membre_id_fkey (
+                    id, nom, email, patrimoine_total
+                )
+            `)
+            .eq('user_id', user.id);
+        if (error) { console.error('getFamilleMembers:', error.message); return []; }
+        // Aplatir : retourner tableau de profils enrichis
+        return (data || []).map(row => ({
+            id:               row.id,
+            role:             row.role || 'Membre',
+            ami_id:           row.membre?.id,
+            nom:              row.membre?.nom  || null,
+            email:            row.membre?.email || null,
+            patrimoine_total: row.membre?.patrimoine_total || 0
+        }));
+    }
+ 
+    // ── Famille : inviter un membre ───────────────────────────────────────────
+    async inviteFamilleMember(email) {
+        const user = await getUser(); if (!user) return false;
+        // Trouver l'utilisateur cible par email
+        const { data: targets, error: findErr } = await sb
+            .from('profiles')
+            .select('id')
+            .eq('email', email)
+            .single();
+        if (findErr || !targets) { console.error('inviteFamilleMember – user not found'); return false; }
+ 
+        // Insérer l'invitation (table : famille_invitations)
+        const { error } = await sb
+            .from('famille_invitations')
+            .insert([{
+                from_user: user.id,
+                to_user:   targets.id,
+                status:    'pending',
+                created_at: new Date().toISOString()
+            }]);
+        if (error) { console.error('inviteFamilleMember:', error.message); return false; }
+        return true;
+    }
+ 
+    // ── Réseau : liste d'amis ─────────────────────────────────────────────────
+    // Table suggérée : amis (id, user_id, ami_id, created_at)
+    // + join profiles pour nom/email + last_activity
+    async getAmis() {
+        const user = await getUser(); if (!user) return [];
+        const { data, error } = await sb
+            .from('amis')
+            .select(`
+                id,
+                ami:profiles!amis_ami_id_fkey (
+                    id, nom, email
+                )
+            `)
+            .eq('user_id', user.id);
+        if (error) { console.error('getAmis:', error.message); return []; }
+        return (data || []).map(row => ({
+            id:            row.id,
+            ami_id:        row.ami?.id,
+            nom:           row.ami?.nom   || null,
+            email:         row.ami?.email || null,
+            last_activity: null  // à enrichir avec une vue/trigger Supabase
+        }));
+    }
+ 
+    // ── Réseau : demandes d'amis reçues ──────────────────────────────────────
+    async getDemandesAmis() {
+        const user = await getUser(); if (!user) return [];
+        const { data, error } = await sb
+            .from('demandes_amis')
+            .select(`
+                id,
+                emetteur:profiles!demandes_amis_from_user_fkey (
+                    id, nom, email
+                )
+            `)
+            .eq('to_user', user.id)
+            .eq('status', 'pending');
+        if (error) { console.error('getDemandesAmis:', error.message); return []; }
+        return (data || []).map(row => ({
+            id:    row.id,
+            ami_id: row.emetteur?.id,
+            nom:   row.emetteur?.nom   || null,
+            email: row.emetteur?.email || null
+        }));
+    }
+ 
+    // ── Réseau : envoyer une demande d'ami ───────────────────────────────────
+    async sendDemandeAmi(email) {
+        const user = await getUser(); if (!user) return false;
+        // Trouver l'utilisateur cible
+        const { data: target, error: findErr } = await sb
+            .from('profiles')
+            .select('id')
+            .eq('email', email)
+            .single();
+        if (findErr || !target) return false;
+        if (target.id === user.id) { showToast('Vous ne pouvez pas vous ajouter vous-même.', 'error'); return false; }
+ 
+        const { error } = await sb
+            .from('demandes_amis')
+            .insert([{
+                from_user:  user.id,
+                to_user:    target.id,
+                status:     'pending',
+                created_at: new Date().toISOString()
+            }]);
+        if (error) { console.error('sendDemandeAmi:', error.message); return false; }
+        return true;
+    }
+ 
+    // ── Réseau : répondre à une demande ─────────────────────────────────────
+    async repondreDemandeAmi(demandeId, accepter) {
+        const user = await getUser(); if (!user) return false;
+ 
+        if (accepter) {
+            // 1. Récupérer l'émetteur
+            const { data: demande, error: getErr } = await sb
+                .from('demandes_amis')
+                .select('from_user')
+                .eq('id', demandeId)
+                .single();
+            if (getErr || !demande) return false;
+ 
+            // 2. Créer le lien d'amitié (bidirectionnel)
+            const { error: amiErr } = await sb
+                .from('amis')
+                .insert([
+                    { user_id: user.id,          ami_id: demande.from_user },
+                    { user_id: demande.from_user, ami_id: user.id           }
+                ]);
+            if (amiErr) { console.error('repondreDemandeAmi – amis:', amiErr.message); }
+        }
+ 
+        // 3. Mettre à jour le statut de la demande
+        const { error } = await sb
+            .from('demandes_amis')
+            .update({ status: accepter ? 'accepted' : 'declined' })
+            .eq('id', demandeId);
+        if (error) { console.error('repondreDemandeAmi:', error.message); return false; }
+        return true;
+    }
+ 
+    // ── Réseau : fil d'activité des amis ─────────────────────────────────────
+    // Optionnel : nécessite une vue Supabase "ami_activity_feed"
+    async getActiviteFeed() {
+        const user = await getUser(); if (!user) return [];
+        const { data, error } = await sb
+            .from('ami_activity_feed')
+            .select('*')
+            .eq('viewer_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(20);
+        if (error) { console.error('getActiviteFeed:', error.message); return []; }
+        return data || [];
     }
 }
 

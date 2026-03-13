@@ -175,6 +175,7 @@ async function updatePageContent(page) {
         case 'flux':         await updateFlux();                 break;
         case 'entrees':      await updateCashFlowPage('entree'); break;
         case 'depenses':     await updateCashFlowPage('sortie'); break;
+        case 'social':       await updateSocial();               break;
         case 'profil':       await updateProfil();               break;
         case 'parametres':   updateParametres();                 break;
     }
