@@ -1,11 +1,4 @@
-// =============================================================================
-// PAGE SOCIAL — social.js
-// Gestion des features Famille & Réseau avec système de déverrouillage
-// =============================================================================
-
-// ─────────────────────────────────────────────────────────────────────────────
 // INIT — appelée par updatePageContent('social')
-// ─────────────────────────────────────────────────────────────────────────────
 async function updateSocial() {
     const profile = await dataManager.getProfile();
 
@@ -17,9 +10,7 @@ async function updateSocial() {
     if (profile.reseau  === true) await loadReseauContent();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // RENDU DES CARDS
-// ─────────────────────────────────────────────────────────────────────────────
 function renderFeatureCard(feature, isUnlocked) {
     const card = document.getElementById(`social-card-${feature}`);
     if (!card) return;
@@ -33,9 +24,7 @@ function renderFeatureCard(feature, isUnlocked) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // POP-UP DE DÉVERROUILLAGE
-// ─────────────────────────────────────────────────────────────────────────────
 function openUnlockModal(feature) {
     const modal = document.getElementById('modalUnlockSocial');
     if (!modal) return;
@@ -57,15 +46,15 @@ function openUnlockModal(feature) {
     // Description de la fonctionnalité
     const features = isFamille
         ? [
-            'Reliez votre compte à celui de votre partenaire ou famille',
+            'Reliez votre compte à celui de votre partenaire',
             'Visualisez le patrimoine combiné du foyer',
-            'Comparez les dépenses et revenus de chaque membre',
-            'Tableau de bord familial avec statistiques consolidées'
+            'Analysez les dépenses et revenus de chaque membre',
+            'Tableau de bord familial avec des statistiques utiles'
           ]
         : [
             'Ajoutez des amis utilisant Welcker',
-            'Suivez leur activité financière (anonymisée)',
-            'Comparez votre taux d\'épargne avec votre entourage',
+            'Suivez leur activité financière',
+            'Comparez votre taux d\'épargne',
             'Recevez et envoyez des demandes d\'amis'
           ];
 
@@ -89,9 +78,7 @@ function closeUnlockModal() {
     if (modal) modal.classList.remove('active');
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // CONFIRMATION & MISE À JOUR DB
-// ─────────────────────────────────────────────────────────────────────────────
 async function confirmUnlock(feature) {
     const confirmBtn = document.querySelector('#modalUnlockSocial .btn-unlock-confirm');
     if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = 'Activation…'; }
@@ -115,9 +102,7 @@ async function confirmUnlock(feature) {
     if (confirmBtn) { confirmBtn.disabled = false; }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // CONTENU FAMILLE
-// ─────────────────────────────────────────────────────────────────────────────
 async function loadFamilleContent() {
     const container = document.getElementById('famille-content-inner');
     if (!container) return;
@@ -202,9 +187,7 @@ async function submitInviteFamille(e) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // CONTENU RÉSEAU
-// ─────────────────────────────────────────────────────────────────────────────
 async function loadReseauContent() {
     showReseauTab('amis'); // Onglet par défaut
 }
@@ -364,9 +347,7 @@ function viewAmiProfil(amiId) {
     showToast('Profil de cet ami (à venir)', 'info');
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // CONFETTI animation
-// ─────────────────────────────────────────────────────────────────────────────
 function launchConfetti() {
     const layer = document.createElement('div');
     layer.className = 'unlock-confetti';
