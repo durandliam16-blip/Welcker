@@ -48,6 +48,7 @@ class DataManager {
             type:          Boolean(transaction.type),   // boolean NOT NULL
             titre:         transaction.titre,
             libelle:       transaction.libelle || null,
+            categorie: transaction.categorie || null,
             quantite:      parseFloat(transaction.quantite),
             prix_unitaire: parseFloat(transaction.prix_unitaire),
             frais:         parseFloat(transaction.frais) || 0,
@@ -84,6 +85,7 @@ class DataManager {
             type:          Boolean(transaction.type),
             titre:         transaction.titre,
             libelle:       transaction.libelle || null,
+            categorie: transaction.categorie || null,
             quantite:      parseFloat(transaction.quantite),
             prix_unitaire: parseFloat(transaction.prix_unitaire),
             frais:         parseFloat(transaction.frais) || 0,
