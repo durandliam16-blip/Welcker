@@ -577,7 +577,7 @@ window.saveEditCompte = async function() {
     const user = await getUser();
     if (!user) return;
     
-    const { error } = await sb.from('bank_accounts')
+    const { error } = await sb.from('accounts')
         .update({ solde: solde })
         .eq('id', id)
         .eq('user_id', user.id);

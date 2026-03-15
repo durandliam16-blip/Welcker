@@ -28,28 +28,34 @@ async function getUser() {
     return user;
 }
 
-
-// =============================================================================
 // LOGGER LA CONNEXION
-// =============================================================================
 async function logConnexion() {
     try {
         const { data: { user } } = await sb.auth.getUser();
         if (!user) return;
         
-        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        const today = new Date().toISOString().split('T')[0];
         
-        // Insérer la connexion (le UNIQUE constraint empêche les doublons)
-        await sb.from('connexions').insert([{
+        // Récupérer l'erreur proprement
+        const { error } = await sb.from('connexions').insert([{
             user_id: user.id,
             date_connexion: today
         }]);
         
-        console.log('✅ Connexion loggée');
+        // Gérer l'erreur selon le code
+        if (error) {
+            if (error.code === '23505') {
+                // Doublon détecté (normal)
+                console.log('📅 Connexion déjà enregistrée aujourd\'hui');
+            } else {
+                console.error('Erreur log connexion:', error.message);
+            }
+        } else {
+            console.log('✅ Connexion loggée');
+        }
     } catch (error) {
-        console.log('Connexion déjà loggée aujourd\'hui');
+        console.error('Erreur inattendue:', error);
     }
 }
 
-// Logger la connexion au chargement
 logConnexion();

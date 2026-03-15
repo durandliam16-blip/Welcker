@@ -208,7 +208,7 @@ function renderCashFlowCategoryChart(type, data) {
 }
 
 function renderCashFlowEvolutionChart(type, data) {
-    const canvasId = type === 'entree' ? 'entreeEvolutionChart' : 'depenseEvolutionChart';
+    const canvasId = type === 'entree' ? 'entreesEvolutionChart' : 'depensesEvolutionChart';
     const ctx = destroyChart(canvasId);
     if (!ctx) return;
     

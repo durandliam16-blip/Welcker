@@ -4,4 +4,4 @@ CREATE POLICY "Users can manage their own profile" ON profiles
 FOR ALL USING (auth.uid() = id);
 
 -- Check anonymement les propositions des users
-SELECT suggestion FROM feature_suggestions;
+SELECT suggestion FROM feature_suggestions WHERE done is NOT TRUE;

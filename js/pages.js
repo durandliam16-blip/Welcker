@@ -460,16 +460,6 @@ async function updateProfil() {
         const premiereConnexion = connexions[connexions.length - 1].date_connexion;
         const dateDebut = new Date(premiereConnexion);
         document.getElementById('membreDepuis').textContent = dateDebut.toLocaleDateString('fr-FR');
-        
-        // Dernière connexion (exclure aujourd'hui)
-        const today = new Date().toISOString().split('T')[0];
-        const derniereAutre = connexions.find(c => c.date_connexion !== today);
-        if (derniereAutre) {
-            const dateDerniere = new Date(derniereAutre.date_connexion);
-            document.getElementById('derniereConnexion').textContent = dateDerniere.toLocaleDateString('fr-FR');
-        } else {
-            document.getElementById('derniereConnexion').textContent = 'Première connexion';
-        }
     }
     
     // Nombre de transactions
