@@ -230,8 +230,12 @@ function renderCashFlowEvolutionChart(type, data) {
     
     const values = labels.map(l => mois[l] || 0);
     
+    // Couleurs selon le type
+    const borderColor = type === 'entree' ? '#10b981' : '#ef4444';  // Vert ou Rouge
+    const bgColor = type === 'entree' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';  // Transparent
+    
     new Chart(ctx, {
-        type: 'bar',
+        type: 'line',  // Type courbe sinon "bar" pour histogramme
         data: {
             labels: labels.map(l => {
                 const [y, m] = l.split('-');
@@ -241,16 +245,45 @@ function renderCashFlowEvolutionChart(type, data) {
             datasets: [{
                 label: type === 'entree' ? 'Entrées' : 'Dépenses',
                 data: values,
-                backgroundColor: type === 'entree' ? '#10b981' : '#ef4444'
+                borderColor: borderColor,           // Couleur de la ligne
+                backgroundColor: bgColor,            // Remplissage transparent
+                tension: 0.4,                        // Courbe lisse
+                fill: true,                          // Remplir sous la courbe
+                pointRadius: 4,                      // Taille des points
+                pointHoverRadius: 6,                 // Taille au survol
+                pointBackgroundColor: borderColor,   // Couleur des points
+                pointBorderColor: '#fff',            // Bordure blanche
+                pointBorderWidth: 2                  // Épaisseur bordure
             }]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${fmt(context.parsed.y)}`;
+                        }
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
             },
             scales: {
-                y: { beginAtZero: true }
+                y: { 
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return fmt(value);
+                        }
+                    }
+                }
             }
         }
     });
