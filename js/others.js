@@ -561,3 +561,32 @@ document.addEventListener('DOMContentLoaded', () => {
     // Charger la page d'accueil
     navigateTo('accueil');
 });
+
+// Modifier un compte bancaire
+window._editAccount = function(id, nom, solde) {
+    document.getElementById('editCompteId').value = id;
+    document.getElementById('editCompteNom').value = nom;
+    document.getElementById('editCompteSolde').value = solde;
+    openModal('modalEditCompte');
+};
+
+window.saveEditCompte = async function() {
+    const id = document.getElementById('editCompteId').value;
+    const solde = parseFloat(document.getElementById('editCompteSolde').value);
+    
+    const user = await getUser();
+    if (!user) return;
+    
+    const { error } = await sb.from('bank_accounts')
+        .update({ solde: solde })
+        .eq('id', id)
+        .eq('user_id', user.id);
+    
+    if (error) {
+        showToast('Erreur : ' + error.message, 'error');
+    } else {
+        showToast('Compte modifié !', 'success');
+        closeModal('modalEditCompte');
+        await updateComptes();
+    }
+};

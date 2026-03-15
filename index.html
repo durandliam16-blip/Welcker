@@ -868,7 +868,7 @@
                         </div>
                         <div class="stat-row">
                             <span>Nombre de transactions</span>
-                            <span id="nbTransactions">0</span>
+                            <span id="nombreTransactions">0</span>
                         </div>
                         <div class="stat-row">
                             <span>Dernière connexion</span>
@@ -1282,6 +1282,33 @@
                     <div class="modal-actions">
                         <button type="button" class="btn-secondary" onclick="closeModal('modalAddCompte')">Annuler</button>
                         <button type="submit" class="btn-primary">Ajouter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Modifier Compte -->
+    <div class="modal" id="modalEditCompte">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Modifier le compte</h2>
+                <button class="modal-close" onclick="closeModal('modalEditCompte')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditCompte" onsubmit="return false;">
+                    <input type="hidden" id="editCompteId">
+                    <div class="form-group">
+                        <label>Nom du compte</label>
+                        <input type="text" id="editCompteNom" readonly style="background: var(--background-secondary);">
+                    </div>
+                    <div class="form-group">
+                        <label>Nouveau solde (€)</label>
+                        <input type="number" id="editCompteSolde" step="0.01" required>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal('modalEditCompte')">Annuler</button>
+                        <button type="button" class="btn-primary" onclick="saveEditCompte()">Enregistrer</button>
                     </div>
                 </form>
             </div>

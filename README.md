@@ -49,14 +49,10 @@ css/
 |   ├── utilities.css         ← Responsive + Dark mode  
 |   ├── profil_para.css       ← Majorité des élements de profil/para/pop-ups 
 |   ├── social.css            ← Tout le css de la page social
-DB/  
-|   ├── BD_access.sql         ← Ajout des règles d'accès par user  
-|   ├── config_avatar.sql     ← Code pour les photos de profil  
-|   ├── DB_auth.sql           ← Complément de BD_access.sql  
-|   ├── DB_schema.sql         ← Structure initiale de la DB   
-|   ├── suggestions.sql       ← Ajout de la feature récupérant les suggestions
-|   ├── supabase.sql          ← Code complet de la DB de la V1
-|   |── social.sql            ← Code complet de la création de la page social
+DB/    
+|   ├── other.sql             ← Bouts de codes utiles
+|   ├── supabase.sql          ← Code complet de la DB
+|   |── uml.md                ← Code pour créer l'UML avec Mermaid
 Images/  
 |   ├── logo.png              ← Mon logo au fond blanc 
 |   ├── bandeau.png           ← Image d'acceuil et présentation de mon site 
@@ -83,6 +79,6 @@ Pour l'instant sur GitHub pages en gratuit
 
 ---
 
-**Version** : 2.0.0
+**Version** : 2.0.1
 **Date** : Mars 2026  
 **Licence** : Partage aux proches

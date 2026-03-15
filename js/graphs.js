@@ -155,45 +155,50 @@ function renderFluxChart(entrees, sorties) {
 }
 
 function renderCashFlowCategoryChart(type, data) {
-    const canvasId = type === 'entree' ? 'entreeCategoriesChart' : 'depenseCategoriesChart';
+    const canvasId = type === 'entree' ? 'entreesChart' : 'depensesChart';
     const ctx = destroyChart(canvasId);
-    if (!ctx) return;
+    if (!ctx || !data || data.length === 0) return;
     
     // Grouper par catégorie
-    const categories = {};
-    data.forEach(item => {
-        const cat = item.categorie || 'Autre';
-        categories[cat] = (categories[cat] || 0) + parseFloat(item.montant || 0);
+    const cats = {};
+    data.forEach(i => {
+        const cat = i.categorie || 'Autre';
+        cats[cat] = (cats[cat] || 0) + parseFloat(i.montant || 0);
     });
     
-    const labels = Object.keys(categories);
-    const values = Object.values(categories);
+    // Calculer le nombre de mois différents
+    const moisUniques = new Set();
+    data.forEach(i => {
+        const mois = i.date.substring(0, 7); // YYYY-MM
+        moisUniques.add(mois);
+    });
+    const nbMois = Math.max(moisUniques.size, 1); // Au moins 1 pour éviter division par 0
     
-    if (labels.length === 0) {
-        const canvas = document.getElementById(canvasId);
-        if (canvas) {
-            canvas.parentElement.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:40px;">Aucune donnée</p>';
-        }
-        return;
-    }
+    // Diviser par le nombre de mois pour avoir la moyenne
+    const catsMoyenne = {};
+    Object.keys(cats).forEach(cat => {
+        catsMoyenne[cat] = cats[cat] / nbMois;
+    });
     
     new Chart(ctx, {
-        type: 'doughnut',
+        type: 'pie',
         data: {
-            labels: labels,
+            labels: Object.keys(catsMoyenne),
             datasets: [{
-                data: values,
-                backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16']
+                data: Object.values(catsMoyenne),
+                backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#14b8a6']
             }]
         },
         options: {
             responsive: true,
-            plugins: { 
+            plugins: {
                 legend: { position: 'bottom' },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return `${context.label}: ${fmt(context.parsed)}`;
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            return `${label}: ${fmt(value)}/mois`;
                         }
                     }
                 }

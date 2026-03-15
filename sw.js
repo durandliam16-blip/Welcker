@@ -1,4 +1,4 @@
-const CACHE_NAME = 'monpatrimoine-v200'; // new version pour forcer la mise à jour
+const CACHE_NAME = 'monpatrimoine-v201'; // new version pour forcer la mise à jour
 const ASSETS = [
   './',
   './index.html',

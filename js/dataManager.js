@@ -552,6 +552,36 @@ class DataManager {
         if (error) { console.error('getActiviteFeed:', error.message); return []; }
         return data || [];
     }
+
+    // ── Connexions ────────────────────────────────────────
+    async getConnexions() {
+        const user = await getUser(); if (!user) return [];
+        const { data, error } = await sb.from('connexions')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('date_connexion', { ascending: false });
+        if (error) { console.error('getConnexions:', error.message); return []; }
+        return data || [];
+    }
+
+    // ── Comptage transactions ────────────────────────────
+    async countAllTransactions() {
+        const user = await getUser(); if (!user) return 0;
+        
+        const [cto, pea, crypto, entrees, sorties] = await Promise.all([
+            this.getInvestments('CTO'),
+            this.getInvestments('PEA'),
+            this.getCryptoTransactions(),
+            this.getCashFlow('entree'),
+            this.getCashFlow('sortie')
+        ]);
+        
+        return (cto?.length || 0) + 
+            (pea?.length || 0) + 
+            (crypto?.length || 0) + 
+            (entrees?.length || 0) + 
+            (sorties?.length || 0);
+    }
 }
 
 const dataManager = new DataManager();

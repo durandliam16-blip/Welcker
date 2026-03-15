@@ -247,9 +247,14 @@ async function updateComptes() {
                     <span class="compte-type">${typeLabels[a.type] || a.type || 'Compte'}</span>
                 </div>
                 <div class="compte-amount">${fmt(a.solde)}</div>
-                <button class="btn-danger" style="margin-top:12px;width:100%;font-size:12px;padding:8px" onclick="window._deleteAccount('${a.id}')">
-                    🗑️ Supprimer
-                </button>
+                <div style=\"display:flex;gap:8px;margin-top:12px;\">
+                    <button class=\"btn-secondary\" style=\"flex:1;font-size:12px;padding:8px\" onclick=\"window._editAccount('${a.id}', '${a.nom}', ${a.solde})\">
+                        ✏️ Modifier
+                    </button>
+                    <button class=\"btn-danger\" style=\"flex:1;font-size:12px;padding:8px\" onclick=\"window._deleteAccount('${a.id}')\">
+                        🗑️ Supprimer
+                    </button>
+                </div>
             </div>`;
         }).join('')
         : '<p class="empty-state">Aucun compte bancaire</p>';
@@ -419,41 +424,7 @@ async function updateCashFlowPage(type) {
             options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
     }
-    // --- GRAPHIQUE ÉVOLUTION (Ligne) - S'adapte aux Entrées et Dépenses ---
-    const now2 = new Date();
-    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun'];
-    
-    // Les données "data" contiennent déjà les entrées ou les dépenses selon la page
-    const vals = Array.from({length:6}, (_,i) => {
-        const d = new Date(now2.getFullYear(), now2.getMonth()-5+i, 1);
-        return data.filter(x => { 
-            const id = new Date(x.date); 
-            return id.getMonth() === d.getMonth() && id.getFullYear() === d.getFullYear(); 
-        }).reduce((s,x) => s + parseFloat(x.montant || 0), 0);
-    });
 
-    // Définition des couleurs et de l'ID selon la page
-    const chartId = isE ? 'entreesEvolutionChart' : 'depensesEvolutionChart';
-    const borderColor = isE ? '#10b981' : '#ef4444'; // Vert pour Entrées, Rouge pour Dépenses
-    const bgColor = isE ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
-
-    const ctxEvo = destroyChart(chartId);
-    if (ctxEvo) {
-        new Chart(ctxEvo, { 
-            type: 'line',
-            data: { 
-                labels: months, 
-                datasets: [{ 
-                    data: vals, 
-                    borderColor: borderColor, 
-                    backgroundColor: bgColor, 
-                    tension: 0.4, 
-                    fill: true 
-                }] 
-            },
-            options: { responsive: true, plugins: { legend: { display: false } } }
-        });
-    }
     // Graphiques
     renderCashFlowCategoryChart(type, data);
     renderCashFlowEvolutionChart(type, data);
@@ -465,7 +436,12 @@ async function updateCashFlowPage(type) {
 let currentAvatarData = null; // Stocke temporairement l'avatar sélectionné
 
 async function updateProfil() {
-    const p = await dataManager.getProfile();
+    const [p, connexions, nbTransactions] = await Promise.all([
+        dataManager.getProfile(),
+        dataManager.getConnexions(),
+        dataManager.countAllTransactions()
+    ]);
+    
     document.getElementById('profilNom').value   = p.nom       || '';
     document.getElementById('profilEmail').value = p.email     || '';
     document.getElementById('profilTel').value   = p.telephone || '';
@@ -474,10 +450,30 @@ async function updateProfil() {
     if (p.avatar_url) {
         displayAvatar(p.avatar_url);
     } else {
-        // Afficher placeholder par défaut
         document.getElementById('profilAvatarImg').style.display = 'none';
         document.getElementById('profilAvatarPlaceholder').style.display = 'flex';
     }
+    
+    // Stats
+    if (connexions && connexions.length > 0) {
+        // Membre depuis (première connexion)
+        const premiereConnexion = connexions[connexions.length - 1].date_connexion;
+        const dateDebut = new Date(premiereConnexion);
+        document.getElementById('membreDepuis').textContent = dateDebut.toLocaleDateString('fr-FR');
+        
+        // Dernière connexion (exclure aujourd'hui)
+        const today = new Date().toISOString().split('T')[0];
+        const derniereAutre = connexions.find(c => c.date_connexion !== today);
+        if (derniereAutre) {
+            const dateDerniere = new Date(derniereAutre.date_connexion);
+            document.getElementById('derniereConnexion').textContent = dateDerniere.toLocaleDateString('fr-FR');
+        } else {
+            document.getElementById('derniereConnexion').textContent = 'Première connexion';
+        }
+    }
+    
+    // Nombre de transactions
+    document.getElementById('nombreTransactions').textContent = nbTransactions;
 }
 
 function displayAvatar(url) {
