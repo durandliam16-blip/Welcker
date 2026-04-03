@@ -4,9 +4,8 @@
 
 Application web complète de gestion financière personnelle avec suivi de patrimoine, investissements, comptes bancaires, biens, et analyse des flux financiers.
 > Attention : A chaque ajout de fichier ou version, vérifier les fichiers "README.md", "sw.js" et "index.html".
-+ 2 fonctionnalitées innovantes :  
-Compte commun famille qui cumule les comptes dans une nouvelle page  
-Comme un réseau social avec suivi et amis
+
+**Détail du principe** : suit le patrimoine personnel en analysant les dépenses, entrées d'argent, investissements, possessions etc. De plus il y a 3 features intéressantes qui sont : option de suivi d'amis comme un réseau social avec une possibilité de voir leurs dernières transactions / un option familiale qui regroupe le patrimoine de plusieurs personnes au sein d'un même foyer / une IA intégré sur le côté à qui on peut soit utiliser sa personnalité "Analyse financier" ou "Trader" etc pour lui demander des conseils sachant qu'il a accès aux statistiques sur le patrimoine de l'user.
 
 Sites autres utilisés :  
 - *Notion* pour à faire 

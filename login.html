@@ -215,7 +215,7 @@
         <!-- Brand -->
         <div class="brand">
             <div class="brand-logo">
-                <img src="logo.png" alt="Welcker" onerror="this.parentElement.textContent='W'">
+                <img src="images/logo.png" alt="Welcker" onerror="this.parentElement.textContent='W'">
             </div>
             <span class="brand-name">Welcker</span>
         </div>
@@ -355,7 +355,7 @@
                 btn.innerHTML = 'Créer mon compte';
                 btn.disabled  = false;
             } else {
-                showMsg('signup', '✅ Compte créé ! Vérifiez votre email puis connectez-vous.', 'success');
+                showMsg('signup', '✅ Compte créé ! Connectez-vous (si ne fonctionne pas, vérifiez vos mails).', 'success');
                 btn.innerHTML = 'Créer mon compte';
                 btn.disabled  = false;
                 setTimeout(() => switchTab('login'), 3000);
