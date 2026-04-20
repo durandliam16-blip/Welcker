@@ -286,6 +286,8 @@ async function updateInvestmentPage(mode) {
     renderPositionsChart(`${pfx}PositionsChart`, stats.positions);
     renderInvestTable(pfx, transactions, mode, stats);
     renderInvestChart(pfx, transactions);
+
+    await initLivePrices(pfx, stats.positions);
 }
 
 function renderInvestTable(pfx, data, mode) {

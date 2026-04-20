@@ -40,8 +40,9 @@ Sites autres utilisés :
 │   ├── dataManager.js        ← Toutes les requêtes DB  
 │   ├── app.js                ← Fonctionnalitées principales   
 │   ├── pages.js              ← Toutes les pages   
-|   ├── utilities.css         ← Autres features
-|   ├── social.css            ← Tout les fonctions de la page social 
+|   ├── utilities.js          ← Autres features
+|   ├── social.js             ← Tout les fonctions de la page social 
+|   ├── liveprices.js         ← Utilise l'API Yahho pour avoir le cours en direct des actions
 css/  
 |   ├── base.css              ← Variables + Reset + Layout  
 |   ├── components.css        ← Buttons + Cards + Forms + Modals  
