@@ -1,4 +1,4 @@
-const CACHE_NAME = 'monpatrimoine-v201'; // new version pour forcer la mise à jour
+const CACHE_NAME = 'monpatrimoine-v211'; // new version pour forcer la mise à jour
 const ASSETS = [
   './',
   './index.html',
@@ -17,6 +17,7 @@ const ASSETS = [
   './js/pages.js',
   './js/others.js',
   './js/graphs.js',
+  './js/liveprices.js',
   './js/social.js',
   // CDN (ne pas cacher Supabase !)
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'
@@ -43,8 +44,12 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  // Ne JAMAIS cacher Supabase
-  if (e.request.url.includes('supabase.co') || e.request.url.includes('supabase-js')) {
+  // Evite le blocage de ces sites
+  if (e.request.url.includes('supabase.co') ||
+    e.request.url.includes('supabase-js') ||
+    e.request.url.includes('yahoo.com') ||
+    e.request.url.includes('codetabs.com') ||
+    e.request.url.includes('thingproxy.freeboard.io')) {
     return;
   }
 

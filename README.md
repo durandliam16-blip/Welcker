@@ -60,6 +60,7 @@ Images/
 |   ├── avatar.png            ← Zoom de la mascotte
 ```
 
+> Ajouter chaque nouveau fichier code à Index.html et sw.js !
 
 ## 🚀 Hébergement
 
