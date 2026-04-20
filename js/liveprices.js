@@ -12,7 +12,7 @@
 
 const PROXIES = [
     'https://api.codetabs.com/v1/proxy?quest=',
-    'https://thingproxy.freeboard.io/fetch/'
+    'https://api.allorigins.win/raw?url='
 ];
 const YAHOO_URL  = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=';
 const TICKER_KEY = 'welcker_tickers'; // localStorage : { "LVMH": "MC.PA", ... }
