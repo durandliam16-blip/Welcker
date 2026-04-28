@@ -35,6 +35,7 @@ Sites autres utilisés :
 ├── login.html                ← page de connexion/inscription   
 ├── manifest.json             ← Permet au navigateur d'ouvrir corréctement l'app  
 ├── sw.js                     ← enregistre le cache pour quand hors-ligne
+├── api_yahoo.py              ← Utilise l'API Yahho pour avoir le cours en direct des actions
 ├── js/  
 │   ├── config.js             ← Supabase config  
 │   ├── dataManager.js        ← Toutes les requêtes DB  
@@ -42,7 +43,6 @@ Sites autres utilisés :
 │   ├── pages.js              ← Toutes les pages   
 |   ├── utilities.js          ← Autres features
 |   ├── social.js             ← Tout les fonctions de la page social 
-|   ├── liveprices.js         ← Utilise l'API Yahho pour avoir le cours en direct des actions
 css/  
 |   ├── base.css              ← Variables + Reset + Layout  
 |   ├── components.css        ← Buttons + Cards + Forms + Modals  
@@ -60,7 +60,7 @@ Images/
 |   ├── avatar.png            ← Zoom de la mascotte
 ```
 
-> Ajouter chaque nouveau fichier code à Index.html et sw.js !
+> Ajouter/suprimer chaque nouveau fichier code à Index.html et sw.js !
 
 ## 🚀 Hébergement
 

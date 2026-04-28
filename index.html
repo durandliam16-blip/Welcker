@@ -31,6 +31,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
     <link rel="icon" href="icon-192.png">
+
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -265,11 +268,12 @@
                                     <tr>
                                         <th>Position</th>
                                         <th style="text-align: right;">Valorisation</th>
+                                        <th style="text-align: right;">Cours actuel</th>
                                         <th style="text-align: right;">Plus-value</th>
                                     </tr>
                                 </thead>
                                 <tbody id="ctoPositionsTable">
-                                    <tr><td colspan="3" class="empty-state">Aucune position</td></tr>
+                                    <tr><td colspan="4" class="empty-state">Aucune position</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -375,11 +379,12 @@
                                     <tr>
                                         <th>Position</th>
                                         <th style="text-align: right;">Valorisation</th>
+                                        <th style="text-align: right;">Cours actuel</th>
                                         <th style="text-align: right;">Plus-value</th>
                                     </tr>
                                 </thead>
                                 <tbody id="peaPositionsTable">
-                                    <tr><td colspan="3" class="empty-state">Aucune position</td></tr>
+                                    <tr><td colspan="4" class="empty-state">Aucune position</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -485,11 +490,12 @@
                                     <tr>
                                         <th>Position</th>
                                         <th style="text-align: right;">Valorisation</th>
+                                        <th style="text-align: right;">Cours actuel</th>
                                         <th style="text-align: right;">Plus-value</th>
                                     </tr>
                                 </thead>
                                 <tbody id="cryptoPositionsTable">
-                                    <tr><td colspan="3" class="empty-state">Aucune position</td></tr>
+                                    <tr><td colspan="4" class="empty-state">Aucune position</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -1034,7 +1040,7 @@
                         <input type="text" id="transactionTitre" placeholder="Ex: Apple Inc." required>
                     </div>
                     <div class="form-group">
-                        <label>Code (libellé)</label>
+                        <label>Code (à choisir sur "https://finance.yahoo.com/lookup")</label>
                         <input type="text" id="transactionLibelle" placeholder="AAPL, BTC, ETH..." required>
                     </div>
                     <div class="form-group">
@@ -1403,7 +1409,6 @@
     <script src="js/pages.js"></script>
     <script src="js/others.js"></script>
     <script src="js/graphs.js"></script>
-    <script src="js/liveprices.js"></script>
     <script src="js/social.js"></script>
     
     <!-- Initialisation -->
@@ -1422,6 +1427,26 @@
         // Charger page d'accueil
         await navigateTo('accueil');
     });
+    </script>
+
+    <py-config>
+        packages = ["yfinance"]
+    </py-config>
+    <script type="py">
+        import yfinance as yf
+        from pyscript import window
+
+        def cours_actuel_python(ticker):
+            try:
+                data = yf.Ticker(ticker)
+                prix = data.fast_info['lastPrice']
+                return float(prix)
+            except Exception as e:
+                print(f"Erreur Python pour {ticker}: {e}")
+                return None
+
+        # Exposer la fonction Python à l'environnement JavaScript global
+        window.cours_actuel_python = cours_actuel_python
     </script>
 </body>
 </html>

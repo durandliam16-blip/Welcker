@@ -1,8 +1,9 @@
-const CACHE_NAME = 'monpatrimoine-v212'; // new version pour forcer la mise à jour
+const CACHE_NAME = 'monpatrimoine-v213'; // new version pour forcer la mise à jour
 const ASSETS = [
   './',
   './index.html',
   './login.html',
+  './api_yahoo.py',
   // CSS
   './css/base.css',
   './css/components.css',
@@ -17,7 +18,6 @@ const ASSETS = [
   './js/pages.js',
   './js/others.js',
   './js/graphs.js',
-  './js/liveprices.js',
   './js/social.js',
   // CDN (ne pas cacher Supabase !)
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'
