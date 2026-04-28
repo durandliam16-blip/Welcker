@@ -3,7 +3,6 @@ const ASSETS = [
   './',
   './index.html',
   './login.html',
-  './api_yahoo.py',
   // CSS
   './css/base.css',
   './css/components.css',
