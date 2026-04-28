@@ -445,7 +445,8 @@ function renderPositionsTable(prefix, positions) {
     if (!tbody) return;
     
     if (!positions || positions.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" class="empty-state">Aucune position</td></tr>';
+        // Ajout d'un colspan=4 pour correspondre aux 4 colonnes
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Aucune position</td></tr>';
         return;
     }
     
@@ -454,19 +455,35 @@ function renderPositionsTable(prefix, positions) {
         .sort((a, b) => (b.valorisation || 0) - (a.valorisation || 0))
         .slice(0, 10);
     
-    tbody.innerHTML = top10.map(p => `
+    tbody.innerHTML = top10.map(p => {
+        // Calcul de l'évolution du cours par rapport au Prix de Revient (PRU)
+        const evoCours = p.pru > 0 ? ((p.dernierPrix - p.pru) / p.pru) * 100 : 0;
+        const colorEvo = evoCours >= 0 ? 'positive' : 'negative';
+
+        return `
         <tr>
             <td>
                 <strong style="color: var(--text-primary); font-size: 14px;">
                     ${p.libelle || p.titre}
                 </strong>
                 <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
-                    ${p.quantite.toFixed(4)} × ${fmt(p.dernierPrix)}
+                    ${p.quantite.toFixed(4)} titres
                 </div>
             </td>
+
             <td style="text-align: right; font-weight: 600; font-size: 15px;">
                 ${fmt(p.valorisation)}
             </td>
+
+            <td style="text-align: right;">
+                <span style="font-weight: 600; font-size: 14px;" class="${colorEvo}">
+                    ${fmt(p.dernierPrix)}
+                </span>
+                <div style="font-size: 11px; margin-top: 2px;" class="${colorEvo}">
+                    ${evoCours >= 0 ? '+' : ''}${evoCours.toFixed(1)}%
+                </div>
+            </td>
+
             <td style="text-align: right;">
                 <span class="${p.pvLatente >= 0 ? 'positive' : 'negative'}" 
                       style="font-weight: 600; font-size: 14px;">
@@ -477,7 +494,7 @@ function renderPositionsTable(prefix, positions) {
                 </div>
             </td>
         </tr>
-    `).join('');
+    `}).join('');
 }
 
 function renderCashHistory(prefix, cashTransactions) {

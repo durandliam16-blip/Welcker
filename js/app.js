@@ -166,55 +166,68 @@ const performance = totalDepose > 0 ? ((totalPortefeuille - totalDepose) / total
 window.initLivePrices = async function(prefix, positions) {
     if (!positions || positions.length === 0) return;
 
+    // 1. Attendre que le code Python soit chargé (Max 10 secondes)
+    let retries = 0;
+    while (typeof window.cours_actuel_python !== 'function' && retries < 20) {
+        await new Promise(r => setTimeout(r, 500)); // Attend 500ms
+        retries++;
+    }
+
+    if (typeof window.cours_actuel_python !== 'function') {
+        console.warn("⚠️ PyScript n'a pas chargé à temps. Les prix ne sont pas mis à jour.");
+        showToast("Erreur: Le module Python Yahoo Finance n'est pas prêt.", "error");
+        return;
+    }
+
     let updated = false;
     let newValorisationTotale = 0;
     let newPvLatenteTotale = 0;
 
-    // 1. Boucler sur toutes les positions pour MAJ le prix via Python
+    // 2. Boucler sur les positions et interroger Python
     for (let pos of positions) {
-        // On s'assure d'avoir un libellé valide (ex: AAPL, BTC-USD)
-        if (!pos.libelle || pos.libelle === 'UNKNOWN') continue;
+        if (!pos.libelle || pos.libelle === 'UNKNOWN') {
+            newValorisationTotale += pos.valorisation || 0;
+            newPvLatenteTotale += pos.pvLatente || 0;
+            continue;
+        }
 
         try {
-            // Appel à la fonction Python exposée sur l'objet window
-            if (typeof window.cours_actuel_python === 'function') {
-                let livePrice = window.cours_actuel_python(pos.libelle);
-                
-                if (livePrice && !isNaN(livePrice)) {
-                    pos.dernierPrix = parseFloat(livePrice); // Mise à jour de la colonne "Cours actuel"
-                    
-                    // Recalcul des métriques avec le vrai prix
-                    pos.valorisation = pos.quantite * pos.dernierPrix;
-                    pos.pvLatente = pos.valorisation - pos.capitalInvesti;
-                    updated = true;
-                }
+            // APPEL AU CODE PYTHON !
+            let livePrice = window.cours_actuel_python(pos.libelle);
+            
+            if (livePrice && !isNaN(livePrice)) {
+                // Mise à jour de la data
+                pos.dernierPrix = parseFloat(livePrice);
+                pos.valorisation = pos.quantite * pos.dernierPrix;
+                pos.pvLatente = pos.valorisation - pos.capitalInvesti;
+                updated = true;
             }
         } catch (err) {
             console.warn(`Erreur lors de la MAJ du prix pour ${pos.libelle}:`, err);
         }
 
-        // On cumule les totaux
+        // Cumul pour les statistiques globales
         newValorisationTotale += pos.valorisation || 0;
         newPvLatenteTotale += pos.pvLatente || 0;
     }
 
-    // 2. Si au moins un prix a été mis à jour, on rafraîchit l'interface
+    // 3. Ré-afficher le tableau et les encarts si des prix ont changé
     if (updated) {
-        // On re-génère le tableau (la fonction utilise pos.dernierPrix)
+        // Redessine le tableau avec la nouvelle fonction 4 colonnes
         renderPositionsTable(prefix, positions);
 
-        // On met à jour les encarts globaux du dashboard
+        // Met à jour les grosses cartes en haut
         const valEl = document.getElementById(`${prefix}ValeurActuelle`);
         if (valEl) valEl.textContent = fmt(newValorisationTotale);
 
         const pvLatenteEl = document.getElementById(`${prefix}PvLatente`);
         if (pvLatenteEl) pvLatenteEl.textContent = fmt(newPvLatenteTotale);
 
-        // Optionnel : recalculer le "Total Portefeuille" (Valorisation + Cash)
-        const cashStr = document.getElementById(`${prefix}Cash`).textContent.replace(/[^0-9,-]/g, '').replace(',', '.');
-        const cash = parseFloat(cashStr) || 0;
+        const cashStr = document.getElementById(`${prefix}Cash`)?.textContent.replace(/[^0-9,-]/g, '').replace(',', '.') || '0';
         const totalPortefeuilleEl = document.getElementById(`${prefix}TotalPortefeuille`);
-        if (totalPortefeuilleEl) totalPortefeuilleEl.textContent = fmt(newValorisationTotale + cash);
+        if (totalPortefeuilleEl) totalPortefeuilleEl.textContent = fmt(newValorisationTotale + parseFloat(cashStr));
+        
+        showToast(`✅ Cours des actifs mis à jour en direct !`, "success");
     }
 };
 
