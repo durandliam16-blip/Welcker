@@ -491,8 +491,6 @@ window.renderSankeyDiagram = renderSankeyDiagram;
 // =============================================================================
 
 async function renderPatrimoineEvolutionChart() {
-    const ctx = destroyChart('patrimoineChart');
-    if (!ctx) return; // Sécurité si le canvas n'existe pas
 
     const canvas = document.getElementById('patrimoineChart');
     if (!canvas) return;
