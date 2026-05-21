@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://pyscript.net; connect-src 'self' https://qktbcgumyqjgbvcpynjo.supabase.co https://query1.finance.yahoo.com https://api.codetabs.com https://api.allorigins.win https://cdn.jsdelivr.net https://pyscript.net; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://pyscript.net; font-src 'self' https://fonts.gstatic.com; worker-src 'self' blob:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://pyscript.net; connect-src 'self' https://qktbcgumyqjgbvcpynjo.supabase.co https://query1.finance.yahoo.com https://api.codetabs.com https://api.allorigins.win https://cdn.jsdelivr.net https://pyscript.net https://pypi.org https://files.pythonhosted.org; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://pyscript.net; font-src 'self' https://fonts.gstatic.com; worker-src 'self' blob:;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcker - Wealth Tracker</title>
     <title>Welcker - Votre Guide vers la Richesse</title>
@@ -30,7 +30,7 @@
     <link rel="stylesheet" href="css/social.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
-    <link rel="icon" href="logo.png">
+    <link rel="icon" href="images/logo.png">
 
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
@@ -1367,17 +1367,19 @@
     <!-- Vérification auth -->
     <script>
     (async () => {
-        if (!window.supabase) {
-            console.error('Supabase non chargé !');
-            window.location.replace('login.html');
+        // Attendre que config.js soit chargé pour utiliser 'sb'
+        let retries = 0;
+        while (!window.sb && retries < 20) {
+            await new Promise(r => setTimeout(r, 100));
+            retries++;
+        }
+        
+        if (!window.sb) {
+            console.error('Supabase non chargé via config.js !');
             return;
         }
-        const { createClient } = window.supabase;
-        const _sb = createClient(
-            'https://qktbcgumyqjgbvcpynjo.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrdGJjZ3VteXFqZ2J2Y3B5bmpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MDQ0MDYsImV4cCI6MjA4NjM4MDQwNn0.Bjv4bb2gnXKG8-UY4oSUQrjaJIzNWEG_zM8_XTQbwsY'
-        );
-        const { data: { session } } = await _sb.auth.getSession();
+
+        const { data: { session } } = await window.sb.auth.getSession();
         if (!session) {
             window.location.replace('login.html');
             return;
@@ -1414,9 +1416,11 @@
     </script>
 
     <py-config>
-        packages = ["yfinance"]
+        packages = ["yfinance", "pyodide-http"]
     </py-config>
     <script type="py">
+        import pyodide_http
+        pyodide_http.patch_all()
         import yfinance as yf
         from pyscript import window
 

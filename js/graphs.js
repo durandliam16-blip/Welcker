@@ -497,9 +497,6 @@ async function renderPatrimoineEvolutionChart() {
     const canvas = document.getElementById('patrimoineChart');
     if (!canvas) return;
     
-    const ctx = destroyChart('patrimoineChart');
-    if (!ctx) return;
-    
     /// Récupérer période sélectionnée
     const periodSelect = document.getElementById('patrimoineChartPeriod');
     const period = periodSelect ? periodSelect.value : '12';
@@ -510,6 +507,10 @@ async function renderPatrimoineEvolutionChart() {
 
     // Récupérer l'historique
     const history = await dataManager.getPatrimoineHistory(months);
+    
+    // DESTRUCTION ICI JUSTE AVANT LA CRÉATION (Anti-concurrence)
+    const ctx = destroyChart('patrimoineChart');
+    if (!ctx) return;
     
     if (!history || history.length === 0) {
         canvas.parentElement.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:100px 20px;">Aucun historique disponible. Utilisez le bouton "💾 Sauvegarder snapshot" pour commencer à enregistrer l\'évolution de votre patrimoine.</p>';
