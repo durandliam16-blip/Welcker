@@ -5,15 +5,17 @@
 function destroyChart(canvasId) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return null;
-    
+
     const existingChart = Chart.getChart(canvas);
     if (existingChart) {
         existingChart.destroy();
     }
-    
-    return canvas.getContext('2d');
-}
 
+    // S'assurer que le canvas est propre
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    return ctx;
+}
 function renderPositionsChart(canvasId, positions) {
     const ctx = destroyChart(canvasId);
     if (!ctx || !positions || positions.length === 0) {

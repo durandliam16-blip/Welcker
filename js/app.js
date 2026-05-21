@@ -166,9 +166,9 @@ const performance = totalDepose > 0 ? ((totalPortefeuille - totalDepose) / total
 window.initLivePrices = async function(prefix, positions) {
     if (!positions || positions.length === 0) return;
 
-    // 1. Attendre que le code Python soit chargé (Max 10 secondes)
+    // 1. Attendre que le code Python soit chargé (Max 30 secondes)
     let retries = 0;
-    while (typeof window.cours_actuel_python !== 'function' && retries < 20) {
+    while (typeof window.cours_actuel_python !== 'function' && retries < 60) {
         await new Promise(r => setTimeout(r, 500)); // Attend 500ms
         retries++;
     }
