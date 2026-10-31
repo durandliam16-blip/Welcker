@@ -34,18 +34,8 @@ function renderPositionsChart(canvasId, positions) {
         parCategorie[cat] += p.valorisation || 0;
     });
     
-    // Icônes par catégorie
-    const icons = {
-        'Tech': '🖥️',
-        'Santé': '🧬',
-        'ETF pays': '💰',
-        'Industrie': '🏭',
-        'Transports': '🚗',
-        'Luxe': '💎',
-        'Autres': '📦'
-    };
-    
-    const labels = Object.keys(parCategorie).map(cat => `${icons[cat] || ''} ${cat}`);
+    // Libellés par catégorie sans emojis
+    const labels = Object.keys(parCategorie);
     const data = Object.values(parCategorie);
     
     new Chart(ctx, {
@@ -55,13 +45,13 @@ function renderPositionsChart(canvasId, positions) {
             datasets: [{
                 data: data,
                 backgroundColor: [
-                    '#2563eb', // Bleu
-                    '#f59e0b', // Orange
-                    '#ef4444', // Rouge
-                    '#06b6d4', // Cyan
-                    '#14b8a6', // Teal
-                    '#a855f7', // Violet foncé
-                    '#64748b'  // Gris
+                    '#2563eb',
+                    '#059669',
+                    '#64748b',
+                    '#0284c7',
+                    '#d97706',
+                    '#475569',
+                    '#0d9488'
                 ]
             }]
         },
@@ -186,7 +176,7 @@ function renderCashFlowCategoryChart(type, data) {
             labels: Object.keys(catsMoyenne),
             datasets: [{
                 data: Object.values(catsMoyenne),
-                backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#14b8a6']
+                backgroundColor: ['#2563eb', '#059669', '#64748b', '#0284c7', '#d97706', '#475569', '#0d9488', '#6366f1']
             }]
         },
         options: {

@@ -6,20 +6,24 @@ function showToast(message, type = 'info') {
     if (!container) {
         container = document.createElement('div');
         container.id = 'toast-container';
-        container.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;';
         document.body.appendChild(container);
     }
     const toast = document.createElement('div');
-    const colors = { success: '#10b981', error: '#ef4444', info: '#2563eb' };
-    toast.style.cssText = `background:${colors[type]||colors.info};color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-family:Inter,sans-serif;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,0.2);opacity:0;transform:translateY(10px);transition:all 0.3s;min-width:220px;`;
-    toast.textContent = message;
+    toast.className = `toast toast-${type}`;
+    const icons = {
+        success: '<i data-lucide="check-circle-2" style="color:var(--success-color);width:16px;height:16px;flex-shrink:0;"></i>',
+        error: '<i data-lucide="alert-circle" style="color:var(--danger-color);width:16px;height:16px;flex-shrink:0;"></i>',
+        info: '<i data-lucide="info" style="color:var(--primary-color);width:16px;height:16px;flex-shrink:0;"></i>'
+    };
+    toast.innerHTML = `${icons[type] || icons.info}<span>${escapeHTML(message)}</span>`;
     container.appendChild(toast);
-    requestAnimationFrame(() => { toast.style.opacity = '1'; toast.style.transform = 'translateY(0)'; });
+    if (window.lucide) lucide.createIcons();
     setTimeout(() => {
         toast.style.opacity = '0';
-        toast.style.transform = 'translateY(10px)';
-        setTimeout(() => toast.remove(), 300);
-    }, 3500);
+        toast.style.transform = 'translateY(4px)';
+        toast.style.transition = 'all 140ms ease';
+        setTimeout(() => toast.remove(), 150);
+    }, 3200);
 }
 
 // =============================================================================
@@ -29,7 +33,11 @@ async function navigateTo(page) {
     document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const el = document.getElementById(`page-${page}`);
-    if (el) { el.classList.add('active'); await updatePageContent(page); }
+    if (el) { 
+        el.classList.add('active'); 
+        await updatePageContent(page); 
+        if (window.lucide) lucide.createIcons();
+    }
 }
 
 // =============================================================================

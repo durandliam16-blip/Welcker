@@ -1,22 +1,51 @@
-/* Cards */
+/* =============================================================================
+   COMPONENTS - UNSLOP REFINED DESIGN SYSTEM
+   ============================================================================= */
+
+/* ── Cards ──────────────────────────────────────────────────────────── */
 .card {
     background: var(--bg-primary);
     border-radius: var(--radius-lg);
-    padding: 24px;
-    box-shadow: var(--shadow-sm);
+    padding: 20px 24px;
     border: 1px solid var(--border-color);
-    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .card:hover {
-    box-shadow: var(--shadow-md);
+    border-color: var(--border-strong);
 }
 
 .card h3 {
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 600;
-    margin-bottom: 20px;
+    letter-spacing: -0.2px;
     color: var(--text-primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card h3 svg,
+.card h3 i {
+    width: 17px;
+    height: 17px;
+    stroke-width: 1.75px;
+    color: var(--text-secondary);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.card-header h3 {
+    margin-bottom: 0;
 }
 
 .card-large {
@@ -27,223 +56,325 @@
     grid-column: 1 / -1;
 }
 
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-/* Dashboard Grid */
+/* ── Grids ──────────────────────────────────────────────────────────── */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
 }
 
-/* Overview Content */
-.overview-content {
+/* ── Executive Overview (Page Accueil) ──────────────────────────────── */
+.overview-card {
+    padding: 24px;
+}
+
+.overview-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.overview-hero-main {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 4px;
+}
+
+.overview-hero-main .stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+}
+
+.amount-display {
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: -0.8px;
+    color: var(--text-primary);
+    line-height: 1.1;
+}
+
+.overview-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
 }
 
 .stat-item {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 0;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.stat-item:last-child {
-    border-bottom: none;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
 }
 
 .stat-label {
-    font-size: 14px;
-    color: var(--text-secondary);
+    font-size: 11px;
     font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
 }
 
 .stat-value {
-    font-size: 24px;
-    font-weight: 700;
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
     color: var(--text-primary);
 }
 
-/* Transaction List */
-.transaction-list {
+/* ── Transactions List (Accueil) ────────────────────────────────────── */
+#recentTransactions {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 .transaction-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
+    padding: 10px 14px;
     background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.transaction-item:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--border-strong);
+}
+
+.transaction-item strong {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-primary);
 }
 
 .empty-state {
     text-align: center;
     color: var(--text-tertiary);
-    padding: 40px 20px;
+    padding: 36px 16px;
+    font-size: 13px;
 }
 
-/* Bilan Grid */
-.bilan-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
+/* ── Page Comptes ───────────────────────────────────────────────────── */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 28px 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.card-summary {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 40px;
+.section-header h2 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    letter-spacing: -0.2px;
 }
 
-.amount-display {
-    font-size: 48px;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin-top: 16px;
+.section-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
 }
 
-/* Comptes Grid */
+.section-icon svg,
+.section-icon i {
+    width: 18px;
+    height: 18px;
+    stroke-width: 1.75px;
+}
+
 .comptes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
 }
 
 .compte-card {
     cursor: pointer;
-    transition: var(--transition);
+    position: relative;
+    padding: 20px;
 }
 
 .compte-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
 }
 
 .compte-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .compte-header h3 {
-    font-size: 16px;
+    font-size: 14.5px;
+    font-weight: 500;
     margin: 0;
+    color: var(--text-primary);
 }
 
 .compte-type {
-    font-size: 12px;
-    padding: 4px 12px;
+    font-size: 11px;
+    padding: 2px 8px;
     background: var(--bg-tertiary);
     color: var(--text-secondary);
-    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
     font-weight: 500;
+    letter-spacing: 0.03em;
 }
 
 .compte-amount {
-    font-size: 32px;
-    font-weight: 700;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.4px;
     color: var(--text-primary);
-    margin: 16px 0;
+    margin: 8px 0;
 }
 
 .compte-evolution {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 12.5px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 
-.compte-evolution .positive {
+.compte-evolution .positive,
+.positive {
     color: var(--success-color);
 }
 
-.compte-evolution .negative {
+.compte-evolution .negative,
+.negative {
     color: var(--danger-color);
 }
 
-/* Investment Layout */
+/* ── Investment Layout (CTO, PEA, Crypto) ───────────────────────────── */
 .investment-layout {
     display: grid;
-    gap: 24px;
-}
-
-.portfolio-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
-    margin-bottom: 24px;
 }
 
-/* Table */
-.table-container {
+.investment-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.investment-dashboard .card {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.investment-dashboard .stat-value {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.4px;
+    margin: 6px 0 10px;
+}
+
+/* ── Tables Professionnelles (Grand Livre) ──────────────────────────── */
+.table-container,
+.table-responsive {
     overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-primary);
 }
 
-.transactions-table {
+.transactions-table,
+.positions-table {
     width: 100%;
     border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
 }
 
 .transactions-table th,
-.transactions-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.transactions-table th {
+.positions-table th {
     background: var(--bg-tertiary);
-    font-weight: 600;
-    color: var(--text-secondary);
-    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.05em;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
 }
 
-.transactions-table tbody tr {
-    transition: var(--transition);
+.transactions-table td,
+.positions-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+    vertical-align: middle;
 }
 
-.transactions-table tbody tr:hover {
+.transactions-table tbody tr:last-child td,
+.positions-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.transactions-table tbody tr,
+.positions-table tbody tr {
+    transition: background-color var(--transition-fast);
+}
+
+.transactions-table tbody tr:hover,
+.positions-table tbody tr:hover {
     background: var(--bg-secondary);
 }
 
-.transactions-table .btn-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
+.transactions-table .btn-icon,
+.positions-table .btn-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+    border-radius: var(--radius-sm);
 }
 
-/* Filter Controls */
+/* ── Filtres ────────────────────────────────────────────────────────── */
 .filter-controls {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     align-items: center;
     flex-wrap: wrap;
 }
 
 .filter-controls select,
 .filter-controls input[type="date"] {
-    padding: 8px 12px;
+    padding: 6px 10px;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
-    font-size: 14px;
+    font-size: 13px;
     font-family: inherit;
+    background: var(--bg-primary);
+    color: var(--text-primary);
     outline: none;
-    transition: var(--transition);
+    transition: border-color var(--transition-fast);
 }
 
 .filter-controls select:focus,
@@ -251,107 +382,253 @@
     border-color: var(--primary-color);
 }
 
-/* Biens Grid */
-.biens-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
+/* ── Cash History ───────────────────────────────────────────────────── */
+.cash-history {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
-.bien-card {
-    position: relative;
+.cash-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-fast);
 }
 
-.bien-type {
-    font-size: 12px;
-    padding: 4px 12px;
-    background: var(--primary-color);
-    color: white;
-    border-radius: 20px;
-    display: inline-block;
-    margin-bottom: 12px;
+.cash-item:hover {
+    background: var(--bg-tertiary);
 }
 
-.bien-value {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin: 16px 0;
+.cash-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
 }
 
-/* Flux Layout */
+.cash-details {
+    flex: 1;
+}
+
+.cash-desc {
+    font-weight: 500;
+    font-size: 13.5px;
+    color: var(--text-primary);
+}
+
+.cash-date {
+    font-size: 11.5px;
+    color: var(--text-tertiary);
+    margin-top: 1px;
+}
+
+.cash-amount {
+    font-weight: 600;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Flux Financiers ────────────────────────────────────────────────── */
 .flux-layout {
     display: grid;
-    gap: 24px;
+    gap: 20px;
 }
 
 .flux-summary {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 24px;
+    gap: 16px;
 }
 
 .flux-item {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 8px;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
 }
 
 .flux-label {
-    font-size: 14px;
-    color: var(--text-secondary);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    margin-bottom: 6px;
 }
 
 .flux-value {
-    font-size: 32px;
-    font-weight: 700;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.4px;
 }
 
-.flux-value.positive {
+.flux-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+    font-family: inherit;
+    text-decoration: none;
+}
+
+.flux-entrees-btn {
+    background: var(--success-subtle);
     color: var(--success-color);
+    border: 1px solid rgba(5, 150, 105, 0.25);
 }
 
-.flux-value.negative {
+.flux-entrees-btn:hover {
+    background: #d1fae5;
+}
+
+.flux-depenses-btn {
+    background: var(--danger-subtle);
     color: var(--danger-color);
+    border: 1px solid rgba(220, 38, 38, 0.25);
 }
 
-/* Entrées & Dépenses Layout */
+.flux-depenses-btn:hover {
+    background: #fee2e2;
+}
+
+.flux-action-btn svg,
+.flux-action-btn i {
+    width: 15px;
+    height: 15px;
+    stroke-width: 1.75px;
+}
+
+/* ── Page Biens ─────────────────────────────────────────────────────── */
+.biens-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.bien-card {
+    position: relative;
+    padding: 20px;
+}
+
+.bien-type {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    display: inline-block;
+    margin-bottom: 10px;
+    text-transform: capitalize;
+}
+
+.bien-value {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.4px;
+    color: var(--text-primary);
+    margin: 8px 0 12px;
+}
+
+/* ── Formulaires Modernes & Modales ─────────────────────────────────── */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 13.5px;
+    font-family: inherit;
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.form-group textarea {
+    resize: vertical;
+    line-height: 1.5;
+}
+
+/* ── Layout Entrées / Dépenses ──────────────────────────────────────── */
 .entrees-layout,
 .depenses-layout {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
 }
 
-/* Profil Layout */
+/* ── Layout Profil & Paramètres ─────────────────────────────────────── */
 .profil-layout {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    gap: 24px;
+    gap: 20px;
 }
 
 .profil-card {
     display: flex;
-    gap: 32px;
+    gap: 28px;
 }
 
-.profil-avatar {
+.profil-avatar-section {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 16px;
+    width: 200px;
 }
 
-.avatar-placeholder {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
+.avatar-placeholder-large {
+    width: 84px;
+    height: 84px;
+    border-radius: var(--radius-full);
     background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 48px;
+    font-size: 32px;
+    color: var(--text-secondary);
 }
 
 .profil-info {
@@ -361,341 +638,91 @@
 .stats-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
 }
 
 .stat-row {
     display: flex;
     justify-content: space-between;
-    padding: 12px 0;
+    padding: 10px 0;
     border-bottom: 1px solid var(--border-color);
+    font-size: 13px;
 }
 
 .stat-row:last-child {
     border-bottom: none;
 }
 
-/* Paramètres Layout */
 .parametres-layout {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
+    gap: 20px;
 }
 
 .settings-group {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
 .setting-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 0;
+    padding: 8px 0;
 }
 
 .setting-item label {
+    font-size: 13.5px;
     font-weight: 500;
     color: var(--text-primary);
 }
 
 .setting-item select {
-    padding: 8px 12px;
+    padding: 6px 10px;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     font-family: inherit;
-}
-
-.setting-item input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-}
-
-/* Forms */
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: var(--text-primary);
-    font-size: 14px;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    font-family: inherit;
-    outline: none;
-    transition: var(--transition);
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.form-group textarea {
-    resize: vertical;
-}
-
-/* Investment Dashboard */
-.investment-dashboard {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
-    margin-bottom: 24px;
-}
-
-.investment-dashboard .card {
-    padding: 20px;
-}
-
-.investment-dashboard .stat-value {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 12px 0;
-}
-
-/* Positions Table */
-.positions-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.positions-table th,
-.positions-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.positions-table th {
-    background: var(--bg-secondary);
-    font-weight: 600;
     font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
 }
 
-.positions-table tr:hover {
-    background: var(--bg-secondary);
-}
-
-/* Cash History */
-.cash-history {
+.contact-links {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.cash-item {
+.contact-link {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px;
+    padding: 10px 14px;
     background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-}
-
-.cash-icon {
-    font-size: 24px;
-    width: 40px;
-    text-align: center;
-}
-
-.cash-details {
-    flex: 1;
-}
-
-.cash-desc {
-    font-weight: 500;
-    font-size: 14px;
-}
-
-.cash-date {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 2px;
-}
-
-.cash-amount {
-    font-weight: 600;
-    font-size: 16px;
-}
-
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
-}
-
-.positions-table {
-    font-size: 13px;
-}
-
-.positions-table th,
-.positions-table td {
-    padding: 8px 6px;
-    white-space: nowrap;
-}
-
-.positions-table th:first-child,
-.positions-table td:first-child {
-    padding-left: 12px;
-}
-
-.positions-table td:nth-child(n+2) {
-    text-align: right;
-}
-
-.positions-table th {
-    font-size: 11px;
-}
-
-.positions-table tbody tr:hover {
-    background: var(--bg-secondary);
-    transform: scale(1.01);
-    transition: all 0.15s;
-}
-
-/* Page Comptes - Section headers */
-.section-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 32px 0 16px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid var(--border-color);
-}
-
-.section-header h2 {
-    font-size: 18px;
-    font-weight: 600;
+    text-decoration: none;
     color: var(--text-primary);
-    margin: 0;
+    transition: background-color var(--transition-fast);
 }
 
-.section-icon {
-    font-size: 24px;
+.contact-link:hover {
+    background: var(--bg-tertiary);
 }
 
-/* Améliorer les cards de comptes */
-.compte-card {
-    position: relative;
-    overflow: hidden;
+.contact-icon {
+    font-size: 16px;
+    color: var(--text-secondary);
 }
 
-.compte-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(180deg, var(--primary-color), var(--success-color));
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.compte-card:hover::before {
-    opacity: 1;
-}
-
-.compte-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-}
-
-/* Badge type amélioré */
-.compte-type {
+.contact-label {
     font-size: 11px;
-    padding: 4px 10px;
-    background: linear-gradient(135deg, var(--primary-color), #7c3aed);
-    color: white;
-    border-radius: 12px;
-    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
 }
 
-/* Montant mis en valeur */
-.compte-amount {
-    font-size: 32px;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--primary-color), #7c3aed);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 16px 0;
-}
-
-/* Boutons flux financiers */
-.flux-action-btn {
-    display: flex;
-    align-items: center;
-    padding: 10px 18px;
-    border: none;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: inherit;
-}
-
-.flux-entrees-btn {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-.flux-entrees-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-}
-
-.flux-entrees-btn:active {
-    transform: translateY(0);
-}
-
-.flux-depenses-btn {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    color: white;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-}
-
-.flux-depenses-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
-}
-
-.flux-depenses-btn:active {
-    transform: translateY(0);
-}
-
-/* Mobile */
-@media (max-width: 768px) {
-    .flux-action-btn {
-        font-size: 13px;
-        padding: 8px 14px;
-    }
-    
-    .flux-action-btn svg {
-        width: 16px;
-        height: 16px;
-        margin-right: 4px;
-    }
+.contact-value {
+    font-size: 13px;
+    font-weight: 500;
 }

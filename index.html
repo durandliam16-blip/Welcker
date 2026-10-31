@@ -4,24 +4,18 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://qktbcgumyqjgbvcpynjo.supabase.co; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcker - Wealth Tracker</title>
-    <title>Welcker - Votre Guide vers la Richesse</title>
-    <meta name="title" content="Welcker - Votre Guide vers la Richesse">
-    <meta name="description" content="Prenez le contrôle total de vos finances et de votre patrimoine avec Welcker, votre assistant financier intelligent.">
+    <title>Welcker - Wealth & Portfolio Tracker</title>
+    <meta name="title" content="Welcker - Wealth & Portfolio Tracker">
+    <meta name="description" content="Suivi consolidé de patrimoine, investissements, comptes bancaires et analyse des flux financiers.">
 
-    <!-- Preview pour les réseaux sociaux -->
+    <!-- Preview réseaux sociaux -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://durandliam16-blip.github.io/Welcker/">
-    <meta property="og:title" content="Welcker - Votre Guide vers la Richesse">
-    <meta property="og:description" content="Prenez le contrôle total de vos finances et de votre patrimoine avec Welcker, votre assistant financier intelligent.">
+    <meta property="og:title" content="Welcker - Wealth & Portfolio Tracker">
+    <meta property="og:description" content="Suivi consolidé de patrimoine, investissements, comptes bancaires et analyse des flux financiers.">
     <meta property="og:image" content="https://durandliam16-blip.github.io/Welcker/images/Bandeau.png">
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://durandliam16-blip.github.io/Welcker/">
-    <meta property="twitter:title" content="Welcker - Votre Guide vers la Richesse">
-    <meta property="twitter:description" content="Prenez le contrôle total de vos finances et de votre patrimoine avec Welcker, votre assistant financier intelligent.">
-    <meta property="twitter:image" content="https://durandliam16-blip.github.io/Welcker/images/Bandeau.png">
     
-    <!-- Récupérer les js -->
+    <!-- Feuilles de styles -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/graphs.css">
@@ -29,92 +23,102 @@
     <link rel="stylesheet" href="css/profil_para.css">
     <link rel="stylesheet" href="css/social.css">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2563eb">
+    <meta name="theme-color" content="#0f172a">
     <link rel="icon" href="icon-192.png">
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
-    <!-- Navigation -->
+    <!-- Sidebar Navigation -->
     <nav class="sidebar" id="sidebar">
         <div class="logo-container">
-            <img src="images/logo.png" alt="Logo" class="logo">
+            <img src="images/logo.png" alt="Welcker Logo" class="logo">
             <h2 class="app-name">Welcker</h2>
         </div>
         <div class="nav-links">
             <a href="#" class="nav-link active" data-page="accueil">
-                <span class="icon">📊</span>
+                <i data-lucide="layout-dashboard"></i>
                 <span>Accueil</span>
             </a>
             <a href="#" class="nav-link" data-page="comptes">
-                <span class="icon">💳</span>
+                <i data-lucide="credit-card"></i>
                 <span>Comptes</span>
             </a>
             <a href="#" class="nav-link" data-page="autres-biens">
-                <span class="icon">🏡</span>
+                <i data-lucide="landmark"></i>
                 <span>Autres biens</span>
             </a>
             <a href="#" class="nav-link" data-page="flux">
-                <span class="icon">💰</span>
+                <i data-lucide="arrow-left-right"></i>
                 <span>Flux financiers</span>
             </a>
             <a href="#" class="nav-link" data-page="social">
-                <span class="icon">🌐</span>
+                <i data-lucide="users"></i>
                 <span>Social</span>
             </a>
             <a href="#" class="nav-link" data-page="profil">
-                <span class="icon">👤</span>
+                <i data-lucide="user"></i>
                 <span>Profil</span>
             </a>
             <a href="#" class="nav-link" data-page="parametres">
-                <span class="icon">⚙️</span>
+                <i data-lucide="settings"></i>
                 <span>Paramètres</span>
             </a>
         </div>
-        <div class="sidebar-footer" style="padding: 16px; border-top: 1px solid var(--border-color);">
-            <button class="btn-secondary" onclick="handleLogout()" style="width: 100%; justify-content: center;">
-                <span>🚪</span> Déconnection
+        <div class="sidebar-footer">
+            <button class="btn-secondary" onclick="handleLogout()" style="width: 100%;">
+                <i data-lucide="log-out"></i>
+                <span>Déconnexion</span>
             </button>
         </div>
     </nav>
 
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Header with search bar -->
+        <!-- Header -->
         <header class="header">
             <div class="search-container">
-                <input type="text" class="search-bar" placeholder="Recherchez des transactions, items...">
+                <i data-lucide="search"></i>
+                <input type="text" class="search-bar" placeholder="Rechercher des transactions, titres, comptes...">
+                <span class="search-shortcut">⌘K</span>
             </div>
             <div class="header-actions">
-                <button class="btn-icon" id="notificationBtn">🔔</button>
-                <button class="btn-icon" id="userBtn">👤</button>
+                <button class="btn-icon" id="notificationBtn" title="Notifications">
+                    <i data-lucide="bell"></i>
+                </button>
+                <button class="btn-icon" id="userBtn" title="Profil utilisateur">
+                    <i data-lucide="user"></i>
+                </button>
             </div>
         </header>
 
         <!-- Page: Accueil -->
         <div class="page active" id="page-accueil">
-
-            <!-- 1. Vue d'ensemble -->
-            <div class="card">
-                <h3>💼 Vue d'ensemble</h3>
+            <!-- 1. Vue d'ensemble du patrimoine (Executive Banner) -->
+            <div class="card overview-card">
+                <div class="overview-hero">
+                    <div class="overview-hero-main">
+                        <span class="stat-label">Patrimoine total net</span>
+                        <div class="amount-display" id="patrimoineTotal">0,00 €</div>
+                    </div>
+                </div>
                 <div class="overview-content">
                     <div class="stat-item">
-                        <span class="stat-label">Patrimoine total</span>
-                        <span class="amount-display" id="patrimoineTotal">0 €</span>
+                        <span class="stat-label">Liquidités bancaires</span>
+                        <span class="stat-value" id="liquiditesTotal">0,00 €</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Cash</span>
-                        <span class="stat-value" id="liquiditesTotal">0 €</span>
+                        <span class="stat-label">Investissements cotés</span>
+                        <span class="stat-value" id="investissementsTotal">0,00 €</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Investissements</span>
-                        <span class="stat-value" id="investissementsTotal">0 €</span>
+                        <span class="stat-label">Biens & possessions</span>
+                        <span class="stat-value" id="autresBiens">0,00 €</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Total des posessions</span>
-                        <span class="stat-value" id="autresBiens">0 €</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Total des économies</span>
-                        <span class="stat-value" id="beneficeFlux">0 €</span>
+                        <span class="stat-label">Épargne cumulée</span>
+                        <span class="stat-value" id="beneficeFlux">0,00 €</span>
                     </div>
                 </div>
             </div>
@@ -123,25 +127,28 @@
             <div class="dashboard-grid">
                 <!-- 2A. Dernières transactions -->
                 <div class="card">
-                    <h3>🕐 Dernières transactions</h3>
+                    <div class="card-header">
+                        <h3><i data-lucide="history"></i> Dernières transactions</h3>
+                    </div>
                     <div id="recentTransactions"></div>
                 </div>
 
-                <!-- 2B. Répartition actifs (CAMEMBERT) -->
+                <!-- 2B. Répartition actifs -->
                 <div class="card">
-                    <h3>📊 Répartition par actifs</h3>
+                    <div class="card-header">
+                        <h3><i data-lucide="pie-chart"></i> Répartition par actif</h3>
+                    </div>
                     <canvas id="patrimoineRepartition" height="200"></canvas>
                 </div>
             </div>
-            <!-- FIN du dashboard-grid -->
 
-            <!-- 3. Graphique évolution (EN DESSOUS, pleine largeur) -->
-            <div class="card" style="margin-top: 32px;">
-                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <h3>📈 Évolution du patrimoine total</h3>
-                    <div style="display: flex; gap: 12px; align-items: center;">
-                        <label style="font-size: 14px; color: var(--text-secondary);">Période :</label>
-                        <select id="patrimoineChartPeriod" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit;">
+            <!-- 3. Graphique évolution -->
+            <div class="card" style="margin-top: 20px;">
+                <div class="card-header">
+                    <h3><i data-lucide="trending-up"></i> Évolution de la valorisation</h3>
+                    <div class="filter-controls">
+                        <label style="font-size: 12px; color: var(--text-tertiary);">Période :</label>
+                        <select id="patrimoineChartPeriod">
                             <option value="3">3 mois</option>
                             <option value="6">6 mois</option>
                             <option value="12" selected>1 an</option>
@@ -152,22 +159,25 @@
                         </select>
                     </div>
                 </div>
-                <div style="height: 350px; width: 100%; position: relative;">
+                <div style="height: 320px; width: 100%; position: relative;">
                     <canvas id="patrimoineChart"></canvas>
                 </div>
             </div>
-        </div> <!-- Fermeture page-accueil -->
+        </div>
 
+        <!-- Page: Comptes -->
         <div class="page" id="page-comptes">
             <div class="page-header">
+                <h1>Comptes & Investissements</h1>
                 <button class="btn-primary" onclick="openModal('modalAddCompte')">
-                    + Ajouter un compte
+                    <i data-lucide="plus"></i> Nouveau compte
                 </button>
             </div>
+
             <!-- Section Investissements -->
             <div class="section-header">
-                <span class="section-icon">📈</span>
-                <h2>Investissements</h2>
+                <span class="section-icon"><i data-lucide="line-chart"></i></span>
+                <h2>Portefeuilles d'investissements</h2>
             </div>
             <div class="comptes-grid">
                 <div class="card compte-card" onclick="navigateTo('cto')">
@@ -194,8 +204,8 @@
                 
                 <div class="card compte-card" onclick="navigateTo('crypto')">
                     <div class="compte-header">
-                        <h3>Cryptomonnaies</h3>
-                        <span class="compte-type">₿</span>
+                        <h3>Actifs numériques</h3>
+                        <span class="compte-type">CRYPTO</span>
                     </div>
                     <div class="compte-amount" id="cryptoAmount">0,00 €</div>
                     <div class="compte-evolution">
@@ -206,58 +216,61 @@
             
             <!-- Section Comptes bancaires -->
             <div class="section-header">
-                <span class="section-icon">🏦</span>
-                <h2>Comptes bancaires</h2>
+                <span class="section-icon"><i data-lucide="building-2"></i></span>
+                <h2>Comptes bancaires & dépôts</h2>
             </div>
             <div class="comptes-grid" id="autresComptesContainer">
-                <p class="empty-state">Aucun compte bancaire</p>
+                <p class="empty-state">Aucun compte bancaire enregistré</p>
             </div>
         </div>
 
         <!-- Page: CTO -->
         <div class="page" id="page-cto">
             <div class="page-header">
-                <button class="btn-back" onclick="navigateTo('comptes')">← Retour</button>
+                <button class="btn-back" onclick="navigateTo('comptes')">
+                    <i data-lucide="arrow-left"></i> Retour
+                </button>
                 <h1>Compte-titres ordinaire</h1>
-                <button class="btn-primary" onclick="openModal('modalAddTransaction', 'CTO')">+ Nouvelle transaction</button>
+                <button class="btn-primary" onclick="openModal('modalAddTransaction', 'CTO')">
+                    <i data-lucide="plus"></i> Nouvelle transaction
+                </button>
             </div>
             <div class="investment-layout">
                 <!-- Dashboard Stats -->
                 <div class="investment-dashboard">
                     <div class="card">
-                        <h3>💰 Cash disponible</h3>
+                        <span class="stat-label">Liquidités disponibles</span>
                         <div class="stat-value" id="ctoCash">0,00 €</div>
-                        <button class="btn-secondary btn-sm" onclick="openCashModal('CTO')" style="margin-top: 12px;">
-                            ➕ Gérer le cash
+                        <button class="btn-secondary" onclick="openCashModal('CTO')">
+                            <i data-lucide="coins"></i> Gérer le cash
                         </button>
                     </div>
                     
                     <div class="card">
-                        <h3>📈 Valorisation positions</h3>
+                        <span class="stat-label">Valorisation des titres</span>
                         <div class="stat-value" id="ctoValeurActuelle">0,00 €</div>
                     </div>
                     
                     <div class="card">
-                        <h3>💼 Total portefeuille</h3>
+                        <span class="stat-label">Actif net total</span>
                         <div class="stat-value" id="ctoTotalPortefeuille">0,00 €</div>
                     </div>
                     
                     <div class="card">
-                        <h3>📊 Performance</h3>
+                        <span class="stat-label">Rendement global</span>
                         <div class="stat-value" id="ctoPerformance">+0,00%</div>
-                        <div style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">
-                            <div>PV réalisée: <span id="ctoPvRealisee">0€</span></div>
-                            <div>PV latente: <span id="ctoPvLatente">0€</span></div>
+                        <div style="font-size: 12px; color: var(--text-tertiary); margin-top: 4px;">
+                            <span>PV réalisée: <span id="ctoPvRealisee">0,00 €</span></span> · 
+                            <span>PV latente: <span id="ctoPvLatente">0,00 €</span></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- All positions actuelles -->
+                <!-- Positions actuelles -->
                 <div class="dashboard-grid">
-                    <!-- Tableau des positions actuelles -->
                     <div class="card">
                         <div class="card-header">
-                            <h3>Positions principales :</h3>
+                            <h3><i data-lucide="layers"></i> Positions principales</h3>
                         </div>
                         <div class="table-responsive">
                             <table class="positions-table">
@@ -274,9 +287,10 @@
                             </table>
                         </div>
                     </div>
-                    <!-- Graphique répartition positions -->
                     <div class="card">
-                        <h3>Répartition du portefeuille</h3>
+                        <div class="card-header">
+                            <h3><i data-lucide="pie-chart"></i> Répartition du portefeuille</h3>
+                        </div>
                         <canvas id="ctoPositionsChart"></canvas>
                     </div>
                 </div>
@@ -284,19 +298,20 @@
                 <!-- Historique cash -->
                 <div class="card">
                     <div class="card-header">
-                        <h3>💰 Historique cash</h3>
+                        <h3><i data-lucide="wallet"></i> Mouvements de liquidités</h3>
                     </div>
                     <div class="cash-history" id="ctoCashHistory">
-                        <p class="empty-state">Aucune transaction cash</p>
+                        <p class="empty-state">Aucun mouvement de liquidités</p>
                     </div>
                 </div>
 
+                <!-- Historique transactions -->
                 <div class="card">
                     <div class="card-header">
-                        <h3>Historique des transactions</h3>
+                        <h3><i data-lucide="file-text"></i> Grand livre des ordres</h3>
                         <div class="filter-controls">
                             <select id="ctoFilterType" onchange="filterTransactions('CTO')">
-                                <option value="all">Toutes</option>
+                                <option value="all">Toutes opérations</option>
                                 <option value="achat">Achats</option>
                                 <option value="vente">Ventes</option>
                             </select>
@@ -309,12 +324,12 @@
                             <thead>
                                 <tr>
                                     <th>Date</th>
-                                    <th>Type</th>
+                                    <th>Sens</th>
                                     <th>Titre</th>
                                     <th>Quantité</th>
                                     <th>Prix unitaire</th>
                                     <th>Montant total</th>
-                                    <th>Actions</th>
+                                    <th style="text-align: right;">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="ctoTransactionsTable"></tbody>
@@ -327,47 +342,50 @@
         <!-- Page: PEA -->
         <div class="page" id="page-pea">
             <div class="page-header">
-                <button class="btn-back" onclick="navigateTo('comptes')">← Retour</button>
+                <button class="btn-back" onclick="navigateTo('comptes')">
+                    <i data-lucide="arrow-left"></i> Retour
+                </button>
                 <h1>Plan d'Épargne Actions</h1>
-                <button class="btn-primary" onclick="openModal('modalAddTransaction', 'PEA')">+ Nouvelle transaction</button>
+                <button class="btn-primary" onclick="openModal('modalAddTransaction', 'PEA')">
+                    <i data-lucide="plus"></i> Nouvelle transaction
+                </button>
             </div>
             <div class="investment-layout">
                 <!-- Dashboard Stats -->
                 <div class="investment-dashboard">
                     <div class="card">
-                        <h3>💰 Cash disponible</h3>
+                        <span class="stat-label">Liquidités disponibles</span>
                         <div class="stat-value" id="peaCash">0,00 €</div>
-                        <button class="btn-secondary btn-sm" onclick="openCashModal('PEA')" style="margin-top: 12px;">
-                            ➕ Gérer le cash
+                        <button class="btn-secondary" onclick="openCashModal('PEA')">
+                            <i data-lucide="coins"></i> Gérer le cash
                         </button>
                     </div>
                     
                     <div class="card">
-                        <h3>📈 Valorisation positions</h3>
+                        <span class="stat-label">Valorisation des titres</span>
                         <div class="stat-value" id="peaValeurActuelle">0,00 €</div>
                     </div>
                     
                     <div class="card">
-                        <h3>💼 Total portefeuille</h3>
+                        <span class="stat-label">Actif net total</span>
                         <div class="stat-value" id="peaTotalPortefeuille">0,00 €</div>
                     </div>
                     
                     <div class="card">
-                        <h3>📊 Performance</h3>
+                        <span class="stat-label">Rendement global</span>
                         <div class="stat-value" id="peaPerformance">+0,00%</div>
-                        <div style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">
-                            <div>PV réalisée: <span id="peaPvRealisee">0€</span></div>
-                            <div>PV latente: <span id="peaPvLatente">0€</span></div>
+                        <div style="font-size: 12px; color: var(--text-tertiary); margin-top: 4px;">
+                            <span>PV réalisée: <span id="peaPvRealisee">0,00 €</span></span> · 
+                            <span>PV latente: <span id="peaPvLatente">0,00 €</span></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- All positions actuelles -->
+                <!-- Positions actuelles -->
                 <div class="dashboard-grid">
-                    <!-- Tableau des positions actuelles -->
                     <div class="card">
                         <div class="card-header">
-                            <h3>Positions principales :</h3>
+                            <h3><i data-lucide="layers"></i> Positions principales</h3>
                         </div>
                         <div class="table-responsive">
                             <table class="positions-table">
@@ -384,9 +402,10 @@
                             </table>
                         </div>
                     </div>
-                    <!-- Graphique répartition positions -->
                     <div class="card">
-                        <h3>Répartition du portefeuille</h3>
+                        <div class="card-header">
+                            <h3><i data-lucide="pie-chart"></i> Répartition du portefeuille</h3>
+                        </div>
                         <canvas id="peaPositionsChart"></canvas>
                     </div>
                 </div>
@@ -394,19 +413,20 @@
                 <!-- Historique cash -->
                 <div class="card">
                     <div class="card-header">
-                        <h3>💰 Historique cash</h3>
+                        <h3><i data-lucide="wallet"></i> Mouvements de liquidités</h3>
                     </div>
                     <div class="cash-history" id="peaCashHistory">
-                        <p class="empty-state">Aucune transaction cash</p>
+                        <p class="empty-state">Aucun mouvement de liquidités</p>
                     </div>
                 </div>
 
+                <!-- Historique transactions -->
                 <div class="card">
                     <div class="card-header">
-                        <h3>Historique des transactions</h3>
+                        <h3><i data-lucide="file-text"></i> Grand livre des ordres</h3>
                         <div class="filter-controls">
                             <select id="peaFilterType" onchange="filterTransactions('PEA')">
-                                <option value="all">Toutes</option>
+                                <option value="all">Toutes opérations</option>
                                 <option value="achat">Achats</option>
                                 <option value="vente">Ventes</option>
                             </select>
@@ -419,12 +439,12 @@
                             <thead>
                                 <tr>
                                     <th>Date</th>
-                                    <th>Type</th>
+                                    <th>Sens</th>
                                     <th>Titre</th>
                                     <th>Quantité</th>
                                     <th>Prix unitaire</th>
                                     <th>Montant total</th>
-                                    <th>Actions</th>
+                                    <th style="text-align: right;">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="peaTransactionsTable"></tbody>
@@ -437,47 +457,50 @@
         <!-- Page: Crypto -->
         <div class="page" id="page-crypto">
             <div class="page-header">
-                <button class="btn-back" onclick="navigateTo('comptes')">← Retour</button>
-                <h1>Cryptomonnaies</h1>
-                <button class="btn-primary" onclick="openModal('modalAddTransaction', 'CRYPTO')">+ Nouvelle transaction</button>
+                <button class="btn-back" onclick="navigateTo('comptes')">
+                    <i data-lucide="arrow-left"></i> Retour
+                </button>
+                <h1>Actifs numériques</h1>
+                <button class="btn-primary" onclick="openModal('modalAddTransaction', 'CRYPTO')">
+                    <i data-lucide="plus"></i> Nouvelle transaction
+                </button>
             </div>
             <div class="investment-layout">
                 <!-- Dashboard Stats -->
                 <div class="investment-dashboard">
                     <div class="card">
-                        <h3>💰 Cash disponible</h3>
+                        <span class="stat-label">Liquidités disponibles</span>
                         <div class="stat-value" id="cryptoCash">0,00 €</div>
-                        <button class="btn-secondary btn-sm" onclick="openCashModal('CRYPTO')" style="margin-top: 12px;">
-                            ➕ Gérer le cash
+                        <button class="btn-secondary" onclick="openCashModal('CRYPTO')">
+                            <i data-lucide="coins"></i> Gérer le cash
                         </button>
                     </div>
                     
                     <div class="card">
-                        <h3>📈 Valorisation positions</h3>
+                        <span class="stat-label">Valorisation des actifs</span>
                         <div class="stat-value" id="cryptoValeurActuelle">0,00 €</div>
                     </div>
                     
                     <div class="card">
-                        <h3>💼 Total portefeuille</h3>
+                        <span class="stat-label">Actif net total</span>
                         <div class="stat-value" id="cryptoTotalPortefeuille">0,00 €</div>
                     </div>
                     
                     <div class="card">
-                        <h3>📊 Performance</h3>
+                        <span class="stat-label">Rendement global</span>
                         <div class="stat-value" id="cryptoPerformance">+0,00%</div>
-                        <div style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">
-                            <div>PV réalisée: <span id="cryptoPvRealisee">0€</span></div>
-                            <div>PV latente: <span id="cryptoPvLatente">0€</span></div>
+                        <div style="font-size: 12px; color: var(--text-tertiary); margin-top: 4px;">
+                            <span>PV réalisée: <span id="cryptoPvRealisee">0,00 €</span></span> · 
+                            <span>PV latente: <span id="cryptoPvLatente">0,00 €</span></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- All positions actuelles -->
+                <!-- Positions actuelles -->
                 <div class="dashboard-grid">
-                    <!-- Tableau des positions actuelles -->
                     <div class="card">
                         <div class="card-header">
-                            <h3>Positions principales :</h3>
+                            <h3><i data-lucide="layers"></i> Positions principales</h3>
                         </div>
                         <div class="table-responsive">
                             <table class="positions-table">
@@ -494,9 +517,10 @@
                             </table>
                         </div>
                     </div>
-                    <!-- Graphique répartition positions -->
                     <div class="card">
-                        <h3>Répartition du portefeuille</h3>
+                        <div class="card-header">
+                            <h3><i data-lucide="pie-chart"></i> Répartition du portefeuille</h3>
+                        </div>
                         <canvas id="cryptoPositionsChart"></canvas>
                     </div>
                 </div>
@@ -504,19 +528,20 @@
                 <!-- Historique cash -->
                 <div class="card">
                     <div class="card-header">
-                        <h3>💰 Historique cash</h3>
+                        <h3><i data-lucide="wallet"></i> Mouvements de liquidités</h3>
                     </div>
                     <div class="cash-history" id="cryptoCashHistory">
-                        <p class="empty-state">Aucune transaction cash</p>
+                        <p class="empty-state">Aucun mouvement de liquidités</p>
                     </div>
                 </div>
 
+                <!-- Historique transactions -->
                 <div class="card">
                     <div class="card-header">
-                        <h3>Historique des transactions</h3>
+                        <h3><i data-lucide="file-text"></i> Grand livre des transactions</h3>
                         <div class="filter-controls">
                             <select id="cryptoFilterType" onchange="filterTransactions('CRYPTO')">
-                                <option value="all">Toutes</option>
+                                <option value="all">Toutes opérations</option>
                                 <option value="achat">Achats</option>
                                 <option value="vente">Ventes</option>
                             </select>
@@ -529,12 +554,12 @@
                             <thead>
                                 <tr>
                                     <th>Date</th>
-                                    <th>Type</th>
+                                    <th>Sens</th>
                                     <th>Titre</th>
                                     <th>Quantité</th>
                                     <th>Prix unitaire</th>
                                     <th>Montant total</th>
-                                    <th>Actions</th>
+                                    <th style="text-align: right;">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="cryptoTransactionsTable"></tbody>
@@ -547,73 +572,66 @@
         <!-- Page: Autres biens -->
         <div class="page" id="page-autres-biens">
             <div class="page-header">
-                <h1>Autres biens</h1>
-                <button class="btn-primary" onclick="openModal('modalAddBien')">+ Ajouter un bien</button>
+                <h1>Biens matériels & réels</h1>
+                <button class="btn-primary" onclick="openModal('modalAddBien')">
+                    <i data-lucide="plus"></i> Nouveau bien
+                </button>
             </div>
-            <div class="biens-grid" id="biensContainer">
-                <!-- Populated by JS -->
-            </div>
+            <div class="biens-grid" id="biensContainer"></div>
         </div>
 
         <!-- Page: Flux financiers -->
         <div class="page" id="page-flux">
-            <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h1>Comparaison des flux financiers</h1>
-                <div style="display: flex; gap: 12px;">
+            <div class="page-header">
+                <h1>Flux financiers & trésorerie</h1>
+                <div style="display: flex; gap: 8px;">
                     <button class="flux-action-btn flux-entrees-btn" onclick="navigateTo('entrees')">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
-                            <path d="M12 19V5M5 12l7-7 7 7"/>
-                        </svg>
-                        Détail des entrées d'argent
+                        <i data-lucide="arrow-down-left"></i> Entrées d'argent
                     </button>
                     <button class="flux-action-btn flux-depenses-btn" onclick="navigateTo('depenses')">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
-                            <path d="M12 5v14M5 12l7 7 7-7"/>
-                        </svg>
-                        Détail des dépenses
+                        <i data-lucide="arrow-up-right"></i> Dépenses
                     </button>
                 </div>
             </div>
-            <class class="flux-layout">
+            <div class="flux-layout">
                 <div class="card card-summary">
                     <div class="flux-summary">
                         <div class="flux-item">
-                            <span class="flux-label">Entrées totales</span>
-                            <span class="flux-value positive" id="entreesTotales">0 €</span>
+                            <span class="flux-label">Entrées consolidées</span>
+                            <span class="flux-value positive" id="entreesTotales">0,00 €</span>
                         </div>
                         <div class="flux-item">
-                            <span class="flux-label">Sorties totales</span>
-                            <span class="flux-value negative" id="sortiesTotales">0 €</span>
+                            <span class="flux-label">Sorties consolidées</span>
+                            <span class="flux-value negative" id="sortiesTotales">0,00 €</span>
                         </div>
                         <div class="flux-item">
-                            <span class="flux-label">Economies</span>
-                            <span class="flux-value" id="soldeFlux">0 €</span>
+                            <span class="flux-label">Capacité d'épargne nette</span>
+                            <span class="flux-value" id="soldeFlux">0,00 €</span>
                         </div>
                     </div>
                 </div>
                 <div class="card">
-                    <h3>Évolution mensuelle</h3>
+                    <div class="card-header">
+                        <h3><i data-lucide="bar-chart-2"></i> Évolution mensuelle des flux</h3>
+                    </div>
                     <canvas id="fluxChart"></canvas>
                 </div>
-            </class>
-                <div class="card" style="margin-top: 32px;">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3>Sankey Diagramme</h3>
-                        <div style="display: flex; gap: 12px; align-items: center;">
-                            <label for="sankeyMonthFilter" style="font-size: 14px; color: var(--text-secondary);">
-                                Période :
-                            </label>
-                            <select id="sankeyMonthFilter" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit;">
-                                <option value="all">Tous les mois</option>
-                                <option value="0">Ce mois-ci</option>
-                                <option value="1">Mois dernier</option>
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i data-lucide="git-merge"></i> Diagramme de flux (Sankey)</h3>
+                        <div class="filter-controls">
+                            <label for="sankeyMonthFilter" style="font-size: 12px; color: var(--text-tertiary);">Période :</label>
+                            <select id="sankeyMonthFilter">
+                                <option value="all">Historique complet</option>
+                                <option value="0">Mois en cours</option>
+                                <option value="1">Mois précédent</option>
                                 <option value="3">3 derniers mois</option>
                                 <option value="6">6 derniers mois</option>
-                                <option value="12">Sur un an</option>
+                                <option value="12">12 derniers mois</option>
                             </select>
                         </div>
                     </div>
-                    <div id="sankeyDiagram" style="width: 100%; height: 300px;"></div>
+                    <div id="sankeyDiagram" style="width: 100%; height: 320px;"></div>
                 </div>
             </div>
         </div>
@@ -621,21 +639,27 @@
         <!-- Page: Entrées -->
         <div class="page" id="page-entrees">
             <div class="page-header">
-                <h1>Entrées d'argent</h1>
-                <button class="btn-primary" onclick="openModal('modalAddEntree')">+ Ajouter une entrée</button>
+                <h1>Entrées de trésorerie</h1>
+                <button class="btn-primary" onclick="openModal('modalAddEntree')">
+                    <i data-lucide="plus"></i> Nouvelle entrée
+                </button>
             </div>
             <div class="entrees-layout">
                 <div class="card">
-                    <h3>Par catégorie (moyenne/mois)</h3>
+                    <div class="card-header">
+                        <h3><i data-lucide="pie-chart"></i> Répartition par catégorie</h3>
+                    </div>
                     <canvas id="entreesChart"></canvas>
                 </div>
                 <div class="card">
-                    <h3>Évolution des entrées</h3>
+                    <div class="card-header">
+                        <h3><i data-lucide="trending-up"></i> Tendance temporelle</h3>
+                    </div>
                     <canvas id="entreesEvolutionChart"></canvas>
                 </div>
                 <div class="card card-full">
                     <div class="card-header">
-                        <h3>Historique des entrées</h3>
+                        <h3><i data-lucide="list"></i> Registre des entrées</h3>
                         <div class="filter-controls">
                             <select id="entreesFilterCategorie" onchange="filterEntrees()">
                                 <option value="all">Toutes catégories</option>
@@ -646,8 +670,8 @@
                             </select>
                             <select id="entreesFilterPeriode" onchange="filterEntrees()">
                                 <option value="all">Toutes périodes</option>
-                                <option value="mois">Ce mois</option>
-                                <option value="annee">Cette année</option>
+                                <option value="mois">Mois en cours</option>
+                                <option value="annee">Année en cours</option>
                             </select>
                         </div>
                     </div>
@@ -659,7 +683,7 @@
                                     <th>Catégorie</th>
                                     <th>Description</th>
                                     <th>Montant</th>
-                                    <th>Supprimer</th>
+                                    <th style="text-align: right;">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="entreesTable"></tbody>
@@ -672,21 +696,27 @@
         <!-- Page: Dépenses -->
         <div class="page" id="page-depenses">
             <div class="page-header">
-                <h1>Dépenses</h1>
-                <button class="btn-primary" onclick="openModal('modalAddDepense')">+ Ajouter une dépense</button>
+                <h1>Dépenses & décaissements</h1>
+                <button class="btn-primary" onclick="openModal('modalAddDepense')">
+                    <i data-lucide="plus"></i> Nouvelle dépense
+                </button>
             </div>
             <div class="depenses-layout">
                 <div class="card">
-                    <h3>Par catégorie (moyenne/mois)</h3>
+                    <div class="card-header">
+                        <h3><i data-lucide="pie-chart"></i> Répartition par catégorie</h3>
+                    </div>
                     <canvas id="depensesChart"></canvas>
                 </div>
                 <div class="card">
-                    <h3>Évolution des dépenses</h3>
+                    <div class="card-header">
+                        <h3><i data-lucide="trending-down"></i> Tendance temporelle</h3>
+                    </div>
                     <canvas id="depensesEvolutionChart"></canvas>
                 </div>
                 <div class="card card-full">
                     <div class="card-header">
-                        <h3>Historique des dépenses</h3>
+                        <h3><i data-lucide="list"></i> Registre des dépenses</h3>
                         <div class="filter-controls">
                             <select id="depensesFilterCategorie" onchange="filterDepenses()">
                                 <option value="all">Toutes catégories</option>
@@ -698,8 +728,8 @@
                                 <option value="autre">Autre</option>
                             </select>
                             <select id="depensesFilterPeriode" onchange="filterDepenses()">
-                                <option value="mois">Ce mois</option>
-                                <option value="annee">Cette année</option>
+                                <option value="mois">Mois en cours</option>
+                                <option value="annee">Année en cours</option>
                                 <option value="all">Toutes périodes</option>
                             </select>
                         </div>
@@ -712,7 +742,7 @@
                                     <th>Catégorie</th>
                                     <th>Description</th>
                                     <th>Montant</th>
-                                    <th>Supprimer</th>
+                                    <th style="text-align: right;">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="depensesTable"></tbody>
@@ -722,78 +752,57 @@
             </div>
         </div>
 
-        <!-- Page Social -->  
+        <!-- Page: Social -->  
         <div class="page" id="page-social">
-        
-            <!-- Grid des deux features -->
+            <div class="social-intro">
+                <h1>Espace Collaboratif & Réseau</h1>
+                <p>Gestion conjointe de patrimoine et échanges de perspectives financières.</p>
+            </div>
             <div class="social-grid">
-        
-                <!-- ── CARTE FAMILLE ─────────────────────────────────── -->
+                <!-- Carte Famille -->
                 <div class="feature-card feature-famille" id="social-card-famille">
-                    <div class="feature-card-bg"></div>
-        
-                    <!-- Contenu visible derrière le flou -->
                     <div class="feature-card-content">
-                        <span class="feature-badge">Exclusif</span>
-                        <div class="feature-card-icon">👨‍👩‍👧‍👦</div>
-                        <div class="feature-card-title">Famille</div>
+                        <span class="feature-badge">Espace Partagé</span>
+                        <div class="feature-card-icon"><i data-lucide="users-2"></i></div>
+                        <div class="feature-card-title">Patrimoine Familial</div>
                         <div class="feature-card-desc">
-                            Fonctionnalités à venir !
+                            Vision consolidée des actifs et passifs à l'échelle du foyer.
                         </div>
                     </div>
-        
-                    <!-- Contenu déverrouillé -->
-                    <div class="famille-content" id="famille-content-inner">
-                        <!-- Chargé dynamiquement par loadFamilleContent() -->
-                    </div>
-        
-                    <!-- Overlay flou + cadenas -->
+                    <div class="famille-content" id="famille-content-inner"></div>
                     <div class="feature-card-blur">
-                        <button class="lock-btn" onclick="openUnlockModal('famille')" title="Débloquer la fonctionnalité Famille">
-                            🔒
+                        <button class="lock-btn" onclick="openUnlockModal('famille')" title="Activer le module Famille">
+                            <i data-lucide="lock"></i>
                         </button>
-                        <span class="lock-label">Fonctionnalité verrouillée</span>
+                        <span class="lock-label">Module désactivé</span>
                     </div>
                 </div>
-        
-                <!-- ── CARTE RÉSEAU ──────────────────────────────────── -->
+
+                <!-- Carte Réseau -->
                 <div class="feature-card feature-reseau" id="social-card-reseau">
-                    <div class="feature-card-bg"></div>
-        
-                    <!-- Contenu visible derrière le flou -->
                     <div class="feature-card-content">
-                        <span class="feature-badge">Exclusif</span>
-                        <div class="feature-card-icon">🤝</div>
-                        <div class="feature-card-title">Suivis</div>
+                        <span class="feature-badge">Réseau Privé</span>
+                        <div class="feature-card-icon"><i data-lucide="user-check"></i></div>
+                        <div class="feature-card-title">Réseau d'Investisseurs</div>
                         <div class="feature-card-desc">
-                            Fonctionnalités à venir !
+                            Suivi des allocations et transactions partagées par vos pairs.
                         </div>
                     </div>
-        
-                    <!-- Contenu déverrouillé réseau -->
                     <div class="reseau-content" id="reseau-content-inner">
                         <div class="reseau-tabs">
-                            <button class="reseau-tab active" data-tab="amis"
-                                onclick="showReseauTab('amis')">Amis</button>
-                            <button class="reseau-tab" data-tab="demandes"
-                                onclick="showReseauTab('demandes')">
-                                Demandes
-                                <span class="reseau-tab-badge" style="display:none">0</span>
+                            <button class="reseau-tab active" data-tab="amis" onclick="showReseauTab('amis')">Relations</button>
+                            <button class="reseau-tab" data-tab="demandes" onclick="showReseauTab('demandes')">
+                                Demandes <span class="reseau-tab-badge" style="display:none">0</span>
                             </button>
-                            <button class="reseau-tab" data-tab="activite"
-                                onclick="showReseauTab('activite')">Activité</button>
+                            <button class="reseau-tab" data-tab="activite" onclick="showReseauTab('activite')">Flux d'activité</button>
                         </div>
-                        <div id="reseau-tab-content">
-                            <!-- Chargé dynamiquement -->
-                        </div>
+                        <div id="reseau-tab-content"></div>
                     </div>
-        
-                    <!-- Overlay flou + cadenas -->
                     <div class="feature-card-blur">
-                        <button class="lock-btn" onclick="openUnlockModal('reseau')" title="Débloquer le Réseau Social">
-                            🔒
+                        <button class="lock-btn" onclick="openUnlockModal('reseau')" title="Activer le module Réseau">
+                            <i data-lucide="lock"></i>
                         </button>
-                        <span class="lock-label">Fonctionnalité verrouillée</span>
+                        <span class="lock-label">Module désactivé</span>
                     </div>
                 </div>
             </div>
@@ -802,42 +811,37 @@
         <!-- Page: Profil -->
         <div class="page" id="page-profil">
             <div class="page-header">
-                <h1>Mes informations personnelles</h1>
+                <h1>Profil & Identité</h1>
             </div>
             <div class="profil-layout">
                 <div class="card profil-card">
                     <div class="profil-avatar-section">
                         <div class="profil-avatar-preview">
-                            <img id="profilAvatarImg" src="" alt="Photo de profil" style="display:none;">
-                            <div id="profilAvatarPlaceholder" class="avatar-placeholder-large">👤</div>
+                            <img id="profilAvatarImg" src="" alt="Avatar" style="display:none; width:84px; height:84px; border-radius:50%; object-fit:cover; border:1px solid var(--border-color);">
+                            <div id="profilAvatarPlaceholder" class="avatar-placeholder-large">
+                                <i data-lucide="user"></i>
+                            </div>
                         </div>
-                        <div class="profil-avatar-actions">
-                            <h4 style="margin-bottom: 12px; font-size: 14px; font-weight: 600; color: var(--text-primary);">Avatars</h4>
-                            
-                            <!-- Avatars par défaut -->
-                            <div class="avatar-presets" style="display: flex; gap: 12px; margin-bottom: 16px;">
-                                <div class="avatar-preset" data-avatar="1" onclick="selectPresetAvatar('1')" style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid transparent; background: #f3f4f6;">
+                        <div class="profil-avatar-actions" style="width: 100%;">
+                            <span class="stat-label" style="display:block; text-align:center; margin-bottom: 8px;">Avatars prédéfinis</span>
+                            <div class="avatar-presets" style="display: flex; gap: 8px; justify-content: center; margin-bottom: 12px;">
+                                <div class="avatar-preset" data-avatar="1" onclick="selectPresetAvatar('1')" style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 1px solid var(--border-color);">
                                     <img src="images/logo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>                                
-                                <div class="avatar-preset" data-avatar="2" onclick="selectPresetAvatar('2')" style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid transparent; background: #ffffff;">
-                                    <img src="images/avatar.png" alt="avatar" style="width: 100%; height: 100%; object-fit: contain;">
+                                <div class="avatar-preset" data-avatar="2" onclick="selectPresetAvatar('2')" style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 1px solid var(--border-color);">
+                                    <img src="images/avatar.png" alt="Mascotte" style="width: 100%; height: 100%; object-fit: contain;">
                                 </div>                              
-                                <div class="avatar-preset" data-avatar="3" onclick="selectPresetAvatar('3')" style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid transparent; background: #f3f4f6;">
+                                <div class="avatar-preset" data-avatar="3" onclick="selectPresetAvatar('3')" style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 1px solid var(--border-color);">
                                     <img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/Warren_Buffett_at_the_2015_SelectUSA_Investment_Summit_%28cropped%29.jpg" alt="Warren Buffett" style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>
-                                <div class="avatar-preset" data-avatar="4" onclick="selectPresetAvatar('4')" style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid transparent; background: #0f172a; display: flex; align-items: center; justify-content: center; font-size: 20px;">
-                                    📈
-                                </div>
                             </div>
-
-                            <!-- Upload personnalisé -->
-                            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                            <div style="border-top: 1px solid var(--border-color); padding-top: 12px;">
                                 <input type="file" id="avatarUpload" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
-                                <button class="btn-secondary" onclick="document.getElementById('avatarUpload').click()" style="width: 100%; justify-content: center;">
-                                    📤 Importer une photo
+                                <button class="btn-secondary" onclick="document.getElementById('avatarUpload').click()" style="width: 100%;">
+                                    <i data-lucide="upload"></i> Importer
                                 </button>
-                                <p style="font-size: 11px; color: var(--text-tertiary); margin-top: 8px; text-align: center;">
-                                    PNG, JPG • Max 2MB
+                                <p style="font-size: 11px; color: var(--text-tertiary); margin-top: 6px; text-align: center;">
+                                    PNG, JPG · 2 Mo max
                                 </p>
                             </div>
                         </div>
@@ -846,34 +850,38 @@
                     <div class="profil-info">
                         <div class="form-group">
                             <label>Nom complet</label>
-                            <input type="text" id="profilNom" placeholder="Votre nom">
+                            <input type="text" id="profilNom" placeholder="Nom et prénom">
                         </div>
                         <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" id="profilEmail" placeholder="votre@email.com">
+                            <label>Adresse email</label>
+                            <input type="email" id="profilEmail" placeholder="nom@exemple.com">
                         </div>
                         <div class="form-group">
-                            <label>Téléphone</label>
+                            <label>Numéro de téléphone</label>
                             <input type="tel" id="profilTel" placeholder="+33 6 00 00 00 00">
                         </div>
-                        <button class="btn-primary" onclick="saveProfile()">Enregistrer</button>
+                        <button class="btn-primary" onclick="saveProfile()">
+                            <i data-lucide="check"></i> Enregistrer les modifications
+                        </button>
                     </div>
                 </div>
+
                 <div class="card">
-                    <h3>Statistiques</h3>
+                    <div class="card-header">
+                        <h3><i data-lucide="shield-check"></i> Statut du compte</h3>
+                    </div>
                     <div class="stats-list">
                         <div class="stat-row">
-                            <span>Membre depuis</span>
+                            <span class="stat-label">Date d'inscription</span>
                             <span id="membreDepuis">-</span>
                         </div>
                         <div class="stat-row">
-                            <span>Nombre de transactions</span>
+                            <span class="stat-label">Transactions enregistrées</span>
                             <span id="nombreTransactions">0</span>
                         </div>
                         <div class="stat-row">
-                            <span>Followers</span>
-                            <!-- <span id="nombreFollowers">0</span> -->
-                            <p>Bientôt disponible</p>
+                            <span class="stat-label">Réseau d'abonnés</span>
+                            <span style="color: var(--text-tertiary);">Non activé</span>
                         </div>
                     </div>
                 </div>
@@ -883,80 +891,79 @@
         <!-- Page: Paramètres -->
         <div class="page" id="page-parametres">
             <div class="page-header">
-                <h1>Paramètres</h1>
+                <h1>Paramètres de l'application</h1>
             </div>
             <div class="parametres-layout">
                 <div class="card">
-                    <h3>Apparence</h3>
+                    <div class="card-header">
+                        <h3><i data-lucide="moon"></i> Apparence</h3>
+                    </div>
                     <div class="settings-group">
                         <div class="setting-item">
-                            <label>Thème</label>
+                            <label>Thème visuel</label>
                             <select id="settingTheme" onchange="changeTheme()">
-                                <option value="light">Clair</option>
-                                <option value="dark">Sombre</option>
-                                <option value="auto">Automatique</option>
+                                <option value="light">Clair (Architectural)</option>
+                                <option value="dark">Sombre (Obsidian)</option>
+                                <option value="auto">Automatique (Système)</option>
                             </select>
                         </div>
                     </div>
                 </div>
+
                 <div class="card">
-                    <h3>Devise</h3>
+                    <div class="card-header">
+                        <h3><i data-lucide="globe"></i> Devise de référence</h3>
+                    </div>
                     <div class="settings-group">
                         <div class="setting-item">
                             <label>Devise principale</label>
                             <select id="settingDevise">
                                 <option value="EUR">Euro (€)</option>
-                                <option value="USD">Dollar ($)</option>
-                                <option value="GBP">Livre (£)</option>
+                                <option value="USD">Dollar US ($)</option>
+                                <option value="GBP">Livre Sterling (£)</option>
+                                <option value="CHF">Franc Suisse (CHF)</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <!-- Bloc Améliorations possibles -->
+                <!-- Suggestions -->
                 <div class="card">
-                    <h3>💡 Proposer une amélioration</h3>
-                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
-                        Une idée pour améliorer Welcker ? Partagez vos suggestions de fonctionnalités ! (Anonyme)
+                    <div class="card-header">
+                        <h3><i data-lucide="message-square"></i> Retours & Suggestions</h3>
+                    </div>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">
+                        Partagez vos propositions d'amélioration ou signalements de bugs.
                     </p>
                     <div class="settings-group">
                         <textarea 
                             id="featureSuggestion" 
-                            placeholder="Ex: IA qui donne des conseils d'investissement, import automatique bancaire, graphiques avancés..."
-                            rows="4"
-                            style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: inherit; font-size: 14px; resize: vertical;"
+                            placeholder="Ex : Connecteurs bancaires Open Banking, alertes de seuils, exports PDF..."
+                            rows="3"
                         ></textarea>
-                        <button class="btn-primary" onclick="submitFeatureSuggestion()" style="margin-top: 12px;">
-                            📤 Envoyer ma suggestion
+                        <button class="btn-primary" onclick="submitFeatureSuggestion()">
+                            <i data-lucide="send"></i> Transmettre
                         </button>
-                        <div id="suggestionStatus" style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);"></div>
+                        <div id="suggestionStatus" style="font-size: 12px; color: var(--text-tertiary);"></div>
                     </div>
                 </div>
 
-                <!-- Bloc Contact -->
+                <!-- Contact & Licence -->
                 <div class="card">
-                    <h3>📬 Contact & Réseaux</h3>
-                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
-                        Une question, un bug à signaler, ou juste envie de discuter ?
-                    </p>
+                    <div class="card-header">
+                        <h3><i data-lucide="help-circle"></i> Support & Documentation</h3>
+                    </div>
                     <div class="contact-links">
-                        <a href="/cdn-cgi/l/email-protection#f3909c9d87929087b384969f90989681dd928383" class="contact-link" target="_blank">
-                            <span class="contact-icon">📧</span>
+                        <a href="mailto:diverse.app.dev@gmail.com" class="contact-link" target="_blank">
+                            <span class="contact-icon"><i data-lucide="mail"></i></span>
                             <div>
-                                <div class="contact-label">Email</div>
+                                <div class="contact-label">Assistance technique</div>
                                 <div class="contact-value">diverse.app.dev@gmail.com</div>
                             </div>
                         </a>
-                        <a href="https://twitter.com/welcker_app" class="contact-link" target="_blank">
-                            <span class="contact-icon">🐦</span>
-                            <div>
-                                <div class="contact-label">Twitter</div>
-                                <div class="contact-value">@Soon</div>
-                            </div>
-                        </a>
                     </div>
-                    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color); font-size: 12px; color: var(--text-tertiary); text-align: center;">
-                        Welcker v1.0 - 2026
+                    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-color); font-size: 11px; color: var(--text-tertiary); text-align: center;">
+                        Welcker v2.0.2 · Design unslop
                     </div>
                 </div>
             </div>
@@ -968,7 +975,7 @@
     <div class="modal" id="modalGererCash">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>💰 Gérer le cash</h2>
+                <h2>Mouvements de liquidités</h2>
                 <button class="modal-close" onclick="closeModal('modalGererCash')">&times;</button>
             </div>
             <div class="modal-body">
@@ -976,27 +983,27 @@
                     <input type="hidden" id="cashAccountType" value="">
                     
                     <div class="form-group">
-                        <label>Type d'opération</label>
+                        <label>Nature du mouvement</label>
                         <select id="cashType" required>
-                            <option value="depot">➕ Dépôt</option>
-                            <option value="retrait">➖ Retrait</option>
-                            <option value="dividende">💰 Dividende</option>
-                            <option value="frais">💳 Frais</option>
+                            <option value="depot">Dépôt</option>
+                            <option value="retrait">Retrait</option>
+                            <option value="dividende">Dividende</option>
+                            <option value="frais">Frais & commissions</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label>Montant (€)</label>
-                        <input type="number" id="cashMontant" step="0.01" required placeholder="1000">
+                        <input type="number" id="cashMontant" step="0.01" required placeholder="0.00">
                     </div>
 
                     <div class="form-group">
-                        <label>Description</label>
-                        <input type="text" id="cashDescription" placeholder="Ex: Dépôt initial">
+                        <label>Libellé / Description</label>
+                        <input type="text" id="cashDescription" placeholder="Ex: Apport de capital">
                     </div>
 
                     <div class="form-group">
-                        <label>Date</label>
+                        <label>Date d'effet</label>
                         <input type="date" id="cashDate" required>
                     </div>
 
@@ -1008,67 +1015,68 @@
             </div>
         </div>
     </div>
+
     <!-- Modal: Add Transaction -->
     <div class="modal" id="modalAddTransaction">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Nouvelle transaction</h2>
+                <h2>Nouvel ordre financier</h2>
                 <button class="modal-close" onclick="closeModal('modalAddTransaction')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="formAddTransaction" >
+                <form id="formAddTransaction">
                     <input type="hidden" id="transactionCompte" value="">
                     <div class="form-group">
-                        <label>Type</label>
+                        <label>Sens de l'opération</label>
                         <select id="transactionType" required>
                             <option value="achat">Achat</option>
                             <option value="vente">Vente</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Date</label>
+                        <label>Date d'exécution</label>
                         <input type="date" id="transactionDate" required>
                     </div>
                     <div class="form-group">
-                        <label>Titre / Action</label>
-                        <input type="text" id="transactionTitre" placeholder="Ex: Apple Inc." required>
+                        <label>Désignation du titre / Actif</label>
+                        <input type="text" id="transactionTitre" placeholder="Ex: ASML Holding" required>
                     </div>
                     <div class="form-group">
-                        <label>Code (libellé)</label>
-                        <input type="text" id="transactionLibelle" placeholder="AAPL, BTC, ETH..." required>
+                        <label>Symbole boursier (Ticker / Code)</label>
+                        <input type="text" id="transactionLibelle" placeholder="ASML, CW8, BTC..." required>
                     </div>
                     <div class="form-group">
-                        <label>Catégorie</label>
+                        <label>Secteur / Catégorie</label>
                         <select id="transactionCategorie" required>
-                            <option value="">-- Choisir une catégorie --</option>
-                            <option value="Tech">🖥️ Tech</option>
-                            <option value="Bio">🧬 Santé</option>
-                            <option value="Finance">💰 ETF pays</option>
-                            <option value="Industrie">🏭 Industrie</option>
-                            <option value="Transports">🚗 Transports</option>
-                            <option value="Luxe">💎 Luxe</option>
-                            <option value="Autres">📦 Autres</option>
+                            <option value="">Sélectionner une catégorie</option>
+                            <option value="Tech">Technologie</option>
+                            <option value="Bio">Santé & Pharma</option>
+                            <option value="Finance">ETF Indiciel / Finance</option>
+                            <option value="Industrie">Industrie & Matériaux</option>
+                            <option value="Transports">Transports & Énergie</option>
+                            <option value="Luxe">Consommation & Luxe</option>
+                            <option value="Autres">Divers</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Quantité</label>
-                        <input type="number" id="transactionQuantite" step="0.01" required>
+                        <label>Quantité d'unités</label>
+                        <input type="number" id="transactionQuantite" step="0.0001" required>
                     </div>
                     <div class="form-group">
                         <label>Prix unitaire (€)</label>
-                        <input type="number" id="transactionPrix" step="0.01" required>
+                        <input type="number" id="transactionPrix" step="0.0001" required>
                     </div>
                     <div class="form-group">
-                        <label>Frais (€)</label>
+                        <label>Frais de courtage (€)</label>
                         <input type="number" id="transactionFrais" step="0.01" value="0">
                     </div>
                     <div class="form-group">
-                        <label>Notes</label>
-                        <textarea id="transactionNotes" rows="3"></textarea>
+                        <label>Notes & Stratégie</label>
+                        <textarea id="transactionNotes" rows="2"></textarea>
                     </div>
                     <div class="modal-actions">
                         <button type="button" class="btn-secondary" onclick="closeModal('modalAddTransaction')">Annuler</button>
-                        <button type="submit" class="btn-primary">Ajouter</button>
+                        <button type="submit" class="btn-primary">Exécuter l'enregistrement</button>
                     </div>
                 </form>
             </div>
@@ -1079,35 +1087,35 @@
     <div class="modal" id="modalAddBien">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Ajouter un bien</h2>
+                <h2>Enregistrer un actif matériel</h2>
                 <button class="modal-close" onclick="closeModal('modalAddBien')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="formAddBien" >
+                <form id="formAddBien">
                     <div class="form-group">
-                        <label>Type de bien</label>
+                        <label>Classe d'actif</label>
                         <select id="bienType" required>
-                            <option value="immobilier">Immobilier</option>
+                            <option value="immobilier">Bien immobilier</option>
                             <option value="vehicule">Véhicule</option>
-                            <option value="objet-valeur">Objet de valeur</option>
-                            <option value="autre">Autre</option>
+                            <option value="objet-valeur">Objet de valeur & Art</option>
+                            <option value="autre">Autre actif</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Nom / Description</label>
-                        <input type="text" id="bienNom" placeholder="Ex: Appartement Paris" required>
+                        <label>Dénomination</label>
+                        <input type="text" id="bienNom" placeholder="Ex: Résidence principale" required>
                     </div>
                     <div class="form-group">
-                        <label>Valeur estimée (€)</label>
+                        <label>Estimation de valorisation (€)</label>
                         <input type="number" id="bienValeur" step="0.01" required>
                     </div>
                     <div class="form-group">
-                        <label>Notes / Description</label>
-                        <textarea id="bienNotes" rows="2" placeholder="Ex: Résidence principale, état..."></textarea>
+                        <label>Notes d'inventaire</label>
+                        <textarea id="bienNotes" rows="2" placeholder="Détails, surface, localisation..."></textarea>
                     </div>
                     <div class="modal-actions">
                         <button type="button" class="btn-secondary" onclick="closeModal('modalAddBien')">Annuler</button>
-                        <button type="submit" class="btn-primary">Ajouter</button>
+                        <button type="submit" class="btn-primary">Ajouter à l'actif</button>
                     </div>
                 </form>
             </div>
@@ -1118,65 +1126,65 @@
     <div class="modal" id="modalAddEntree">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Ajouter une entrée</h2>
+                <h2>Enregistrer une entrée de trésorerie</h2>
                 <button class="modal-close" onclick="closeModal('modalAddEntree')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="formAddEntree" >
+                <form id="formAddEntree">
                     <div class="form-group">
-                        <label>Date</label>
+                        <label>Date de valeur</label>
                         <input type="date" id="entreeDate" required>
                     </div>
                     <div class="form-group">
-                        <label>Catégorie</label>
+                        <label>Nature du revenu</label>
                         <select id="entreeCategorie" required>
-                            <option value="salaire">Salaire</option>
+                            <option value="salaire">Rémunération & Salaire</option>
                             <option value="covoiturage">Covoiturage</option>
-                            <option value="freelance">Freelance</option>
-                            <option value="investissement">Retour investissement</option>
-                            <option value="autre">Autre</option>
+                            <option value="freelance">Prestations freelance</option>
+                            <option value="investissement">Revenus de capitaux / Dividendes</option>
+                            <option value="autre">Autre revenu</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Description</label>
-                        <input type="text" id="entreeDescription" required>
+                        <input type="text" id="entreeDescription" placeholder="Ex: Salaire net" required>
                     </div>
                     <div class="form-group">
                         <label>Montant (€)</label>
-                        <input type="number" id="entreeMontant" step="1.00" required>
+                        <input type="number" id="entreeMontant" step="0.01" required>
                     </div>
                     
                     <div class="form-group">
                         <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="checkbox" id="entreeRecurrent" onchange="toggleRecurrenceFields('entree')" style="width: 20px; height: 20px; cursor: pointer;">
-                            <span style="font-weight: 600;">📆 Transaction récurrente</span>
+                            <input type="checkbox" id="entreeRecurrent" onchange="toggleRecurrenceFields('entree')" style="width: 16px; height: 16px; cursor: pointer;">
+                            <span>Opération récurrente</span>
                         </label>
                     </div>
                     
-                    <!-- Section récurrence (cachée par défaut) -->
-                    <div id="entreeRecurrenceFields" style="display: none; margin-top: 16px; padding: 16px; background: var(--background-secondary); border-radius: 10px; border: 2px dashed var(--border-color);">
+                    <!-- Section récurrence -->
+                    <div id="entreeRecurrenceFields" style="display: none; margin-top: 12px; padding: 14px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
                         <div class="form-group">
-                            <label>Fréquence</label>
+                            <label>Périodicité</label>
                             <select id="entreeFrequence">
-                                <option value="daily">Quotidien (tous les jours)</option>
-                                <option value="weekly">Hebdomadaire (toutes les semaines)</option>
-                                <option value="monthly" selected>Mensuel (tous les mois)</option>
+                                <option value="daily">Quotidienne</option>
+                                <option value="weekly">Hebdomadaire</option>
+                                <option value="monthly" selected>Mensuelle</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Jusqu'au</label>
+                            <label>Échéance finale</label>
                             <input type="date" id="entreeRecurrentEndDate" onchange="updateRecurrencePreview('entree')">
                         </div>
-                        <div class="form-group">
-                            <div style="padding: 12px; background: var(--info-light); border-radius: 8px; font-size: 13px; color: var(--text-secondary);">
-                                <strong id="entreeRecurrencePreview">Sélectionnez une date de fin</strong>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <div style="padding: 10px; background: var(--bg-tertiary); border-radius: var(--radius-sm); font-size: 12px; color: var(--text-secondary);">
+                                <strong id="entreeRecurrencePreview">Définissez une date de fin</strong>
                             </div>
                         </div>
                     </div>
 
                     <div class="modal-actions">
                         <button type="button" class="btn-secondary" onclick="closeModal('modalAddEntree')">Annuler</button>
-                        <button type="submit" class="btn-primary">Ajouter</button>
+                        <button type="submit" class="btn-primary">Enregistrer</button>
                     </div>
                 </form>
             </div>
@@ -1187,67 +1195,67 @@
     <div class="modal" id="modalAddDepense">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Ajouter une dépense</h2>
+                <h2>Enregistrer un décaissement</h2>
                 <button class="modal-close" onclick="closeModal('modalAddDepense')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="formAddDepense" >
+                <form id="formAddDepense">
                     <div class="form-group">
-                        <label>Date</label>
+                        <label>Date de débit</label>
                         <input type="date" id="depenseDate" required>
                     </div>
                     <div class="form-group">
-                        <label>Catégorie</label>
+                        <label>Poste de dépense</label>
                         <select id="depenseCategorie" required>
-                            <option value="alimentation">Alimentation</option>
-                            <option value="transport">Transport</option>
-                            <option value="logement">Logement</option>
-                            <option value="loisirs">Loisirs</option>
-                            <option value="sante">Santé</option>
+                            <option value="alimentation">Alimentation & Courses</option>
+                            <option value="transport">Transports & Mobilité</option>
+                            <option value="logement">Logement & Charges</option>
+                            <option value="loisirs">Loisirs & Culture</option>
+                            <option value="sante">Santé & Prévoyance</option>
                             <option value="habillement">Habillement</option>
-                            <option value="education">Éducation</option>
-                            <option value="autre">Autre</option>
+                            <option value="education">Formation & Éducation</option>
+                            <option value="autre">Autres charges</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Description</label>
-                        <input type="text" id="depenseDescription" required>
+                        <input type="text" id="depenseDescription" placeholder="Ex: Loyer mensuel" required>
                     </div>
                     <div class="form-group">
                         <label>Montant (€)</label>
-                        <input type="number" id="depenseMontant" step="1.00" required>
+                        <input type="number" id="depenseMontant" step="0.01" required>
                     </div>
                     
                     <div class="form-group">
                         <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="checkbox" id="depenseRecurrent" onchange="toggleRecurrenceFields('depense')" style="width: 20px; height: 20px; cursor: pointer;">
-                            <span style="font-weight: 600;">📆 Transaction récurrente</span>
+                            <input type="checkbox" id="depenseRecurrent" onchange="toggleRecurrenceFields('depense')" style="width: 16px; height: 16px; cursor: pointer;">
+                            <span>Dépense récurrente</span>
                         </label>
                     </div>
-                    <!-- Section récurrence (cachée par défaut) -->
-                    <div id="depenseRecurrenceFields" style="display: none; margin-top: 16px; padding: 16px; background: var(--background-secondary); border-radius: 10px; border: 2px dashed var(--border-color);">
+                    
+                    <div id="depenseRecurrenceFields" style="display: none; margin-top: 12px; padding: 14px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
                         <div class="form-group">
-                            <label>Fréquence</label>
+                            <label>Périodicité</label>
                             <select id="depenseFrequence">
-                                <option value="daily">Quotidien (tous les jours)</option>
-                                <option value="weekly">Hebdomadaire (toutes les semaines)</option>
-                                <option value="monthly" selected>Mensuel (tous les mois)</option>
+                                <option value="daily">Quotidienne</option>
+                                <option value="weekly">Hebdomadaire</option>
+                                <option value="monthly" selected>Mensuelle</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Jusqu'au</label>
+                            <label>Échéance finale</label>
                             <input type="date" id="depenseRecurrentEndDate" onchange="updateRecurrencePreview('depense')">
                         </div>
-                        <div class="form-group">
-                            <div style="padding: 12px; background: var(--info-light); border-radius: 8px; font-size: 13px; color: var(--text-secondary);">
-                                <strong id="depenseRecurrencePreview">Sélectionnez une date de fin</strong>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <div style="padding: 10px; background: var(--bg-tertiary); border-radius: var(--radius-sm); font-size: 12px; color: var(--text-secondary);">
+                                <strong id="depenseRecurrencePreview">Définissez une date de fin</strong>
                             </div>
                         </div>
                     </div>
                     
                     <div class="modal-actions">
                         <button type="button" class="btn-secondary" onclick="closeModal('modalAddDepense')">Annuler</button>
-                        <button type="submit" class="btn-primary">Ajouter</button>
+                        <button type="submit" class="btn-primary">Enregistrer</button>
                     </div>
                 </form>
             </div>
@@ -1258,22 +1266,22 @@
     <div class="modal" id="modalAddCompte">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Ajouter un compte</h2>
+                <h2>Nouveau compte bancaire</h2>
                 <button class="modal-close" onclick="closeModal('modalAddCompte')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="formAddCompte" >
+                <form id="formAddCompte">
                     <div class="form-group">
-                        <label>Nom du compte</label>
-                        <input type="text" id="compteNom" placeholder="Ex: Livret A" required>
+                        <label>Intitulé du compte</label>
+                        <input type="text" id="compteNom" placeholder="Ex: Compte Courant Principal" required>
                     </div>
                     <div class="form-group">
                         <label>Type de compte</label>
                         <select id="compteType" required>
-                            <option value="courant">💳 Compte courant</option>
-                            <option value="epargne">💰 Compte épargne</option>
-                            <option value="livret">📘 Livret</option>
-                            <option value="investissement_passif">📊 Investissement passif</option>
+                            <option value="courant">Compte courant</option>
+                            <option value="epargne">Compte sur livret / Épargne</option>
+                            <option value="livret">Livret réglementé (A, LDDS)</option>
+                            <option value="investissement_passif">Placement passif / Assurance-vie</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -1282,7 +1290,7 @@
                     </div>
                     <div class="modal-actions">
                         <button type="button" class="btn-secondary" onclick="closeModal('modalAddCompte')">Annuler</button>
-                        <button type="submit" class="btn-primary">Ajouter</button>
+                        <button type="submit" class="btn-primary">Créer le compte</button>
                     </div>
                 </form>
             </div>
@@ -1293,50 +1301,45 @@
     <div class="modal" id="modalEditCompte">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Modifier le compte</h2>
+                <h2>Ajustement de solde</h2>
                 <button class="modal-close" onclick="closeModal('modalEditCompte')">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="formEditCompte" onsubmit="return false;">
                     <input type="hidden" id="editCompteId">
                     <div class="form-group">
-                        <label>Nom du compte</label>
-                        <input type="text" id="editCompteNom" readonly style="background: var(--background-secondary);">
+                        <label>Compte ciblé</label>
+                        <input type="text" id="editCompteNom" readonly style="background: var(--bg-tertiary);">
                     </div>
                     <div class="form-group">
-                        <label>Nouveau solde (€)</label>
+                        <label>Nouveau solde constaté (€)</label>
                         <input type="number" id="editCompteSolde" step="0.01" required>
                     </div>
                     <div class="modal-actions">
                         <button type="button" class="btn-secondary" onclick="closeModal('modalEditCompte')">Annuler</button>
-                        <button type="button" class="btn-primary" onclick="saveEditCompte()">Enregistrer</button>
+                        <button type="button" class="btn-primary" onclick="saveEditCompte()">Valider la modification</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Modals Social-->
-    <!-- Modal : Déverrouillage d'une feature -->
+    <!-- Modal : Déverrouillage d'une fonctionnalité -->
     <div class="modal unlock-modal" id="modalUnlockSocial">
         <div class="modal-content">
-            <!-- Icône flottante (positionnée en dehors du modal-body par CSS) -->
-            <div style="height: 48px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 16px 16px 0 0; display:flex; align-items:center; padding:0 24px;">
-                <span style="color:white; font-weight:700; font-size:15px;">✨ Nouveau</span>
-            </div>
             <div class="unlock-modal-body">
-                <div class="unlock-modal-icon famille" style="margin: -36px auto 20px; z-index:10; position:relative;">👨‍👩‍👧‍👦</div>
+                <div class="unlock-modal-icon">
+                    <i data-lucide="lock"></i>
+                </div>
                 <h2 class="unlock-modal-title">Activer la fonctionnalité</h2>
-                <p>Souhaitez-vous activer cette fonctionnalité ?<br>Vous pourrez la désactiver plus tard en contactant le <strong>support</strong>.</p>
-                <ul class="unlock-features-list">
-                    <!-- Rempli dynamiquement par openUnlockModal() -->
-                </ul>
+                <p>Souhaitez-vous initialiser ce module collaboratif ? Vous pourrez le suspendre à tout moment.</p>
+                <ul class="unlock-features-list"></ul>
                 <div class="unlock-actions">
                     <button class="btn-unlock btn-unlock-cancel" onclick="closeUnlockModal()">
-                        Non, plus tard
+                        Annuler
                     </button>
                     <button class="btn-unlock btn-unlock-confirm famille" onclick="confirmUnlock('famille')">
-                        Oui, activer !
+                        Activer le module
                     </button>
                 </div>
             </div>
@@ -1345,19 +1348,18 @@
     
     <!-- Modal : Inviter un membre famille -->
     <div class="modal" id="modalInviteFamille">
-        <div class="modal-content" style="max-width: 420px;">
+        <div class="modal-content" style="max-width: 400px;">
             <div class="modal-header">
-                <h2>👨‍👩‍👧‍👦 Inviter un membre</h2>
+                <h2>Associer un membre</h2>
                 <button class="modal-close" onclick="closeInviteFamilleModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="formInviteFamille" onsubmit="submitInviteFamille(event)">
                     <div class="form-group">
-                        <label>Email du membre à inviter</label>
-                        <input type="email" id="inviteEmail"
-                            placeholder="exemple@email.com" required>
-                        <small style="color:var(--text-secondary);font-size:12px;margin-top:6px;display:block;">
-                            La personne doit déjà avoir un compte Welcker.
+                        <label>Adresse email de l'invité</label>
+                        <input type="email" id="inviteEmail" placeholder="nom@exemple.com" required>
+                        <small style="color: var(--text-tertiary); font-size: 11px; margin-top: 4px; display: block;">
+                            Le destinataire doit disposer d'un compte Welcker actif.
                         </small>
                     </div>
                     <div class="modal-actions">
@@ -1369,16 +1371,16 @@
         </div>
     </div>
 
-    <!-- CDN en premier -->
+    <!-- Librairies CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.27.0/plotly.min.js"></script>
 
-    <!-- Vérification auth -->
+    <!-- Contrôle d'authentification -->
     <script>
     (async () => {
         if (!window.supabase) {
-            console.error('Supabase non chargé !');
+            console.error('Supabase non chargé');
             window.location.replace('login.html');
             return;
         }
@@ -1392,11 +1394,10 @@
             window.location.replace('login.html');
             return;
         }
-        console.log('✅ Session active:', session.user.email);
     })();
     </script>
 
-    <!-- Tes fichiers JS (dans l'ordre !) -->
+    <!-- Scripts applicatifs -->
     <script src="js/config.js"></script>
     <script src="js/dataManager.js"></script>
     <script src="js/app.js"></script>
@@ -1408,8 +1409,11 @@
     <!-- Initialisation -->
     <script>
     document.addEventListener('DOMContentLoaded', async () => {
-        console.log('App démarrée');
-        
+        // Initialiser Lucide Icons
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
         // Setup navigation
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', e => {

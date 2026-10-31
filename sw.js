@@ -1,4 +1,4 @@
-const CACHE_NAME = 'monpatrimoine-v201'; // new version pour forcer la mise à jour
+const CACHE_NAME = 'monpatrimoine-v202'; // Version unslop design system
 const ASSETS = [
   './',
   './index.html',
@@ -18,8 +18,9 @@ const ASSETS = [
   './js/others.js',
   './js/graphs.js',
   './js/social.js',
-  // CDN (ne pas cacher Supabase !)
-  'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'
+  // CDN
+  'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
+  'https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js'
 ];
 
 self.addEventListener('install', (e) => {

@@ -43,7 +43,7 @@ async function createRecurrentTransactions(type, data, dates) {
         }
     }
     
-    showToast(`✅ ${created} transactions créées !`, 'success');
+    showToast(`${created} transactions créées`, 'success');
     
     // Rafraîchir la page appropriée
     if (type === 'entree') {
@@ -316,20 +316,21 @@ async function toggleProfilPopup() {
       <div class="popup-header">
         <div class="popup-avatar">${avatarHTML}</div>
         <div>
-          <div class="popup-name">${profile.nom || 'Utilisateur'}</div>
-          <div class="popup-email">${profile.email || ''}</div>
+          <div class="popup-name">${escapeHTML(profile.nom || 'Utilisateur')}</div>
+          <div class="popup-email">${escapeHTML(profile.email || '')}</div>
         </div>
       </div>
       <div class="popup-divider"></div>
       <div class="popup-stat">
-        <span class="popup-stat-label">💰 Patrimoine total</span>
+        <span class="popup-stat-label">Patrimoine total net</span>
         <span class="popup-stat-value">${fmt(patrimoine)}</span>
       </div>
       <div class="popup-divider"></div>
-      <button class="popup-action-btn" onclick="navigateTo('profil');document.getElementById('popupProfil')?.remove()">✏️ Modifier le profil</button>
-      <button class="popup-action-btn popup-logout-btn" onclick="handleLogout()">🚪 Se déconnecter</button>
+      <button class="popup-action-btn" onclick="navigateTo('profil');document.getElementById('popupProfil')?.remove()"><i data-lucide="pencil"></i> Modifier le profil</button>
+      <button class="popup-action-btn popup-logout-btn" onclick="handleLogout()"><i data-lucide="log-out"></i> Déconnexion</button>
     `;
     _placePopup(pop, document.getElementById('userBtn'));
+    if (window.lucide) lucide.createIcons();
 }
 
 // ── Popup Notifications ───────────────────────────────────────────────────────
@@ -407,13 +408,14 @@ async function toggleNotifsPopup() {
     pop.className = 'header-popup';
     pop.innerHTML = `
       <div class="popup-notif-header">
-        <span style="font-weight:600;font-size:14px">🔔 Notifications</span>
+        <span style="font-weight:600;font-size:13px">Notifications</span>
         <span class="popup-notif-badge">${notifs.length}</span>
       </div>
       <div class="popup-divider"></div>
       <div class="popup-notif-list">${notifsHTML}</div>
     `;
     _placePopup(pop, document.getElementById('notificationBtn'));
+    if (window.lucide) lucide.createIcons();
 }
 
 // =============================================================================
@@ -489,22 +491,28 @@ function renderCashHistory(prefix, cashTransactions) {
         return;
     }
     
-    const icons = { depot: '➕', retrait: '➖', dividende: '💰', frais: '💳' };
+    const icons = { 
+        depot: '<i data-lucide="arrow-down-left"></i>', 
+        retrait: '<i data-lucide="arrow-up-right"></i>', 
+        dividende: '<i data-lucide="coins"></i>', 
+        frais: '<i data-lucide="credit-card"></i>' 
+    };
     const colors = { depot: 'positive', retrait: 'negative', dividende: 'positive', frais: 'negative' };
     
     container.innerHTML = cashTransactions.slice(0, 10).map(ct => `
         <div class="cash-item">
-            <span class="cash-icon">${icons[ct.type] || '💵'}</span>
+            <span class="cash-icon">${icons[ct.type] || '<i data-lucide="wallet"></i>'}</span>
             <div class="cash-details">
-                <div class="cash-desc">${ct.description || ct.type}</div>
+                <div class="cash-desc">${escapeHTML(ct.description || ct.type)}</div>
                 <div class="cash-date">${new Date(ct.date).toLocaleDateString('fr-FR')}</div>
             </div>
             <div class="cash-amount ${colors[ct.type]}">${fmt(ct.montant)}</div>
             <button class="btn-icon" onclick="window._deleteCashTransaction('${ct.id}')" title="Supprimer" style="margin-left: 8px;">
-                🗑️
+                <i data-lucide="trash-2"></i>
             </button>
         </div>
     `).join('');
+    if (window.lucide) lucide.createIcons();
 }
 
 // Exposer globalement

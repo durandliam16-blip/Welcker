@@ -78,6 +78,6 @@ Pour l'instant sur GitHub pages en gratuit
 
 ---
 
-**Version** : 2.0.1
+**Version** : 2.0.2 (Design unslop)
 **Date** : Mars 2026  
 **Licence** : Partage aux proches

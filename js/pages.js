@@ -117,7 +117,7 @@ async function updateAccueil() {
             labels: ['Liquidités','Investissements','Biens'],
             datasets: [{ 
                 data: [cashTotal, invTotal, biensVal],
-                backgroundColor: ['#10b981','#2563eb','#f59e0b'] 
+                backgroundColor: ['#059669','#2563eb','#64748b'] 
             }] 
         },
         options: { 
@@ -235,24 +235,24 @@ async function updateComptes() {
     cont.innerHTML = accs.length
         ? accs.map(a => {
             const typeLabels = {
-                'courant': '💳 Courant',
-                'epargne': '💰 Épargne',
-                'livret': '📘 Livret',
-                'investissement_passif': '📊 Inv. passif'
+                'courant': 'Courant',
+                'epargne': 'Épargne',
+                'livret': 'Livret',
+                'investissement_passif': 'Placement passif'
             };
             return `
             <div class="card compte-card">
                 <div class="compte-header">
-                    <h3>${a.nom}</h3>
-                    <span class="compte-type">${typeLabels[a.type] || a.type || 'Compte'}</span>
+                    <h3>${escapeHTML(a.nom)}</h3>
+                    <span class="compte-type">${typeLabels[a.type] || escapeHTML(a.type) || 'Compte'}</span>
                 </div>
                 <div class="compte-amount">${fmt(a.solde)}</div>
-                <div style=\"display:flex;gap:8px;margin-top:12px;\">
-                    <button class=\"btn-secondary\" style=\"flex:1;font-size:12px;padding:8px\" onclick=\"window._editAccount('${a.id}', '${a.nom}', ${a.solde})\">
-                        ✏️ Modifier
+                <div style="display:flex;gap:8px;margin-top:12px;">
+                    <button class="btn-secondary" style="flex:1;font-size:12px;padding:6px 10px;" onclick="window._editAccount('${a.id}', '${escapeHTML(a.nom)}', ${a.solde})">
+                        <i data-lucide="pencil"></i> Modifier
                     </button>
-                    <button class=\"btn-danger\" style=\"flex:1;font-size:12px;padding:8px\" onclick=\"window._deleteAccount('${a.id}')\">
-                        🗑️ Supprimer
+                    <button class="btn-danger" style="flex:1;font-size:12px;padding:6px 10px;" onclick="window._deleteAccount('${a.id}')">
+                        <i data-lucide="trash-2"></i> Supprimer
                     </button>
                 </div>
             </div>`;
@@ -310,12 +310,12 @@ function renderInvestTable(pfx, data, mode) {
         const total   = parseFloat(t.quantite || 0) * parseFloat(t.prix_unitaire || 0);
         return `<tr>
             <td>${escapeHTML(new Date(t.date).toLocaleDateString('fr-FR'))}</td>
-            <td><span class="compte-type" style="background:${isAchat?'#10b981':'#ef4444'};color:#fff">${isAchat?'Achat':'Vente'}</span></td>
+            <td><span class="compte-type" style="color:${isAchat ? 'var(--success-color)' : 'var(--danger-color)'}; background:${isAchat ? 'var(--success-subtle)' : 'var(--danger-subtle)'}; border-color:${isAchat ? 'rgba(5,150,105,0.25)' : 'rgba(220,38,38,0.25)'}">${isAchat ? 'Achat' : 'Vente'}</span></td>
             <td>${escapeHTML(t.titre || '—')}</td>
             <td>${escapeHTML(t.quantite || 0)}</td>
             <td>${escapeHTML(fmt(t.prix_unitaire))}</td>
-            <td>${escapeHTML(fmt(total))}</td>
-            <td><button class="btn-icon" onclick="window._deleteInvestment('${mode}','${t.id}')" title="Supprimer">🗑️</button></td>
+            <td style="font-weight:600;">${escapeHTML(fmt(total))}</td>
+            <td style="text-align:right;"><button class="btn-icon" onclick="window._deleteInvestment('${mode}','${t.id}')" title="Supprimer"><i data-lucide="trash-2"></i></button></td>
         </tr>`;
     }).join('');
 }
@@ -346,7 +346,7 @@ async function updateAutresBiens() {
             <h3>${b.nom}</h3>
             <div class="bien-value">${fmt(b.solde)}</div>
             ${b.fournisseur ? `<p style="margin-top:8px;color:var(--text-secondary);font-size:14px">${b.fournisseur}</p>` : ''}
-            <button class="btn-danger" style="margin-top:16px;width:100%" onclick="window._deleteBien('${b.id}')">Supprimer</button>
+            <button class="btn-danger" style="margin-top:12px;width:100%" onclick="window._deleteBien('${b.id}')"><i data-lucide="trash-2"></i> Supprimer</button>
         </div>`).join('');
 }
 
@@ -410,7 +410,7 @@ async function updateCashFlowPage(type) {
             <td><span class="compte-type">${escapeHTML(i.categorie)}</span></td>
             <td>${escapeHTML(i.description || '—')}</td>
             <td class="${isE?'positive':'negative'}">${escapeHTML(fmt(i.montant))}</td>
-            <td><button class="btn-icon" onclick="window._deleteCashFlow('${type}','${i.id}')" title="Supprimer">🗑️</button></td>
+            <td style="text-align:right;"><button class="btn-icon" onclick="window._deleteCashFlow('${type}','${i.id}')" title="Supprimer"><i data-lucide="trash-2"></i></button></td>
         </tr>`).join('')
         : `<tr><td colspan="5" class="empty-state">Aucune donnée</td></tr>`;
 
