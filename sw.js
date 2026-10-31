@@ -1,4 +1,4 @@
-const CACHE_NAME = 'monpatrimoine-v202'; // Version unslop design system
+const CACHE_NAME = 'monpatrimoine-v203'; // Version 2.0.3 - Responsive mobile & fast portfolio
 const ASSETS = [
   './',
   './index.html',
@@ -39,12 +39,12 @@ self.addEventListener('activate', (e) => {
           return caches.delete(key);
         }
       }));
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', (e) => {
-  // Ne JAMAIS cacher Supabase
+  // Ne JAMAIS cacher Supabase ou les requêtes d'API externes
   if (e.request.url.includes('supabase.co') || e.request.url.includes('supabase-js')) {
     return;
   }

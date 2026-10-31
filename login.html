@@ -423,5 +423,14 @@
             if (loginActive) handleLogin(); else handleSignup();
         });
     </script>
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').then((reg) => {
+                reg.update();
+            }).catch(err => console.warn('[SW] Erreur enregistrement:', err));
+        });
+    }
+    </script>
 </body>
 </html>

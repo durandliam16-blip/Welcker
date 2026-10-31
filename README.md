@@ -78,6 +78,6 @@ Pour l'instant sur GitHub pages en gratuit
 
 ---
 
-**Version** : 2.0.2 (Design unslop)
+**Version** : 2.0.3 (Design unslop, Responsive Mobile natif, Drill-down camembert, Réévaluation des biens, Ajustement rapide investissements & PWA Auto-update)
 **Date** : Mars 2026  
 **Licence** : Partage aux proches

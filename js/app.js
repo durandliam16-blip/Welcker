@@ -30,7 +30,9 @@ function showToast(message, type = 'info') {
 // NAVIGATION
 // =============================================================================
 async function navigateTo(page) {
+    closeMobileSidebar();
     document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
+    document.querySelectorAll('.mobile-nav-item').forEach(l => l.classList.toggle('active', l.dataset.page === page));
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const el = document.getElementById(`page-${page}`);
     if (el) { 
@@ -38,6 +40,36 @@ async function navigateTo(page) {
         await updatePageContent(page); 
         if (window.lucide) lucide.createIcons();
     }
+}
+
+// =============================================================================
+// MOBILE SIDEBAR CONTROLS
+// =============================================================================
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+    if (sidebar.classList.contains('mobile-open')) {
+        closeMobileSidebar();
+    } else {
+        openMobileSidebar();
+    }
+}
+
+function openMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (sidebar) sidebar.classList.add('mobile-open');
+    if (backdrop) backdrop.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    if (window.lucide) lucide.createIcons();
+}
+
+function closeMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (sidebar) sidebar.classList.remove('mobile-open');
+    if (backdrop) backdrop.classList.remove('active');
+    document.body.style.overflow = '';
 }
 
 // =============================================================================
@@ -208,4 +240,93 @@ window.patrimoineGlobal = {
     cash: 0,
     investissements: 0,
     biens: 0
+};
+
+// =============================================================================
+// FAST PORTFOLIO ADJUSTMENT (CTO / PEA / CRYPTO)
+// =============================================================================
+window.openFastPortfolioModal = async function(type) {
+    const modal = document.getElementById('modalFastPortfolio');
+    if (!modal) return;
+    document.getElementById('fastPortfolioType').value = type;
+    const titleEl = document.getElementById('fastPortfolioTitle');
+    if (titleEl) titleEl.textContent = `Ajuster la valeur : ${type.toUpperCase()}`;
+
+    let currentVal = 0;
+    try {
+        if (type === 'CTO') {
+            const [tx, cash] = await Promise.all([dataManager.getInvestments('CTO'), dataManager.getCashTransactions('CTO')]);
+            currentVal = calcStatsPro(tx, cash).totalPortefeuille;
+        } else if (type === 'PEA') {
+            const [tx, cash] = await Promise.all([dataManager.getInvestments('PEA'), dataManager.getCashTransactions('PEA')]);
+            currentVal = calcStatsPro(tx, cash).totalPortefeuille;
+        } else if (type === 'CRYPTO') {
+            const [tx, cash] = await Promise.all([dataManager.getCryptoTransactions(), dataManager.getCashTransactions('CRYPTO')]);
+            currentVal = calcStatsPro(tx, cash).totalPortefeuille;
+        }
+    } catch (e) {
+        console.warn('Erreur récupération valorisation:', e);
+    }
+
+    const valInput = document.getElementById('fastPortfolioValeur');
+    if (valInput) {
+        valInput.value = currentVal > 0 ? currentVal.toFixed(2) : '';
+    }
+    modal.classList.add('active');
+    if (window.lucide) lucide.createIcons();
+    if (valInput) valInput.focus();
+};
+
+window.saveFastPortfolio = async function(e) {
+    if (e) e.preventDefault();
+    const type = document.getElementById('fastPortfolioType').value;
+    const targetVal = parseFloat(document.getElementById('fastPortfolioValeur').value);
+    const note = document.getElementById('fastPortfolioNote').value.trim() || 'Ajustement valorisation';
+
+    if (isNaN(targetVal) || targetVal < 0) {
+        showToast('Veuillez saisir une valorisation valide.', 'error');
+        return;
+    }
+
+    try {
+        let currentVal = 0;
+        if (type === 'CTO') {
+            const [tx, cash] = await Promise.all([dataManager.getInvestments('CTO'), dataManager.getCashTransactions('CTO')]);
+            currentVal = calcStatsPro(tx, cash).totalPortefeuille;
+        } else if (type === 'PEA') {
+            const [tx, cash] = await Promise.all([dataManager.getInvestments('PEA'), dataManager.getCashTransactions('PEA')]);
+            currentVal = calcStatsPro(tx, cash).totalPortefeuille;
+        } else if (type === 'CRYPTO') {
+            const [tx, cash] = await Promise.all([dataManager.getCryptoTransactions(), dataManager.getCashTransactions('CRYPTO')]);
+            currentVal = calcStatsPro(tx, cash).totalPortefeuille;
+        }
+
+        const delta = targetVal - currentVal;
+        if (Math.abs(delta) < 0.01) {
+            showToast('La valorisation est déjà conforme.', 'info');
+            closeModal('modalFastPortfolio');
+            return;
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+        const cashType = delta > 0 ? 'depot' : 'retrait';
+        const montant = Math.abs(delta);
+
+        await dataManager.addCashTransaction(type, {
+            type: cashType,
+            montant: montant,
+            description: `${note} (${delta > 0 ? '+' : ''}${delta.toFixed(2)} €)`,
+            date: today
+        });
+
+        showToast(`Valorisation ${type} mise à jour : ${targetVal.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €`, 'success');
+        closeModal('modalFastPortfolio');
+        await updateComptes();
+        if (type === 'CTO') await updateInvestmentPage('CTO');
+        else if (type === 'PEA') await updateInvestmentPage('PEA');
+        else if (type === 'CRYPTO') await updateInvestmentPage('CRYPTO');
+    } catch (err) {
+        console.error('Erreur ajustement portefeuille:', err);
+        showToast('Erreur lors de la mise à jour de la valorisation.', 'error');
+    }
 };

@@ -35,6 +35,9 @@
         <div class="logo-container">
             <img src="images/logo.png" alt="Welcker Logo" class="logo">
             <h2 class="app-name">Welcker</h2>
+            <button class="sidebar-close-btn" id="sidebarCloseBtn" title="Fermer" onclick="closeMobileSidebar()">
+                <i data-lucide="x"></i>
+            </button>
         </div>
         <div class="nav-links">
             <a href="#" class="nav-link active" data-page="accueil">
@@ -73,11 +76,16 @@
             </button>
         </div>
     </nav>
+    <!-- Volet d'arrière plan mobile -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
 
     <!-- Main Content -->
     <main class="main-content">
         <!-- Header -->
         <header class="header">
+            <button class="btn-icon mobile-menu-btn" id="mobileMenuBtn" title="Menu" onclick="toggleMobileSidebar()">
+                <i data-lucide="menu"></i>
+            </button>
             <div class="search-container">
                 <i data-lucide="search"></i>
                 <input type="text" class="search-bar" placeholder="Rechercher des transactions, titres, comptes...">
@@ -218,6 +226,11 @@
                             Accéder <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
                         </span>
                     </div>
+                    <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
+                        <button type="button" class="btn-secondary" style="font-size: 11px; padding: 4px 8px; height: auto;" onclick="event.stopPropagation(); openFastPortfolioModal('CTO')">
+                            <i data-lucide="sliders-horizontal" style="width: 12px; height: 12px;"></i> Ajuster le solde
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="card compte-card" onclick="navigateTo('pea')">
@@ -232,6 +245,11 @@
                             Accéder <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
                         </span>
                     </div>
+                    <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
+                        <button type="button" class="btn-secondary" style="font-size: 11px; padding: 4px 8px; height: auto;" onclick="event.stopPropagation(); openFastPortfolioModal('PEA')">
+                            <i data-lucide="sliders-horizontal" style="width: 12px; height: 12px;"></i> Ajuster le solde
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="card compte-card" onclick="navigateTo('crypto')">
@@ -245,6 +263,11 @@
                         <span style="font-size:11.5px; color:var(--text-tertiary); display:flex; align-items:center; gap:2px;">
                             Accéder <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
                         </span>
+                    </div>
+                    <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
+                        <button type="button" class="btn-secondary" style="font-size: 11px; padding: 4px 8px; height: auto;" onclick="event.stopPropagation(); openFastPortfolioModal('CRYPTO')">
+                            <i data-lucide="sliders-horizontal" style="width: 12px; height: 12px;"></i> Ajuster le solde
+                        </button>
                     </div>
                 </div>
             </div>
@@ -274,6 +297,9 @@
                     <i data-lucide="arrow-left"></i> Retour
                 </button>
                 <h1>Compte-titres ordinaire</h1>
+                <button class="btn-secondary" onclick="openFastPortfolioModal('CTO')">
+                    <i data-lucide="sliders-horizontal"></i> Ajuster le solde
+                </button>
                 <button class="btn-primary" onclick="openModal('modalAddTransaction', 'CTO')">
                     <i data-lucide="plus"></i> Nouvelle transaction
                 </button>
@@ -389,6 +415,9 @@
                     <i data-lucide="arrow-left"></i> Retour
                 </button>
                 <h1>Plan d'Épargne Actions</h1>
+                <button class="btn-secondary" onclick="openFastPortfolioModal('PEA')">
+                    <i data-lucide="sliders-horizontal"></i> Ajuster le solde
+                </button>
                 <button class="btn-primary" onclick="openModal('modalAddTransaction', 'PEA')">
                     <i data-lucide="plus"></i> Nouvelle transaction
                 </button>
@@ -504,6 +533,9 @@
                     <i data-lucide="arrow-left"></i> Retour
                 </button>
                 <h1>Actifs numériques</h1>
+                <button class="btn-secondary" onclick="openFastPortfolioModal('CRYPTO')">
+                    <i data-lucide="sliders-horizontal"></i> Ajuster le solde
+                </button>
                 <button class="btn-primary" onclick="openModal('modalAddTransaction', 'CRYPTO')">
                     <i data-lucide="plus"></i> Nouvelle transaction
                 </button>
@@ -1508,6 +1540,94 @@
         </div>
     </div>
 
+    <!-- Modal : Modifier / Réévaluer un bien -->
+    <div class="modal" id="modalEditBien">
+        <div class="modal-content" style="max-width: 440px;">
+            <div class="modal-header">
+                <h2>Réévaluer un bien</h2>
+                <button class="modal-close" onclick="closeModal('modalEditBien')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditBien" onsubmit="window.saveEditBien(event)">
+                    <input type="hidden" id="editBienId">
+                    <div class="form-group">
+                        <label>Désignation du bien</label>
+                        <input type="text" id="editBienNom" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Valeur estimée actuelle (€)</label>
+                        <input type="number" id="editBienValeur" step="0.01" required>
+                        <small style="color: var(--text-tertiary); font-size: 11px; margin-top: 4px; display: block;">
+                            Cette valeur met à jour instantanément la valorisation de votre patrimoine net.
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes / Justification d'estimation</label>
+                        <textarea id="editBienNotes" rows="2" placeholder="Ex: Estimation agence, cote Argus, facture..." style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); padding: 10px; font-family: inherit; font-size: 13px;"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal('modalEditBien')">Annuler</button>
+                        <button type="submit" class="btn-primary">Enregistrer la réévaluation</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal : Ajustement rapide de valorisation (CTO / PEA / Crypto) -->
+    <div class="modal" id="modalFastPortfolio">
+        <div class="modal-content" style="max-width: 440px;">
+            <div class="modal-header">
+                <h2 id="fastPortfolioTitle">Ajuster la valorisation</h2>
+                <button class="modal-close" onclick="closeModal('modalFastPortfolio')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="formFastPortfolio" onsubmit="window.saveFastPortfolio(event)">
+                    <input type="hidden" id="fastPortfolioType">
+                    <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px; line-height: 1.4;">
+                        Saisissez simplement le montant total actuel affiché sur votre compte (Boursorama, Trade Republic, Binance, etc.). La différence sera automatiquement comptabilisée en ajustement de solde.
+                    </p>
+                    <div class="form-group">
+                        <label>Valeur totale actuelle (€)</label>
+                        <input type="number" id="fastPortfolioValeur" step="0.01" placeholder="Ex: 14500.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Libellé / Note (optionnel)</label>
+                        <input type="text" id="fastPortfolioNote" placeholder="Ex: Valorisation fin de mois" style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); padding: 10px; font-family: inherit; font-size: 13px;">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal('modalFastPortfolio')">Annuler</button>
+                        <button type="submit" class="btn-primary">Mettre à jour le solde</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Basse Mobile (Mobile Bottom Bar) -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav">
+        <a href="#" class="mobile-nav-item active" data-page="accueil" onclick="event.preventDefault(); navigateTo('accueil')">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Accueil</span>
+        </a>
+        <a href="#" class="mobile-nav-item" data-page="comptes" onclick="event.preventDefault(); navigateTo('comptes')">
+            <i data-lucide="credit-card"></i>
+            <span>Comptes</span>
+        </a>
+        <a href="#" class="mobile-nav-item" data-page="autres-biens" onclick="event.preventDefault(); navigateTo('autres-biens')">
+            <i data-lucide="landmark"></i>
+            <span>Biens</span>
+        </a>
+        <a href="#" class="mobile-nav-item" data-page="flux" onclick="event.preventDefault(); navigateTo('flux')">
+            <i data-lucide="arrow-left-right"></i>
+            <span>Flux</span>
+        </a>
+        <a href="#" class="mobile-nav-item" data-page="profil" onclick="event.preventDefault(); navigateTo('profil')">
+            <i data-lucide="user"></i>
+            <span>Profil</span>
+        </a>
+    </nav>
+
     <!-- Librairies CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -1562,6 +1682,36 @@
         // Charger page d'accueil
         await navigateTo('accueil');
     });
+    </script>
+    <!-- Enregistrement Service Worker avec Détection & Auto-Update -->
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').then((reg) => {
+                // Force la recherche immédiate d'une mise à jour de sw.js
+                reg.update();
+                reg.onupdatefound = () => {
+                    const installingWorker = reg.installing;
+                    if (installingWorker) {
+                        installingWorker.onstatechange = () => {
+                            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('[Welcker PWA] Nouvelle version installée. Rechargement automatique...');
+                                window.location.reload();
+                            }
+                        };
+                    }
+                };
+            }).catch(err => console.warn('[SW] Erreur enregistrement:', err));
+
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
+            });
+        });
+    }
     </script>
 </body>
 </html>

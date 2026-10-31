@@ -196,6 +196,20 @@ body[data-theme="auto"] {
     to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Mobile Navigation Controls (Desktop Hidden) ────────────────────── */
+.mobile-bottom-nav {
+    display: none;
+}
+.mobile-menu-btn {
+    display: none;
+}
+.sidebar-close-btn {
+    display: none;
+}
+.sidebar-backdrop {
+    display: none;
+}
+
 /* ── États Responsive ───────────────────────────────────────────────── */
 @media (max-width: 1024px) {
     .profil-layout {
@@ -214,33 +228,118 @@ body[data-theme="auto"] {
 @media (max-width: 768px) {
     :root {
         --sidebar-width: 0px;
+        --header-height: 56px;
     }
     
+    /* Bouton hamburger dans le header */
+    .mobile-menu-btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    /* Bouton fermer dans la sidebar */
+    .sidebar-close-btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-color);
+        background: var(--bg-secondary);
+        color: var(--text-secondary);
+        cursor: pointer;
+        margin-left: auto;
+        padding: 0;
+    }
+    .sidebar-close-btn svg,
+    .sidebar-close-btn i {
+        width: 18px;
+        height: 18px;
+    }
+    
+    /* Backdrop flouté pour le drawer mobile */
+    .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 198;
+    }
+    .sidebar-backdrop.active {
+        display: block !important;
+    }
+    
+    /* Sidebar transformée en Drawer coulissant */
     .sidebar {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 280px !important;
+        max-width: 82vw;
+        height: 100vh;
+        z-index: 199;
         transform: translateX(-100%);
-        transition: transform var(--transition) ease;
-        width: 260px;
+        transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: none;
+        background: var(--bg-primary);
     }
     
     .sidebar.mobile-open {
-        transform: translateX(0);
-        box-shadow: 0 0 0 1000px rgba(0,0,0,0.5);
+        transform: translateX(0) !important;
+        box-shadow: 0 0 35px rgba(0, 0, 0, 0.35);
     }
     
+    /* Main Content */
     .main-content {
-        margin-left: 0;
+        margin-left: 0 !important;
+        padding-bottom: 74px; /* Dégagement pour la barre basse mobile */
+        min-height: calc(100vh - 60px);
     }
     
     .page {
-        padding: 16px;
+        padding: 14px 12px;
     }
     
     .header {
-        padding: 0 16px;
+        padding: 0 14px;
+        gap: 10px;
     }
     
     .search-container {
         max-width: none;
+    }
+    
+    .search-shortcut {
+        display: none;
+    }
+    
+    .search-bar {
+        font-size: 13px;
+        padding: 7px 12px 7px 32px;
+    }
+    
+    .amount-display {
+        font-size: 26px;
+    }
+    
+    .overview-hero {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .overview-content {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
     }
     
     .dashboard-grid,
@@ -248,8 +347,15 @@ body[data-theme="auto"] {
     .biens-grid,
     .entrees-layout,
     .depenses-layout,
-    .parametres-layout {
-        grid-template-columns: 1fr;
+    .parametres-layout,
+    .investment-layout {
+        grid-template-columns: 1fr !important;
+        gap: 14px;
+    }
+    
+    .investment-dashboard {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
     }
     
     .card-large,
@@ -257,8 +363,121 @@ body[data-theme="auto"] {
         grid-column: 1;
     }
     
-    .overview-hero {
+    .comptes-summary-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+    }
+    
+    .account-filter-chips {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 6px;
+        max-width: 100%;
+    }
+    
+    .filter-chip {
+        flex-shrink: 0;
+        white-space: nowrap;
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+    
+    .card-header {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    /* Tableaux scrollables horizontalement */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -8px;
+        padding: 0 8px;
+    }
+    
+    /* Bottom Navigation Bar Mobile (Style natif iOS / Android) */
+    .mobile-bottom-nav {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: var(--bg-primary);
+        border-top: 1px solid var(--border-color);
+        z-index: 100;
+        justify-content: space-around;
+        align-items: center;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .mobile-nav-item {
+        display: flex;
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        text-decoration: none;
+        color: var(--text-tertiary);
+        font-size: 10px;
+        font-weight: 500;
+        flex: 1;
+        padding: 6px 0;
+        cursor: pointer;
+        transition: color var(--transition-fast);
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .mobile-nav-item.active {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+    
+    .mobile-nav-item svg,
+    .mobile-nav-item i {
+        width: 20px;
+        height: 20px;
+        stroke-width: 1.8px;
+    }
+    
+    /* Modales Mobile façon Bottom Sheet */
+    .modal {
+        padding: 0;
+        align-items: flex-end;
+    }
+    
+    .modal-content {
+        border-radius: 16px 16px 0 0;
+        max-height: 88vh;
+        margin: 0;
+        width: 100%;
+        border-bottom: none;
+    }
+    
+    .modal-header {
+        padding: 14px 18px;
+    }
+    
+    .modal-body {
+        padding: 18px;
+    }
+    
+    /* Évite le zoom automatique agressif de Safari iOS sur focus d'input */
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+    
+    /* Toast au-dessus de la barre mobile */
+    #toast-container {
+        bottom: 74px;
+        right: 12px;
+        left: 12px;
+    }
+    
+    .toast {
+        width: 100%;
+        box-sizing: border-box;
     }
 }
