@@ -598,3 +598,30 @@ window.saveEditCompte = async function() {
         await updateComptes();
     }
 };
+// Modifier / Réévaluer un bien matériel
+window._editBien = function(id, nom, valeur, notes) {
+    document.getElementById('editBienId').value = id;
+    document.getElementById('editBienNom').value = nom;
+    document.getElementById('editBienValeur').value = valeur;
+    document.getElementById('editBienNotes').value = notes || '';
+    openModal('modalEditBien');
+};
+
+window.saveEditBien = async function() {
+    const id = document.getElementById('editBienId').value;
+    const nom = document.getElementById('editBienNom').value.trim();
+    const valeur = parseFloat(document.getElementById('editBienValeur').value);
+    const notes = document.getElementById('editBienNotes').value.trim();
+
+    if (!nom || isNaN(valeur)) {
+        showToast('Veuillez renseigner le nom et la valeur', 'error');
+        return;
+    }
+
+    const ok = await dataManager.updateBien(id, { nom, valeur, notes });
+    if (ok) {
+        closeModal('modalEditBien');
+        await updateAutresBiens();
+        if (typeof updateAccueil === 'function') updateAccueil();
+    }
+};

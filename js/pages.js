@@ -208,60 +208,133 @@ async function updateBilan() {
 // =============================================================================
 // PAGE COMPTES
 // =============================================================================
+// Variables de filtrage comptes
+window._allBankAccounts = [];
+window._activeAccountFilter = 'all';
+
+window.filterComptesCategory = function(filter) {
+    window._activeAccountFilter = filter;
+    document.querySelectorAll('#page-comptes .filter-chip').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+    });
+    renderBankAccountsList();
+};
+
+function renderBankAccountsList() {
+    const cont = document.getElementById('autresComptesContainer');
+    if (!cont) return;
+    
+    const accs = window._allBankAccounts || [];
+    const filter = window._activeAccountFilter || 'all';
+    
+    let filtered = accs;
+    if (filter !== 'all') {
+        if (filter === 'epargne') {
+            filtered = accs.filter(a => a.type === 'epargne' || a.type === 'livret');
+        } else {
+            filtered = accs.filter(a => a.type === filter);
+        }
+    }
+    
+    const totalLiquidites = accs.reduce((s, a) => s + parseFloat(a.solde || 0), 0);
+    
+    const typeMeta = {
+        'courant': { label: 'Compte courant', icon: 'credit-card' },
+        'epargne': { label: 'Compte sur livret', icon: 'coins' },
+        'livret': { label: 'Livret réglementé', icon: 'book-open' },
+        'investissement_passif': { label: 'Placement passif', icon: 'trending-up' }
+    };
+    
+    cont.innerHTML = filtered.length
+        ? filtered.map(a => {
+            const meta = typeMeta[a.type] || { label: a.type || 'Compte', icon: 'wallet' };
+            const pct = totalLiquidites > 0 ? ((parseFloat(a.solde || 0) / totalLiquidites) * 100).toFixed(1) : 0;
+            return `
+            <div class="card compte-card">
+                <div class="compte-header">
+                    <div>
+                        <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                            <i data-lucide="${meta.icon}" style="width:15px;height:15px;color:var(--text-secondary);"></i>
+                            <span class="compte-type">${meta.label}</span>
+                        </div>
+                        <h3 style="font-size:15px;">${escapeHTML(a.nom)}</h3>
+                    </div>
+                </div>
+                <div class="compte-amount">${fmt(a.solde)}</div>
+                <div style="font-size:11.5px; color:var(--text-tertiary); margin-bottom:12px;">
+                    Part : <strong style="color:var(--text-secondary);">${pct}%</strong> des liquidités
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-secondary" style="flex:1; font-size:12px; padding:6px 10px;" onclick="window._editAccount('${a.id}', '${escapeHTML(a.nom)}', ${a.solde})">
+                        <i data-lucide="pencil"></i> Modifier
+                    </button>
+                    <button class="btn-danger" style="font-size:12px; padding:6px 10px;" onclick="window._deleteAccount('${a.id}')" title="Supprimer">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+            </div>`;
+        }).join('')
+        : '<p class="empty-state" style="grid-column: 1 / -1;">Aucun compte dans cette catégorie</p>';
+        
+    if (window.lucide) lucide.createIcons();
+}
+
 async function updateComptes() {
     const [accs, cto, pea, crypto, ctoCash, peaCash, cryptoCash] = await Promise.all([
         dataManager.getBankAccounts(),
         dataManager.getInvestments('CTO'),
         dataManager.getInvestments('PEA'),
-        dataManager.getCryptoTransactions(),  // ← AJOUTÉ
+        dataManager.getCryptoTransactions(),
         dataManager.getCashTransactions('CTO'),
         dataManager.getCashTransactions('PEA'),
-        dataManager.getCashTransactions('CRYPTO')  // ← AJOUTÉ
+        dataManager.getCashTransactions('CRYPTO')
     ]);
     
     const ctoStats = calcStatsPro(cto, ctoCash);
     const peaStats = calcStatsPro(pea, peaCash);
-    const cryptoStats = calcStatsPro(crypto, cryptoCash);  // ← AJOUTÉ
+    const cryptoStats = calcStatsPro(crypto, cryptoCash);
     
+    // Stats des 3 portefeuilles
     document.getElementById('ctoAmount').textContent = fmt(ctoStats.totalPortefeuille);
     document.getElementById('peaAmount').textContent = fmt(peaStats.totalPortefeuille);
-    document.getElementById('cryptoAmount').textContent = fmt(cryptoStats.totalPortefeuille);  // ← AJOUTÉ
+    document.getElementById('cryptoAmount').textContent = fmt(cryptoStats.totalPortefeuille);
     
     document.getElementById('ctoEvolution').innerHTML = `<span class="${ctoStats.performance >= 0 ? 'positive' : 'negative'}">${ctoStats.performance >= 0 ? '+' : ''}${ctoStats.performance.toFixed(2)}%</span>`;
     document.getElementById('peaEvolution').innerHTML = `<span class="${peaStats.performance >= 0 ? 'positive' : 'negative'}">${peaStats.performance >= 0 ? '+' : ''}${peaStats.performance.toFixed(2)}%</span>`;
-    document.getElementById('cryptoEvolution').innerHTML = `<span class="${cryptoStats.performance >= 0 ? 'positive' : 'negative'}">${cryptoStats.performance >= 0 ? '+' : ''}${cryptoStats.performance.toFixed(2)}%</span>`;  // ← AJOUTÉ
+    document.getElementById('cryptoEvolution').innerHTML = `<span class="${cryptoStats.performance >= 0 ? 'positive' : 'negative'}">${cryptoStats.performance >= 0 ? '+' : ''}${cryptoStats.performance.toFixed(2)}%</span>`;
     
-    const cont = document.getElementById('autresComptesContainer');
-    cont.innerHTML = accs.length
-        ? accs.map(a => {
-            const typeLabels = {
-                'courant': 'Courant',
-                'epargne': 'Épargne',
-                'livret': 'Livret',
-                'investissement_passif': 'Placement passif'
-            };
-            return `
-            <div class="card compte-card">
-                <div class="compte-header">
-                    <h3>${escapeHTML(a.nom)}</h3>
-                    <span class="compte-type">${typeLabels[a.type] || escapeHTML(a.type) || 'Compte'}</span>
-                </div>
-                <div class="compte-amount">${fmt(a.solde)}</div>
-                <div style="display:flex;gap:8px;margin-top:12px;">
-                    <button class="btn-secondary" style="flex:1;font-size:12px;padding:6px 10px;" onclick="window._editAccount('${a.id}', '${escapeHTML(a.nom)}', ${a.solde})">
-                        <i data-lucide="pencil"></i> Modifier
-                    </button>
-                    <button class="btn-danger" style="flex:1;font-size:12px;padding:6px 10px;" onclick="window._deleteAccount('${a.id}')">
-                        <i data-lucide="trash-2"></i> Supprimer
-                    </button>
-                </div>
-            </div>`;
-        }).join('')
-        : '<p class="empty-state">Aucun compte bancaire</p>';
+    // Totaux et ratios consolidés (Innovation)
+    const totalLiquidites = accs.reduce((s, a) => s + parseFloat(a.solde || 0), 0);
+    const totalInvested = ctoStats.totalPortefeuille + peaStats.totalPortefeuille + cryptoStats.totalPortefeuille;
+    const totalCombined = totalLiquidites + totalInvested;
+    
+    const pctCash = totalCombined > 0 ? Math.round((totalLiquidites / totalCombined) * 100) : 0;
+    const pctInv = totalCombined > 0 ? (100 - pctCash) : 0;
+    
+    const elCash = document.getElementById('comptesTotalCash');
+    if (elCash) elCash.textContent = fmt(totalLiquidites);
+    const elCountCash = document.getElementById('comptesCountCash');
+    if (elCountCash) elCountCash.textContent = `${accs.length} compte(s) bancaire(s)`;
+    
+    const elInvest = document.getElementById('comptesTotalInvest');
+    if (elInvest) elInvest.textContent = fmt(totalInvested);
+    
+    const elRatio = document.getElementById('comptesAllocationRatio');
+    if (elRatio) elRatio.textContent = `${pctCash}% Liquidités · ${pctInv}% Investissements`;
+    
+    const barCash = document.getElementById('comptesBarCash');
+    if (barCash) barCash.style.width = `${pctCash}%`;
+    const barInvest = document.getElementById('comptesBarInvest');
+    if (barInvest) barInvest.style.width = `${pctInv}%`;
+    
+    window._allBankAccounts = accs;
+    renderBankAccountsList();
+    
+    if (window.lucide) lucide.createIcons();
 }
 
 // =============================================================================
-// PAGE CTO / PEA
+// PAGE CTO// PAGE CTO / PEA
 // =============================================================================
 async function updateInvestmentPage(mode) {
     const pfx = mode.toLowerCase();
@@ -336,22 +409,132 @@ function renderInvestChart(pfx, data) {
 // =============================================================================
 // PAGE AUTRES BIENS
 // =============================================================================
+// Variables de filtrage biens
+window._allBiens = [];
+window._activeBienFilter = 'all';
+
+window.filterBiensCategory = function(filter) {
+    window._activeBienFilter = filter;
+    document.querySelectorAll('#page-autres-biens .filter-chip').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+    });
+    renderBiensList();
+};
+
+function renderBiensList() {
+    const cont = document.getElementById('biensContainer');
+    if (!cont) return;
+    
+    const biens = window._allBiens || [];
+    const filter = window._activeBienFilter || 'all';
+    
+    let filtered = biens;
+    if (filter !== 'all') {
+        filtered = biens.filter(b => (b.type || '').toLowerCase() === filter.toLowerCase());
+    }
+    
+    const totalBiens = biens.reduce((s, b) => s + parseFloat(b.solde || 0), 0);
+    
+    const typeMeta = {
+        'immobilier': { label: 'Immobilier', icon: 'home' },
+        'vehicule': { label: 'Véhicule', icon: 'car' },
+        'objet-valeur': { label: 'Objet d\'art & Valeur', icon: 'gem' },
+        'autre': { label: 'Autre actif', icon: 'package' }
+    };
+    
+    cont.innerHTML = filtered.length
+        ? filtered.map(b => {
+            const t = (b.type || 'autre').toLowerCase();
+            const meta = typeMeta[t] || { label: b.type || 'Bien', icon: 'package' };
+            const pct = totalBiens > 0 ? ((parseFloat(b.solde || 0) / totalBiens) * 100).toFixed(1) : 0;
+            return `
+            <div class="card bien-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <i data-lucide="${meta.icon}" style="width:16px;height:16px;color:var(--text-secondary);"></i>
+                        <span class="bien-type" style="margin-bottom:0;">${meta.label}</span>
+                    </div>
+                    <span style="font-size:11.5px; color:var(--text-tertiary); font-variant-numeric:tabular-nums;">
+                        ${pct}% de l'actif réel
+                    </span>
+                </div>
+                <h3 style="font-size:16px; margin: 6px 0;">${escapeHTML(b.nom)}</h3>
+                <div class="bien-value">${fmt(b.solde)}</div>
+                ${b.fournisseur ? `<p style="font-size:12.5px; color:var(--text-secondary); margin-bottom:12px; line-height:1.4;">${escapeHTML(b.fournisseur)}</p>` : ''}
+                <div style="display:flex; gap:8px; margin-top:12px;">
+                    <button class="btn-secondary" style="flex:1; font-size:12px; padding:6px 10px;" onclick="window._editBien('${b.id}', '${escapeHTML(b.nom)}', ${b.solde}, '${escapeHTML(b.fournisseur || '')}')">
+                        <i data-lucide="pencil"></i> Réévaluer
+                    </button>
+                    <button class="btn-danger" style="font-size:12px; padding:6px 10px;" onclick="window._deleteBien('${b.id}')" title="Supprimer">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+            </div>`;
+        }).join('')
+        : '<p class="empty-state" style="grid-column: 1 / -1;">Aucun bien dans cette catégorie</p>';
+        
+    if (window.lucide) lucide.createIcons();
+}
+
 async function updateAutresBiens() {
     const biens = await dataManager.getBiens();
-    const cont  = document.getElementById('biensContainer');
-    if (!biens.length) { cont.innerHTML = '<div class="card"><p class="empty-state">Aucun bien enregistré</p></div>'; return; }
-    cont.innerHTML = biens.map(b => `
-        <div class="card bien-card">
-            <span class="bien-type">${b.type || 'bien'}</span>
-            <h3>${b.nom}</h3>
-            <div class="bien-value">${fmt(b.solde)}</div>
-            ${b.fournisseur ? `<p style="margin-top:8px;color:var(--text-secondary);font-size:14px">${b.fournisseur}</p>` : ''}
-            <button class="btn-danger" style="margin-top:12px;width:100%" onclick="window._deleteBien('${b.id}')"><i data-lucide="trash-2"></i> Supprimer</button>
-        </div>`).join('');
+    window._allBiens = biens;
+    
+    // Calculs synthétiques
+    const totalBiens = biens.reduce((s, b) => s + parseFloat(b.solde || 0), 0);
+    
+    const catTotals = { immobilier: 0, vehicule: 0, 'objet-valeur': 0, autre: 0 };
+    const catCounts = { immobilier: 0, vehicule: 0, 'objet-valeur': 0, autre: 0 };
+    
+    biens.forEach(b => {
+        const t = (b.type || 'autre').toLowerCase();
+        if (catTotals[t] !== undefined) {
+            catTotals[t] += parseFloat(b.solde || 0);
+            catCounts[t] += 1;
+        } else {
+            catTotals.autre += parseFloat(b.solde || 0);
+            catCounts.autre += 1;
+        }
+    });
+    
+    // Mettre à jour les indicateurs du bandeau récapitulatif
+    const elTotVal = document.getElementById('biensTotalVal');
+    if (elTotVal) elTotVal.textContent = fmt(totalBiens);
+    
+    const elBadge = document.getElementById('biensContributionBadge');
+    if (elBadge) {
+        const globalTot = window.patrimoineGlobal?.total || 0;
+        const pctGlobal = globalTot > 0 ? ((totalBiens / globalTot) * 100).toFixed(1) : 0;
+        elBadge.textContent = `Part dans le patrimoine total : ${pctGlobal}% (${biens.length} actif(s))`;
+    }
+    
+    const elImmo = document.getElementById('biensTotalImmo');
+    if (elImmo) elImmo.textContent = fmt(catTotals.immobilier);
+    const elCountImmo = document.getElementById('biensCountImmo');
+    if (elCountImmo) elCountImmo.textContent = `${catCounts.immobilier} bien(s)`;
+    
+    const elVeh = document.getElementById('biensTotalVehicules');
+    if (elVeh) elVeh.textContent = fmt(catTotals.vehicule);
+    const elCountVeh = document.getElementById('biensCountVehicules');
+    if (elCountVeh) elCountVeh.textContent = `${catCounts.vehicule} véhicule(s)`;
+    
+    const elObj = document.getElementById('biensTotalObjets');
+    if (elObj) elObj.textContent = fmt(catTotals['objet-valeur']);
+    const elCountObj = document.getElementById('biensCountObjets');
+    if (elCountObj) elCountObj.textContent = `${catCounts['objet-valeur']} objet(s)`;
+    
+    const elAut = document.getElementById('biensTotalAutres');
+    if (elAut) elAut.textContent = fmt(catTotals.autre);
+    const elCountAut = document.getElementById('biensCountAutres');
+    if (elCountAut) elCountAut.textContent = `${catCounts.autre} bien(s)`;
+    
+    renderBiensList();
+    
+    if (window.lucide) lucide.createIcons();
 }
 
 // =============================================================================
-// PAGE FLUX
+// PAGE FLUX// PAGE FLUX
 // =============================================================================
 async function updateFlux() {
     const [e, s] = await Promise.all([dataManager.getCashFlow('entree'), dataManager.getCashFlow('sortie')]);

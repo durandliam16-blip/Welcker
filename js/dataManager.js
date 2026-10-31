@@ -262,13 +262,34 @@ class DataManager {
     // Comptes bancaires classiques (type != biens)
     async getBankAccounts() {
         const all = await this.getAccounts();
-        return all.filter(a => !['immobilier','vehicule','objet-valeur'].includes(a.type));
+        const bankTypes = ['courant', 'epargne', 'livret', 'investissement_passif'];
+        return all.filter(a => bankTypes.includes(a.type));
     }
 
-    // "Autres biens" = entrées de accounts avec un type physique
+    // "Autres biens" = tout compte qui est un actif physique/réel
     async getBiens() {
         const all = await this.getAccounts();
-        return all.filter(a => ['immobilier','vehicule','objet-valeur'].includes(a.type));
+        const bankTypes = ['courant', 'epargne', 'livret', 'investissement_passif'];
+        return all.filter(a => !bankTypes.includes(a.type));
+    }
+
+    async updateBien(id, bien) {
+        const user = await getUser(); if (!user) return false;
+        const { error } = await sb.from('accounts')
+            .update({
+                nom: bien.nom,
+                solde: bien.valeur,
+                fournisseur: bien.notes || null
+            })
+            .eq('id', id)
+            .eq('user_id', user.id);
+        if (error) {
+            console.error('updateBien:', error.message);
+            showToast('Erreur : ' + error.message, 'error');
+            return false;
+        }
+        showToast('Valorisation mise à jour', 'success');
+        return true;
     }
 
     async addAccount(account) {

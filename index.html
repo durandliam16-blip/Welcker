@@ -174,6 +174,32 @@
                 </button>
             </div>
 
+            <!-- Synthèse Trésorerie & Investissements (Innovation) -->
+            <div class="card overview-card" style="margin-bottom: 24px;">
+                <div class="comptes-summary-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Liquidités Bancaires</span>
+                        <span class="stat-value" id="comptesTotalCash">0,00 €</span>
+                        <span style="font-size:11.5px; color:var(--text-tertiary);" id="comptesCountCash">0 compte(s)</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total Investi (CTO, PEA, Crypto)</span>
+                        <span class="stat-value" id="comptesTotalInvest">0,00 €</span>
+                        <span style="font-size:11.5px; color:var(--text-tertiary);">Portefeuilles d'actifs cotés</span>
+                    </div>
+                    <div class="stat-item" style="grid-column: span 2;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                            <span class="stat-label">Répartition Liquidités vs Placements</span>
+                            <span id="comptesAllocationRatio" style="font-size:11.5px; font-weight:600; font-variant-numeric:tabular-nums;">--</span>
+                        </div>
+                        <div style="height:8px; width:100%; background:var(--bg-tertiary); border-radius:4px; overflow:hidden; display:flex;">
+                            <div id="comptesBarCash" style="width:50%; background:var(--success-color); transition:width 0.3s ease;"></div>
+                            <div id="comptesBarInvest" style="width:50%; background:var(--primary-color); transition:width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Section Investissements -->
             <div class="section-header">
                 <span class="section-icon"><i data-lucide="line-chart"></i></span>
@@ -186,8 +212,11 @@
                         <span class="compte-type">CTO</span>
                     </div>
                     <div class="compte-amount" id="ctoAmount">0,00 €</div>
-                    <div class="compte-evolution">
+                    <div class="compte-evolution" style="display:flex; justify-content:space-between; align-items:center;">
                         <span id="ctoEvolution">+0,00%</span>
+                        <span style="font-size:11.5px; color:var(--text-tertiary); display:flex; align-items:center; gap:2px;">
+                            Accéder <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                        </span>
                     </div>
                 </div>
                 
@@ -197,8 +226,11 @@
                         <span class="compte-type">PEA</span>
                     </div>
                     <div class="compte-amount" id="peaAmount">0,00 €</div>
-                    <div class="compte-evolution">
+                    <div class="compte-evolution" style="display:flex; justify-content:space-between; align-items:center;">
                         <span id="peaEvolution">+0,00%</span>
+                        <span style="font-size:11.5px; color:var(--text-tertiary); display:flex; align-items:center; gap:2px;">
+                            Accéder <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                        </span>
                     </div>
                 </div>
                 
@@ -208,16 +240,27 @@
                         <span class="compte-type">CRYPTO</span>
                     </div>
                     <div class="compte-amount" id="cryptoAmount">0,00 €</div>
-                    <div class="compte-evolution">
+                    <div class="compte-evolution" style="display:flex; justify-content:space-between; align-items:center;">
                         <span id="cryptoEvolution">+0,00%</span>
+                        <span style="font-size:11.5px; color:var(--text-tertiary); display:flex; align-items:center; gap:2px;">
+                            Accéder <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                        </span>
                     </div>
                 </div>
             </div>
             
             <!-- Section Comptes bancaires -->
-            <div class="section-header">
-                <span class="section-icon"><i data-lucide="building-2"></i></span>
-                <h2>Comptes bancaires & dépôts</h2>
+            <div class="section-header" style="justify-content:space-between; flex-wrap:wrap;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span class="section-icon"><i data-lucide="building-2"></i></span>
+                    <h2>Comptes bancaires & dépôts</h2>
+                </div>
+                <div class="account-filter-chips">
+                    <button class="filter-chip active" data-filter="all" onclick="filterComptesCategory('all')">Tous</button>
+                    <button class="filter-chip" data-filter="courant" onclick="filterComptesCategory('courant')">Courants</button>
+                    <button class="filter-chip" data-filter="epargne" onclick="filterComptesCategory('epargne')">Épargne & Livrets</button>
+                    <button class="filter-chip" data-filter="investissement_passif" onclick="filterComptesCategory('investissement_passif')">Passifs</button>
+                </div>
             </div>
             <div class="comptes-grid" id="autresComptesContainer">
                 <p class="empty-state">Aucun compte bancaire enregistré</p>
@@ -577,6 +620,56 @@
                     <i data-lucide="plus"></i> Nouveau bien
                 </button>
             </div>
+
+            <!-- Synthèse du Patrimoine Réel (Innovation) -->
+            <div class="card overview-card" style="margin-bottom: 24px;">
+                <div class="overview-hero">
+                    <div class="overview-hero-main">
+                        <span class="stat-label">Valorisation totale des biens physiques</span>
+                        <div class="amount-display" id="biensTotalVal">0,00 €</div>
+                    </div>
+                    <div id="biensContributionBadge" style="font-size:12px; color:var(--text-tertiary); font-variant-numeric:tabular-nums;">
+                        Part dans le patrimoine total : --
+                    </div>
+                </div>
+                <div class="overview-content">
+                    <div class="stat-item">
+                        <span class="stat-label">Immobilier</span>
+                        <span class="stat-value" id="biensTotalImmo">0,00 €</span>
+                        <span style="font-size:11.5px; color:var(--text-tertiary);" id="biensCountImmo">0 bien</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Véhicules</span>
+                        <span class="stat-value" id="biensTotalVehicules">0,00 €</span>
+                        <span style="font-size:11.5px; color:var(--text-tertiary);" id="biensCountVehicules">0 véhicule</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Objets de valeur & Art</span>
+                        <span class="stat-value" id="biensTotalObjets">0,00 €</span>
+                        <span style="font-size:11.5px; color:var(--text-tertiary);" id="biensCountObjets">0 objet</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Autres possessions</span>
+                        <span class="stat-value" id="biensTotalAutres">0,00 €</span>
+                        <span style="font-size:11.5px; color:var(--text-tertiary);" id="biensCountAutres">0 bien</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtres de classe d'actifs -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+                <div style="font-size:14px; font-weight:600; color:var(--text-primary);">
+                    Inventaire détaillé des actifs
+                </div>
+                <div class="account-filter-chips">
+                    <button class="filter-chip active" data-filter="all" onclick="filterBiensCategory('all')">Tous</button>
+                    <button class="filter-chip" data-filter="immobilier" onclick="filterBiensCategory('immobilier')">Immobilier</button>
+                    <button class="filter-chip" data-filter="vehicule" onclick="filterBiensCategory('vehicule')">Véhicules</button>
+                    <button class="filter-chip" data-filter="objet-valeur" onclick="filterBiensCategory('objet-valeur')">Objets d'art / Valeur</button>
+                    <button class="filter-chip" data-filter="autre" onclick="filterBiensCategory('autre')">Autres</button>
+                </div>
+            </div>
+
             <div class="biens-grid" id="biensContainer"></div>
         </div>
 
@@ -647,7 +740,13 @@
             <div class="entrees-layout">
                 <div class="card">
                     <div class="card-header">
-                        <h3><i data-lucide="pie-chart"></i> Répartition par catégorie</h3>
+                        <h3 id="entreesCategoryChartTitle"><i data-lucide="pie-chart"></i> Répartition par catégorie</h3>
+                        <button id="entreesCategoryResetBtn" class="btn-back" style="display:none; font-size:12px; padding:4px 10px;" onclick="resetCategoryDrilldown('entree')">
+                            <i data-lucide="arrow-left"></i> Retour
+                        </button>
+                    </div>
+                    <div id="entreesCategorySubtitle" style="font-size:11.5px; color:var(--text-tertiary); margin-top:-8px; margin-bottom:12px;">
+                        Cliquez sur une catégorie pour voir le détail des postes
                     </div>
                     <canvas id="entreesChart"></canvas>
                 </div>
@@ -704,7 +803,13 @@
             <div class="depenses-layout">
                 <div class="card">
                     <div class="card-header">
-                        <h3><i data-lucide="pie-chart"></i> Répartition par catégorie</h3>
+                        <h3 id="depensesCategoryChartTitle"><i data-lucide="pie-chart"></i> Répartition par catégorie</h3>
+                        <button id="depensesCategoryResetBtn" class="btn-back" style="display:none; font-size:12px; padding:4px 10px;" onclick="resetCategoryDrilldown('sortie')">
+                            <i data-lucide="arrow-left"></i> Retour
+                        </button>
+                    </div>
+                    <div id="depensesCategorySubtitle" style="font-size:11.5px; color:var(--text-tertiary); margin-top:-8px; margin-bottom:12px;">
+                        Cliquez sur une catégorie pour voir le détail des postes
                     </div>
                     <canvas id="depensesChart"></canvas>
                 </div>
@@ -1291,6 +1396,38 @@
                     <div class="modal-actions">
                         <button type="button" class="btn-secondary" onclick="closeModal('modalAddCompte')">Annuler</button>
                         <button type="submit" class="btn-primary">Créer le compte</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- Modal: Modifier / Réévaluer un bien (Innovation) -->
+    <div class="modal" id="modalEditBien">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Réévaluer le bien</h2>
+                <button class="modal-close" onclick="closeModal('modalEditBien')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditBien" onsubmit="return false;">
+                    <input type="hidden" id="editBienId">
+                    <div class="form-group">
+                        <label>Désignation du bien</label>
+                        <input type="text" id="editBienNom" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nouvelle valeur estimée (€)</label>
+                        <input type="number" id="editBienValeur" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes, localisation ou état</label>
+                        <textarea id="editBienNotes" rows="2" placeholder="Surface, état, localisation..."></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal('modalEditBien')">Annuler</button>
+                        <button type="button" class="btn-primary" onclick="saveEditBien()">Enregistrer la valorisation</button>
                     </div>
                 </form>
             </div>

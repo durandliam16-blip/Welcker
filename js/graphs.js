@@ -144,57 +144,153 @@ function renderFluxChart(entrees, sorties) {
     });
 }
 
-function renderCashFlowCategoryChart(type, data) {
-    const canvasId = type === 'entree' ? 'entreesChart' : 'depensesChart';
+// State for category drill-down
+window._cashFlowDrilldownData = {
+    entree: { data: null, category: null },
+    sortie: { data: null, category: null }
+};
+
+window.resetCategoryDrilldown = function(type) {
+    if (window._cashFlowDrilldownData[type] && window._cashFlowDrilldownData[type].data) {
+        renderCashFlowCategoryChart(type, window._cashFlowDrilldownData[type].data, null);
+    }
+};
+
+function renderCashFlowCategoryChart(type, data, selectedCategory = null) {
+    const isE = type === 'entree';
+    const canvasId = isE ? 'entreesChart' : 'depensesChart';
+    const titleId = isE ? 'entreesCategoryChartTitle' : 'depensesCategoryChartTitle';
+    const resetBtnId = isE ? 'entreesCategoryResetBtn' : 'depensesCategoryResetBtn';
+    const subtitleId = isE ? 'entreesCategorySubtitle' : 'depensesCategorySubtitle';
+
+    window._cashFlowDrilldownData[type] = { data, category: selectedCategory };
+
     const ctx = destroyChart(canvasId);
     if (!ctx || !data || data.length === 0) return;
-    
-    // Grouper par catégorie
-    const cats = {};
-    data.forEach(i => {
-        const cat = i.categorie || 'Autre';
-        cats[cat] = (cats[cat] || 0) + parseFloat(i.montant || 0);
-    });
-    
-    // Calculer le nombre de mois différents
-    const moisUniques = new Set();
-    data.forEach(i => {
-        const mois = i.date.substring(0, 7); // YYYY-MM
-        moisUniques.add(mois);
-    });
-    const nbMois = Math.max(moisUniques.size, 1); // Au moins 1 pour éviter division par 0
-    
-    // Diviser par le nombre de mois pour avoir la moyenne
-    const catsMoyenne = {};
-    Object.keys(cats).forEach(cat => {
-        catsMoyenne[cat] = cats[cat] / nbMois;
-    });
-    
-    new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: Object.keys(catsMoyenne),
-            datasets: [{
-                data: Object.values(catsMoyenne),
-                backgroundColor: ['#2563eb', '#059669', '#64748b', '#0284c7', '#d97706', '#475569', '#0d9488', '#6366f1']
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'bottom' },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.label || '';
-                            const value = context.parsed || 0;
-                            return `${label}: ${fmt(value)}/mois`;
+
+    const titleEl = document.getElementById(titleId);
+    const resetBtn = document.getElementById(resetBtnId);
+    const subtitleEl = document.getElementById(subtitleId);
+
+    const colors = [
+        '#2563eb', '#059669', '#d97706', '#64748b', '#0284c7', 
+        '#8b5cf6', '#0d9488', '#ea580c', '#4f46e5', '#16a34a',
+        '#f43f5e', '#7c3aed', '#0891b2', '#ca8a04', '#475569'
+    ];
+
+    if (!selectedCategory) {
+        // === VUE NIVEAU 1 : TOUTES LES CATÉGORIES ===
+        if (titleEl) titleEl.innerHTML = `<i data-lucide="pie-chart"></i> Répartition par catégorie`;
+        if (resetBtn) resetBtn.style.display = 'none';
+        if (subtitleEl) {
+            subtitleEl.innerHTML = `Cliquez sur une catégorie pour voir le détail des postes`;
+        }
+
+        const cats = {};
+        data.forEach(i => {
+            const cat = i.categorie || 'Autre';
+            cats[cat] = (cats[cat] || 0) + parseFloat(i.montant || 0);
+        });
+
+        const moisUniques = new Set();
+        data.forEach(i => moisUniques.add(i.date.substring(0, 7)));
+        const nbMois = Math.max(moisUniques.size, 1);
+
+        const labels = Object.keys(cats);
+        const values = labels.map(c => cats[c] / nbMois);
+        const total = values.reduce((a, b) => a + b, 0);
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: colors.slice(0, labels.length)
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '58%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10 } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const pct = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return ` ${label}: ${fmt(value)}/mois (${pct}%) — Cliquer pour détailler`;
+                            }
+                        }
+                    }
+                },
+                onClick: (evt, activeEls, chart) => {
+                    if (!activeEls || activeEls.length === 0) return;
+                    const idx = activeEls[0].index;
+                    const catName = chart.data.labels[idx];
+                    renderCashFlowCategoryChart(type, data, catName);
+                },
+                onHover: (evt, activeEls) => {
+                    evt.native.target.style.cursor = activeEls.length ? 'pointer' : 'default';
+                }
+            }
+        });
+    } else {
+        // === VUE NIVEAU 2 : DÉTAIL DE LA CATÉGORIE SÉLECTIONNÉE (DRILL-DOWN) ===
+        const catNorm = selectedCategory.trim().toLowerCase();
+        const items = data.filter(i => (i.categorie || '').trim().toLowerCase() === catNorm);
+
+        if (titleEl) {
+            titleEl.innerHTML = `<i data-lucide="layers"></i> Détail · <span style="color:var(--primary-color);text-transform:capitalize;">${selectedCategory}</span>`;
+        }
+        if (resetBtn) resetBtn.style.display = 'inline-flex';
+
+        // Grouper par description
+        const subs = {};
+        items.forEach(i => {
+            const desc = (i.description || 'Divers').trim();
+            subs[desc] = (subs[desc] || 0) + parseFloat(i.montant || 0);
+        });
+
+        const subLabels = Object.keys(subs).sort((a, b) => subs[b] - subs[a]);
+        const subValues = subLabels.map(l => subs[l]);
+        const catTotal = subValues.reduce((a, b) => a + b, 0);
+
+        if (subtitleEl) {
+            subtitleEl.innerHTML = `Total : <strong>${fmt(catTotal)}</strong> (${items.length} opérations enregistrées)`;
+        }
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: subLabels,
+                datasets: [{
+                    data: subValues,
+                    backgroundColor: colors.slice(0, subLabels.length)
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '58%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10 } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const pct = catTotal > 0 ? ((value / catTotal) * 100).toFixed(1) : 0;
+                                return ` ${label}: ${fmt(value)} (${pct}%)`;
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
+    }
+
+    if (window.lucide) lucide.createIcons();
 }
 
 function renderCashFlowEvolutionChart(type, data) {
