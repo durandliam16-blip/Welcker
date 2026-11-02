@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://qktbcgumyqjgbvcpynjo.supabase.co https://generativelanguage.googleapis.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net https://qktbcgumyqjgbvcpynjo.supabase.co https://generativelanguage.googleapis.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcker - Wealth & Portfolio Tracker</title>
     <meta name="title" content="Welcker - Wealth & Portfolio Tracker">
@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="css/chatbot.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
-    <link rel="icon" href="icon-192.png">
+    <link rel="icon" href="images/logo.png">
 
     <!-- Lucide Icons CDN -->
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -60,7 +60,6 @@
             <a href="#" class="nav-link nav-link-ai" onclick="event.preventDefault(); toggleChatbot();">
                 <i data-lucide="bot"></i>
                 <span>Assistant IA</span>
-                <span class="badge-ai-pill">Gemini</span>
             </a>
             <a href="#" class="nav-link" data-page="social">
                 <i data-lucide="users"></i>
@@ -111,22 +110,14 @@
             </div>
         </div>
 
-        <!-- Contrôles : Persona & Modèle Gemini -->
+        <!-- Contrôles : Persona de l'Assistant IA -->
         <div class="ai-controls-bar">
             <div class="ai-control-group">
-                <label for="aiPersonaSelect"><i data-lucide="user-check"></i> Persona :</label>
+                <label for="aiPersonaSelect"><i data-lucide="user-check"></i> Persona expert :</label>
                 <select id="aiPersonaSelect" onchange="onAiPersonaChange()">
                     <option value="wealth_manager" selected>Conseiller Patrimonial (Général)</option>
                     <option value="budget_coach">Analyste des Dépenses & Budget</option>
                     <option value="investor">Investisseur (CTO, PEA & Crypto)</option>
-                </select>
-            </div>
-            <div class="ai-control-group">
-                <label for="aiModelSelect"><i data-lucide="cpu"></i> Modèle :</label>
-                <select id="aiModelSelect" onchange="onAiModelChange()">
-                    <option value="gemini-2.5-pro" selected>Gemini 2.5 Pro (Raisonnement)</option>
-                    <option value="gemini-2.5-flash">Gemini 2.5 Flash (Rapide)</option>
-                    <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
                 </select>
             </div>
         </div>
@@ -1824,20 +1815,18 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.27.0/plotly.min.js"></script>
 
+    <!-- Configuration Supabase -->
+    <script src="js/config.js"></script>
+
     <!-- Contrôle d'authentification -->
     <script>
     (async () => {
-        if (!window.supabase) {
+        if (!window.supabase || typeof sb === 'undefined') {
             console.error('Supabase non chargé');
             window.location.replace('login.html');
             return;
         }
-        const { createClient } = window.supabase;
-        const _sb = createClient(
-            'https://qktbcgumyqjgbvcpynjo.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrdGJjZ3VteXFqZ2J2Y3B5bmpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MDQ0MDYsImV4cCI6MjA4NjM4MDQwNn0.Bjv4bb2gnXKG8-UY4oSUQrjaJIzNWEG_zM8_XTQbwsY'
-        );
-        const { data: { session } } = await _sb.auth.getSession();
+        const { data: { session } } = await sb.auth.getSession();
         if (!session) {
             window.location.replace('login.html');
             return;
@@ -1846,7 +1835,6 @@
     </script>
 
     <!-- Scripts applicatifs -->
-    <script src="js/config.js"></script>
     <script src="js/dataManager.js"></script>
     <script src="js/app.js"></script>
     <script src="js/pages.js"></script>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'monpatrimoine-v205'; // Version 2.0.5 - Date filters, 3 Chatbot personas & chained subcategories // Version 2.0.4 - Assistant IA Gemini, Header épuré & Harmonisation // Version 2.0.3 - Responsive mobile & fast portfolio
+const CACHE_NAME = 'monpatrimoine-v206'; // Version 2.0.6 - Correctif requêtes non-HTTP & syntaxe app.js
 const ASSETS = [
   './',
   './index.html',
@@ -46,8 +46,13 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
+  // Ignorer les requêtes non-GET et les schémas non supportés par le CacheStorage (ex: chrome-extension://, data:, etc.)
+  if (e.request.method !== 'GET' || !e.request.url.startsWith('http')) {
+    return;
+  }
+
   // Ne JAMAIS cacher Supabase ou les requêtes d'API externes
-  if (e.request.url.includes('supabase.co') || e.request.url.includes('supabase-js')) {
+  if (e.request.url.includes('supabase.co') || e.request.url.includes('supabase-js') || e.request.url.includes('generativelanguage.googleapis.com')) {
     return;
   }
 

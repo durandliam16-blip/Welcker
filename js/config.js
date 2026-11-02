@@ -36,6 +36,19 @@ async function logConnexion() {
         
         const today = new Date().toISOString().split('T')[0];
         
+        // Vérifier si la connexion a déjà été enregistrée aujourd'hui pour éviter une erreur 409 dans la console
+        const { data: existing } = await sb
+            .from('connexions')
+            .select('user_id')
+            .eq('user_id', user.id)
+            .eq('date_connexion', today)
+            .maybeSingle();
+
+        if (existing) {
+            console.log('📅 Connexion déjà enregistrée aujourd\'hui');
+            return;
+        }
+
         // Récupérer l'erreur proprement
         const { error } = await sb.from('connexions').insert([{
             user_id: user.id,

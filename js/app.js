@@ -44,7 +44,7 @@ async function navigateTo(page) {
             bilan: 'Bilan patrimonial',
             comptes: 'Comptes & Portefeuilles',
             cto: 'Compte-Titres (CTO)',
-            pea: 'Plan d'Épargne Actions (PEA)',
+            pea: "Plan d'Épargne Actions (PEA)",
             crypto: 'Actifs numériques & Crypto',
             'autres-biens': 'Autres biens & Immobilier',
             flux: 'Flux financiers',

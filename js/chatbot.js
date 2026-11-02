@@ -68,12 +68,15 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
         }
     }
 
+    // Modèle fixe : toujours le meilleur modèle possible (Gemini 2.5 Pro)
+    const BEST_MODEL = 'gemini-2.5-pro';
+
     function getSelectedModel() {
-        return localStorage.getItem('welcker_gemini_model') || 'gemini-2.5-pro';
+        return BEST_MODEL;
     }
 
     function setSelectedModel(model) {
-        localStorage.setItem('welcker_gemini_model', model);
+        // Modèle verrouillé sur le meilleur : Gemini 2.5 Pro
     }
 
     function getSelectedPersona() {
@@ -404,14 +407,7 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
         renderWelcomeCard();
     };
 
-    window.onAiModelChange = function() {
-        const sel = document.getElementById('aiModelSelect');
-        if (!sel) return;
-        setSelectedModel(sel.value);
-        if (typeof showToast === 'function') {
-            showToast(`Modèle : ${sel.options[sel.selectedIndex].text}`, 'info');
-        }
-    };
+    window.onAiModelChange = function() {};
 
     window.clearAiChat = function() {
         conversationHistory = [];
@@ -616,8 +612,8 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
                     <span>Audit du matelas de réserve</span>
                 </div>
                 <div class="ai-feature-pill">
-                    <i data-lucide="cpu"></i>
-                    <span>Modèle : ${getSelectedModel()}</span>
+                    <i data-lucide="sparkles"></i>
+                    <span>Modèle : Gemini 2.5 Pro</span>
                 </div>
             </div>
 
@@ -668,8 +664,7 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
         const personaSelect = document.getElementById('aiPersonaSelect');
         if (personaSelect) personaSelect.value = getSelectedPersona();
 
-        const modelSelect = document.getElementById('aiModelSelect');
-        if (modelSelect) modelSelect.value = getSelectedModel();
+
 
         const apiKeyInput = document.getElementById('aiApiKeyInput');
         if (apiKeyInput) apiKeyInput.value = getApiKey();
