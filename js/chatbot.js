@@ -54,6 +54,8 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
     }
 
     function setApiKey(key) {
+        cachedAvailableModels = null;
+        cachedKey = null;
         if (!key) {
             localStorage.removeItem('welcker_gemini_api_key');
             if (window.dataManager && typeof dataManager.saveGeminiApiKey === 'function') {
@@ -65,18 +67,92 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
             if (window.dataManager && typeof dataManager.saveGeminiApiKey === 'function') {
                 dataManager.saveGeminiApiKey(cleanKey);
             }
+            resolveActiveModels(cleanKey).catch(() => {});
         }
     }
 
-    // Modèle fixe : toujours le meilleur modèle possible (Gemini 2.5 Pro)
-    const BEST_MODEL = 'gemini-2.5-pro';
+    // ── DÉTECTION DYNAMIQUE DU MEILLEUR MODÈLE VIA LISTMODELS ──────────────────
+    let cachedAvailableModels = null;
+    let cachedKey = null;
+
+    async function resolveActiveModels(apiKey) {
+        if (!apiKey) return ['gemini-3.1-pro-preview', 'gemini-2.5-flash', 'gemini-2.0-flash'];
+        if (cachedAvailableModels && cachedKey === apiKey) {
+            return cachedAvailableModels;
+        }
+
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`;
+            const resp = await fetch(url);
+            if (resp.ok) {
+                const data = await resp.json();
+                const models = (data.models || []).filter(m => 
+                    Array.isArray(m.supportedGenerationMethods) &&
+                    m.supportedGenerationMethods.includes('generateContent')
+                );
+
+                const cleanNames = models.map(m => m.name.replace(/^models\//, ''));
+                console.log('🤖 Modèles actifs découverts sur votre compte Google AI Studio :', cleanNames);
+
+                if (cleanNames.length > 0) {
+                    // Trier pour toujours garantir le meilleur modèle de raisonnement possible :
+                    // 1. Modèles Pro récents (3.1-pro, 3-pro, 2.5-pro, etc.)
+                    // 2. Modèles Flash récents (3.5-flash, 2.5-flash, 2.0-flash, etc.)
+                    cleanNames.sort((a, b) => {
+                        const score = (name) => {
+                            const n = name.toLowerCase();
+                            if (n.includes('3.1-pro')) return 120;
+                            if (n.includes('3-pro')) return 110;
+                            if (n.includes('2.5-pro')) return 100;
+                            if (n.includes('pro')) return 90;
+                            if (n.includes('3.5-flash')) return 80;
+                            if (n.includes('2.5-flash')) return 70;
+                            if (n.includes('2.0-flash') || n.includes('2-flash')) return 60;
+                            if (n.includes('flash')) return 50;
+                            return 10;
+                        };
+                        return score(b) - score(a);
+                    });
+
+                    cachedAvailableModels = cleanNames;
+                    cachedKey = apiKey;
+                    return cleanNames;
+                }
+            } else if (resp.status === 400) {
+                const errData = await resp.json().catch(() => ({}));
+                if (errData.error?.message?.includes('API key not valid')) {
+                    throw new Error('INVALID_API_KEY');
+                }
+            }
+        } catch (err) {
+            if (err.message === 'INVALID_API_KEY') throw err;
+            console.warn('ListModels non accessible, utilisation des modèles de repli :', err);
+        }
+
+        return ['gemini-3.1-pro-preview', 'gemini-2.5-flash', 'gemini-2.0-flash'];
+    }
+
+    function formatModelDisplayName(rawModelName) {
+        if (!rawModelName) return 'Meilleur modèle automatique';
+        const m = rawModelName.toLowerCase();
+        if (m.includes('3.1-pro')) return 'Gemini 3.1 Pro';
+        if (m.includes('2.5-pro')) return 'Gemini 2.5 Pro';
+        if (m.includes('3.5-flash')) return 'Gemini 3.5 Flash';
+        if (m.includes('2.5-flash')) return 'Gemini 2.5 Flash';
+        if (m.includes('2.0-flash')) return 'Gemini 2.0 Flash';
+        if (m.includes('1.5-flash')) return 'Gemini 1.5 Flash';
+        return rawModelName;
+    }
 
     function getSelectedModel() {
-        return BEST_MODEL;
+        if (cachedAvailableModels && cachedAvailableModels.length > 0) {
+            return cachedAvailableModels[0];
+        }
+        return 'gemini-3.1-pro-preview';
     }
 
     function setSelectedModel(model) {
-        // Modèle verrouillé sur le meilleur : Gemini 2.5 Pro
+        // Sélection automatique du meilleur modèle
     }
 
     function getSelectedPersona() {
@@ -287,10 +363,8 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
             parts: [{ text: userMessage }]
         });
 
-        // Modèles candidats pour fallback gracieux si besoin
-        const modelsToTry = [model];
-        if (model !== 'gemini-2.5-flash') modelsToTry.push('gemini-2.5-flash');
-        if (model !== 'gemini-1.5-pro') modelsToTry.push('gemini-1.5-pro');
+        // Détection et tentative avec les meilleurs modèles réels actifs
+        const modelsToTry = await resolveActiveModels(apiKey);
 
         let lastError = null;
         for (const candidateModel of modelsToTry) {
@@ -611,9 +685,9 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
                     <i data-lucide="shield"></i>
                     <span>Audit du matelas de réserve</span>
                 </div>
-                <div class="ai-feature-pill">
+                <div class="ai-feature-pill" id="aiActiveModelPill">
                     <i data-lucide="sparkles"></i>
-                    <span>Modèle : Gemini 2.5 Pro</span>
+                    <span>Modèle : ${formatModelDisplayName(getSelectedModel())}</span>
                 </div>
             </div>
 
@@ -671,6 +745,17 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
 
         if (conversationHistory.length === 0) {
             renderWelcomeCard();
+        }
+
+        const currentKey = getApiKey();
+        if (currentKey) {
+            resolveActiveModels(currentKey).then((activeList) => {
+                const pill = document.getElementById('aiActiveModelPill');
+                if (pill && activeList && activeList.length > 0) {
+                    pill.innerHTML = `<i data-lucide="sparkles"></i><span>Modèle : ${formatModelDisplayName(activeList[0])}</span>`;
+                    if (window.lucide) lucide.createIcons();
+                }
+            }).catch(() => {});
         }
     }
 

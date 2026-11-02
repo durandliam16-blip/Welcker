@@ -1,4 +1,4 @@
-const CACHE_NAME = 'monpatrimoine-v206'; // Version 2.0.6 - Correctif requêtes non-HTTP & syntaxe app.js
+const CACHE_NAME = 'monpatrimoine-v207'; // Version 2.0.6 - Correctif requêtes non-HTTP & syntaxe app.js
 const ASSETS = [
   './',
   './index.html',
