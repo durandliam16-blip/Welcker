@@ -27,6 +27,16 @@ class DataManager {
         else showToast('Profil enregistré !', 'success');
     }
 
+    async saveGeminiApiKey(key) {
+        const user = await getUser(); if (!user) return false;
+        const { error } = await sb.from('profiles').update({
+            gemini_api_key: key ? key.trim() : null,
+            updated_at: new Date().toISOString()
+        }).eq('id', user.id);
+        if (error) { console.error('saveGeminiApiKey:', error.message); return false; }
+        return true;
+    }
+
     // ── Investissements CTO/PEA ───────────────────────────────────────────────
     // Colonnes: id, user_id, type(boolean), titre, libelle, quantite,
     //           prix_unitaire, frais, date

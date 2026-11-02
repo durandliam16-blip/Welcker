@@ -56,8 +56,15 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
     function setApiKey(key) {
         if (!key) {
             localStorage.removeItem('welcker_gemini_api_key');
+            if (window.dataManager && typeof dataManager.saveGeminiApiKey === 'function') {
+                dataManager.saveGeminiApiKey(null);
+            }
         } else {
-            localStorage.setItem('welcker_gemini_api_key', key.trim());
+            const cleanKey = key.trim();
+            localStorage.setItem('welcker_gemini_api_key', cleanKey);
+            if (window.dataManager && typeof dataManager.saveGeminiApiKey === 'function') {
+                dataManager.saveGeminiApiKey(cleanKey);
+            }
         }
     }
 
@@ -641,7 +648,23 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
         }
     }
 
-    function initChatbotUI() {
+    async function initChatbotUI() {
+        // Synchronisation automatique depuis Supabase si la clé n'est pas encore en local
+        if (!getApiKey() && window.dataManager && typeof dataManager.getProfile === 'function') {
+            try {
+                const profile = await dataManager.getProfile();
+                if (profile && profile.gemini_api_key) {
+                    localStorage.setItem('welcker_gemini_api_key', profile.gemini_api_key);
+                    const apiKeyInput = document.getElementById('aiApiKeyInput');
+                    if (apiKeyInput) apiKeyInput.value = profile.gemini_api_key;
+                    const settingKeyInput = document.getElementById('settingGeminiApiKey');
+                    if (settingKeyInput) settingKeyInput.value = profile.gemini_api_key;
+                }
+            } catch (e) {
+                console.warn('Sync profile gemini key:', e);
+            }
+        }
+
         const personaSelect = document.getElementById('aiPersonaSelect');
         if (personaSelect) personaSelect.value = getSelectedPersona();
 
