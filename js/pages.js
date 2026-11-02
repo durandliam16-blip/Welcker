@@ -597,19 +597,15 @@ async function updateCashFlowPage(type) {
         </tr>`).join('')
         : `<tr><td colspan="5" class="empty-state">Aucune donnée</td></tr>`;
 
-    // Graphiques
-    const cats = {};
-    data.forEach(i => cats[i.categorie] = (cats[i.categorie]||0) + parseFloat(i.montant||0));
-    if (Object.keys(cats).length) {
-        const ctx = destroyChart(isE ? 'entreesChart' : 'depensesChart');
-        if (ctx) new Chart(ctx, { type: 'pie',
-            data: { labels: Object.keys(cats), datasets:[{ data: Object.values(cats), backgroundColor:['#2563eb','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899'] }] },
-            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
-        });
-    }
+    // Graphiques avec support du filtrage par date
+    window._rawCashFlowData = window._rawCashFlowData || {};
+    window._rawCashFlowData[type] = data;
 
-    // Graphiques
-    renderCashFlowCategoryChart(type, data);
+    if (typeof window.filterCashFlowChartByPeriod === 'function') {
+        window.filterCashFlowChartByPeriod(type);
+    } else {
+        renderCashFlowCategoryChart(type, data);
+    }
     renderCashFlowEvolutionChart(type, data);
 }
 
@@ -758,8 +754,22 @@ async function saveProfile() {
 
 function updateParametres() {
     const s = dataManager.getSettings();
-    document.getElementById('settingTheme').value  = s.theme  || 'light';
-    document.getElementById('settingDevise').value = s.devise || 'EUR';
+    const themeEl = document.getElementById('settingTheme');
+    if (themeEl) themeEl.value = s.theme || 'light';
+    const deviseEl = document.getElementById('settingDevise');
+    if (deviseEl) deviseEl.value = s.devise || 'EUR';
+
+    // Synchronisation Assistant IA
+    const isAiActive = localStorage.getItem('welcker_chatbot_enabled') !== 'false';
+    const toggleAi = document.getElementById('toggleChatbotActive');
+    const aiContainer = document.getElementById('chatbotSettingsContainer');
+    const aiKeyInput = document.getElementById('settingGeminiApiKey');
+    const aiPersonaSelect = document.getElementById('settingGeminiPersona');
+
+    if (toggleAi) toggleAi.checked = isAiActive;
+    if (aiContainer) aiContainer.style.display = isAiActive ? 'block' : 'none';
+    if (aiKeyInput) aiKeyInput.value = localStorage.getItem('welcker_gemini_api_key') || '';
+    if (aiPersonaSelect) aiPersonaSelect.value = localStorage.getItem('welcker_gemini_persona') || 'wealth_manager';
 }
 
 function changeTheme() {

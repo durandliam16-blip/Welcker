@@ -1,4 +1,4 @@
-const CACHE_NAME = 'monpatrimoine-v204'; // Version 2.0.4 - Assistant IA Gemini, Header épuré & Harmonisation // Version 2.0.3 - Responsive mobile & fast portfolio
+const CACHE_NAME = 'monpatrimoine-v205'; // Version 2.0.5 - Date filters, 3 Chatbot personas & chained subcategories // Version 2.0.4 - Assistant IA Gemini, Header épuré & Harmonisation // Version 2.0.3 - Responsive mobile & fast portfolio
 const ASSETS = [
   './',
   './index.html',

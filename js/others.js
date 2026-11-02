@@ -139,7 +139,14 @@ async function addEntreeForm(e) {
     const data = {
         date:        document.getElementById('entreeDate').value,
         categorie:   document.getElementById('entreeCategorie').value,
-        description: document.getElementById('entreeDescription').value,
+        description: (() => {
+        const sel = document.getElementById('entreeSousCategorie');
+        if (sel) {
+            if (sel.value === '__custom__') return document.getElementById('entreeCustomDescription')?.value.trim() || 'Autre';
+            return sel.value;
+        }
+        return document.getElementById('entreeDescription')?.value || 'Autre';
+    })(),
         montant:     parseFloat(document.getElementById('entreeMontant').value)
     };
     
@@ -179,7 +186,14 @@ async function addDepenseForm(e) {
     const data = {
         date:        document.getElementById('depenseDate').value,
         categorie:   document.getElementById('depenseCategorie').value,
-        description: document.getElementById('depenseDescription').value,
+        description: (() => {
+        const sel = document.getElementById('depenseSousCategorie');
+        if (sel) {
+            if (sel.value === '__custom__') return document.getElementById('depenseCustomDescription')?.value.trim() || 'Autre';
+            return sel.value;
+        }
+        return document.getElementById('depenseDescription')?.value || 'Autre';
+    })(),
         montant:     parseFloat(document.getElementById('depenseMontant').value)
     };
     
@@ -623,5 +637,60 @@ window.saveEditBien = async function() {
         closeModal('modalEditBien');
         await updateAutresBiens();
         if (typeof updateAccueil === 'function') updateAccueil();
+    }
+};
+
+
+// =============================================================================
+// GESTION DYNAMIQUE DES CATÉGORIES ET SOUS-CATÉGORIES LIÉES
+// =============================================================================
+const SUB_CATEGORIES_DEPENSES = {
+    logement: ['Loyer', 'Elec', 'Réseau', 'Télephonie', 'Hotel', 'Autre'],
+    transport: ['Essence', 'Péage', 'Assurance', 'Avion', 'Snacks', 'Voiture', 'Autre'],
+    alimentation: ['Courses', 'Repas', 'Boissons', 'Autre'],
+    loisirs: ['Sortie', 'Sport', 'Voyage', 'Autre'],
+    autre: ['Médical', 'Shopping/Vetement', 'Meublement', 'Lessive', 'Netflix', 'IA', 'Forfait mobile', 'Kdo', 'Autre']
+};
+
+const SUB_CATEGORIES_ENTREES = {
+    salaire: ['ADEME', 'CapGemini', 'Autre'],
+    covoiturage: ['BlaBlaCar', 'autre'],
+    autre: ['Famille', 'aides gouvernement', 'EDF', 'Autre']
+};
+
+window.onCategorieChange = function(type) {
+    const isD = type === 'depense';
+    const catSelect = document.getElementById(isD ? 'depenseCategorie' : 'entreeCategorie');
+    const sousCatSelect = document.getElementById(isD ? 'depenseSousCategorie' : 'entreeSousCategorie');
+    const customInput = document.getElementById(isD ? 'depenseCustomDescription' : 'entreeCustomDescription');
+    if (!catSelect || !sousCatSelect) return;
+
+    const cat = catSelect.value;
+    const list = isD ? (SUB_CATEGORIES_DEPENSES[cat] || ['Autre']) : (SUB_CATEGORIES_ENTREES[cat] || ['Autre']);
+
+    sousCatSelect.innerHTML = list.map(item => `<option value="${escapeHTML(item)}">${escapeHTML(item)}</option>`).join('') + 
+        `<option value="__custom__">+ Saisie libre / Autre...</option>`;
+
+    if (customInput) {
+        customInput.style.display = 'none';
+        customInput.value = '';
+        customInput.required = false;
+    }
+};
+
+window.onSousCategorieChange = function(type) {
+    const isD = type === 'depense';
+    const sousCatSelect = document.getElementById(isD ? 'depenseSousCategorie' : 'entreeSousCategorie');
+    const customInput = document.getElementById(isD ? 'depenseCustomDescription' : 'entreeCustomDescription');
+    if (!sousCatSelect || !customInput) return;
+
+    if (sousCatSelect.value === '__custom__') {
+        customInput.style.display = 'block';
+        customInput.required = true;
+        customInput.focus();
+    } else {
+        customInput.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
     }
 };

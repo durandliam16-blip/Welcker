@@ -78,6 +78,6 @@ Pour l'instant sur GitHub pages en gratuit
 
 ---
 
-**Version** : 2.0.4 (Assistant IA Financier Gemini avec personas & prompts, suppression barre de recherche, harmonisation catégories & PWA auto-update v204)
+**Version** : 2.0.5 (Filtres de date sur camemberts, 3 experts Chatbot IA, clé API dans paramètres profil avec toggle & sous-catégories dynamiques liées)
 **Date** : Mars 2026  
 **Licence** : Partage aux proches

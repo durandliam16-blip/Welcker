@@ -100,6 +100,10 @@ function openModal(modalId, param) {
     m.classList.add('active');
     if (modalId === 'modalAddTransaction' && param)
         document.getElementById('transactionCompte').value = param;
+    if (modalId === 'modalAddDepense' && typeof window.onCategorieChange === 'function')
+        window.onCategorieChange('depense');
+    if (modalId === 'modalAddEntree' && typeof window.onCategorieChange === 'function')
+        window.onCategorieChange('entree');
 }
 function closeModal(modalId) {
     const m = document.getElementById(modalId); if (!m) return;

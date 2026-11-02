@@ -784,3 +784,55 @@ window.saveCurrentPatrimoine = async function() {
 
 // Exposer globalement
 window.renderPatrimoineEvolutionChart = renderPatrimoineEvolutionChart;
+
+// =============================================================================
+// FILTRAGE PAR DATE DES CAMEMBERTS ENTRÉES / SORTIES
+// =============================================================================
+window._rawCashFlowData = window._rawCashFlowData || {};
+
+window.filterCashFlowChartByPeriod = function(type) {
+    const isE = type === 'entree';
+    const periodSelect = document.getElementById(isE ? 'entreesChartPeriod' : 'depensesChartPeriod');
+    const customDiv = document.getElementById(isE ? 'entreesChartCustomDates' : 'depensesChartCustomDates');
+    const period = periodSelect ? periodSelect.value : 'all';
+
+    if (customDiv) {
+        customDiv.style.display = period === 'custom' ? 'inline-flex' : 'none';
+    }
+
+    const rawData = window._rawCashFlowData[type] || [];
+    let filtered = [...rawData];
+    const now = new Date();
+
+    if (period === 'current_month') {
+        filtered = filtered.filter(i => {
+            const d = new Date(i.date);
+            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        });
+    } else if (period === 'last_month') {
+        const lastM = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        filtered = filtered.filter(i => {
+            const d = new Date(i.date);
+            return d.getMonth() === lastM.getMonth() && d.getFullYear() === lastM.getFullYear();
+        });
+    } else if (period === '3_months') {
+        const threeMAgo = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
+        filtered = filtered.filter(i => new Date(i.date) >= threeMAgo);
+    } else if (period === 'current_year') {
+        filtered = filtered.filter(i => new Date(i.date).getFullYear() === now.getFullYear());
+    } else if (period === 'custom') {
+        const sVal = document.getElementById(isE ? 'entreesChartDateStart' : 'depensesChartDateStart')?.value;
+        const eVal = document.getElementById(isE ? 'entreesChartDateEnd' : 'depensesChartDateEnd')?.value;
+        if (sVal) {
+            const sDate = new Date(sVal);
+            filtered = filtered.filter(i => new Date(i.date) >= sDate);
+        }
+        if (eVal) {
+            const eDate = new Date(eVal);
+            eDate.setHours(23, 59, 59, 999);
+            filtered = filtered.filter(i => new Date(i.date) <= eDate);
+        }
+    }
+
+    renderCashFlowCategoryChart(type, filtered, null);
+};

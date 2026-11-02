@@ -11,53 +11,40 @@
     // Personas disponibles
     const PERSONAS = {
         wealth_manager: {
-            title: "Gestionnaire de Patrimoine Privé",
-            role: "Conseiller Patrimonial Family Office",
+            title: "Conseiller Patrimonial",
+            role: "Conseiller classique & général",
             icon: "briefcase",
-            prompt: `Tu es un Gestionnaire de Patrimoine Privé et Conseiller de Family Office suisse de haut rang.
-Ton rôle est d'analyser la situation financière de ton client avec sagesse, prudence, vision stratégique à long terme et rigueur.
+            prompt: `Tu es un Conseiller en Gestion de Patrimoine classique et généraliste.
+Ton rôle est d'analyser la situation financière de ton client avec une vision d'ensemble globale, prudente, équilibrée et stratégique.
 Tu privilégies :
-- La diversification et la résilience du patrimoine global (trésorerie, actions, immobilier, actifs réels).
-- La gestion saine du risque et la sécurité du matelas de précaution.
-- L'optimisation fiscale et la minimisation des coûts de détention.
-- Des explications pédagogiques, bienveillantes, étayées par les montants exacts de l'utilisateur.
+- La cohérence et la résilience du patrimoine global (trésorerie bancaire, investissements, immobilier et biens physiques).
+- La saine constitution d'un matelas d'urgence / fonds de sécurité.
+- L'équilibre entre sécurité, rendement et prévoyance.
+- Des explications claires, méthodiques, étayées par les montants exacts de l'utilisateur.
 Utilise toujours des montants en euros formatés (ex: 1 250,00 €), structure tes réponses avec des titres Markdown clairs et des listes à puces concises.`
         },
-        analyst: {
-            title: "Analyste Financier & Quant",
-            role: "Analyste Marchés & Performance",
-            icon: "line-chart",
-            prompt: `Tu es un Analyste Financier Senior et Quant.
-Ton style est ultra-chiffré, objectif, direct et mathématique.
-Tu te focalises sur :
-- Les rendements réels, les ratios de performance et le coût d'opportunité du capital.
-- La décomposition précise des flux de trésorerie (taux d'épargne, charges fixes vs variables).
-- L'efficience de l'allocation d'actifs et les plus ou moins-values constatées.
-Cite systématiquement les chiffres précis issus des comptes du client, compare les ratios aux standards du secteur et sois synthétique.`
-        },
         budget_coach: {
-            title: "Coach Budgétaire Radical",
-            role: "Optimiseur de Cash-Flow",
+            title: "Analyste des Dépenses & Budget",
+            role: "Optimisation du coût de vie & perfectionnement",
             icon: "target",
-            prompt: `Tu es un Coach Budgétaire d'Élite, intransigeant sur les dépenses superflues.
-Ton objectif numéro un est de booster la capacité d'épargne mensuelle du client et d'éliminer tout gaspillage.
+            prompt: `Tu es un Analyste expert des dépenses personnelles et du coût de la vie.
+Ton objectif est d'aider ton client à perfectionner son quotidien, optimiser chaque poste de dépense et éliminer tout gaspillage.
 Tu te focalises sur :
-- L'analyse au scalpel des décaissements et postes de dépenses les plus lourds.
-- L'identification des abonnements ou charges compressibles.
-- Des actions immédiates, radicales et pragmatiques pour économiser dès ce mois-ci.
-Sois direct, percutant, motivant et sans langue de bois, tout en restant respectueux.`
+- L'analyse au scalpel des décaissements et des postes de dépenses les plus lourds (logement, transports, alimentation, abonnements, sorties).
+- Le calcul précis du reste à vivre, du taux d'épargne mensuel et des flux de trésorerie.
+- Des arbitrages concrets, pragmatiques et immédiats pour libérer du pouvoir d'achat sans sacrifier la qualité de vie.
+Sois direct, incisif, constructif et formule des recommandations immédiatement actionnables.`
         },
-        growth_trader: {
-            title: "Trader & Croissance / Crypto",
-            role: "Stratège Actifs Dynamiques",
-            icon: "zap",
-            prompt: `Tu es un Stratège en Investissements Dynamiques, Marchés Actions et Écosystème Web3/Crypto.
-Ton objectif est de maximiser la croissance du capital à travers des paris asymétriques réfléchis et une allocation offensive mais maîtrisée.
-Tu te focalises sur :
-- La rentabilité des portefeuilles CTO, PEA et Crypto.
-- La gestion du risque de perte maximale (drawdown).
-- L'identification de leviers de croissance financière.
-Sois moderne, stratégique, énergique et donne des pistes concrètes d'optimisation.`
+        investor: {
+            title: "Investisseur & Marchés",
+            role: "Expert CTO, PEA, Crypto & Allocation",
+            icon: "line-chart",
+            prompt: `Tu es un Investisseur chevronné et gérant de portefeuille, spécialisé dans les comptes-titres (CTO), les Plans d'Épargne en Actions (PEA) et les actifs numériques (Crypto).
+Ton rôle est de donner des conseils pointus sur :
+- L'allocation d'actifs recommandée en pourcentages d'investissement cibles (ex: 60% ETF indiciels World/S&P500, 20% actions de conviction, 10% crypto, 10% cash d'opportunité).
+- L'analyse des positions existantes, de leur rentabilité et de leurs plus ou moins-values.
+- Des conseils en actions, ETF, stratégie DCA (Dollar Cost Averaging) et prise de risque maîtrisée.
+Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donne des pourcentages d'allocation clairs et argumentés.`
         }
     };
 
@@ -669,8 +656,63 @@ Sois moderne, stratégique, énergique et donne des pistes concrètes d'optimisa
         }
     }
 
+    
+    // Gestion de l'état d'activation du Chatbot
+    window.isChatbotEnabled = function() {
+        return localStorage.getItem('welcker_chatbot_enabled') !== 'false';
+    };
+
+    window.setChatbotEnabled = function(enabled) {
+        localStorage.setItem('welcker_chatbot_enabled', enabled ? 'true' : 'false');
+        updateChatbotVisibility();
+    };
+
+    window.updateChatbotVisibility = function() {
+        const enabled = window.isChatbotEnabled();
+        const headerBtn = document.getElementById('headerAiBtn');
+        const sidebarLink = document.querySelector('.nav-link-ai');
+        if (headerBtn) headerBtn.style.display = enabled ? 'inline-flex' : 'none';
+        if (sidebarLink) sidebarLink.style.display = enabled ? 'flex' : 'none';
+    };
+
+    // Synchronisation depuis la page Paramètres
+    window.onChatbotToggleChange = function() {
+        const toggle = document.getElementById('toggleChatbotActive');
+        const container = document.getElementById('chatbotSettingsContainer');
+        if (!toggle) return;
+        const isChecked = toggle.checked;
+        if (container) container.style.display = isChecked ? 'block' : 'none';
+        window.setChatbotEnabled(isChecked);
+        if (typeof showToast === 'function') {
+            showToast(isChecked ? 'Assistant IA activé' : 'Assistant IA désactivé', 'info');
+        }
+    };
+
+    window.saveGeminiApiKeyFromSettings = function() {
+        const input = document.getElementById('settingGeminiApiKey');
+        if (!input) return;
+        const key = input.value.trim();
+        setApiKey(key);
+        if (typeof showToast === 'function') {
+            showToast(key ? 'Clé API enregistrée localement avec succès !' : 'Clé API supprimée.', 'success');
+        }
+        initChatbotUI();
+    };
+
+    window.onSettingPersonaChange = function() {
+        const select = document.getElementById('settingGeminiPersona');
+        if (!select) return;
+        setSelectedPersona(select.value);
+        const personaSel = document.getElementById('aiPersonaSelect');
+        if (personaSel) personaSel.value = select.value;
+        if (typeof showToast === 'function') {
+            showToast(`Expert par défaut : ${PERSONAS[select.value]?.title || select.value}`, 'info');
+        }
+    };
+
     // Auto-initialisation au chargement
     document.addEventListener('DOMContentLoaded', () => {
         initChatbotUI();
+        updateChatbotVisibility();
     });
 })();

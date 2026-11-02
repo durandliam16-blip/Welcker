@@ -116,10 +116,9 @@
             <div class="ai-control-group">
                 <label for="aiPersonaSelect"><i data-lucide="user-check"></i> Persona :</label>
                 <select id="aiPersonaSelect" onchange="onAiPersonaChange()">
-                    <option value="wealth_manager" selected>Conseiller Patrimonial (Privé)</option>
-                    <option value="analyst">Analyste Financier & Quant</option>
-                    <option value="budget_coach">Coach Budgétaire Radical</option>
-                    <option value="growth_trader">Trader & Croissance / Crypto</option>
+                    <option value="wealth_manager" selected>Conseiller Patrimonial (Général)</option>
+                    <option value="budget_coach">Analyste des Dépenses & Budget</option>
+                    <option value="investor">Investisseur (CTO, PEA & Crypto)</option>
                 </select>
             </div>
             <div class="ai-control-group">
@@ -894,11 +893,26 @@
             </div>
             <div class="entrees-layout">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header" style="flex-wrap:wrap; gap:10px;">
                         <h3 id="entreesCategoryChartTitle"><i data-lucide="pie-chart"></i> Répartition par catégorie</h3>
-                        <button id="entreesCategoryResetBtn" class="btn-back" style="display:none; font-size:12px; padding:4px 10px;" onclick="resetCategoryDrilldown('entree')">
-                            <i data-lucide="arrow-left"></i> Retour
-                        </button>
+                        <div class="filter-controls" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                            <button id="entreesCategoryResetBtn" class="btn-back" style="display:none; font-size:12px; padding:4px 10px;" onclick="resetCategoryDrilldown('entree')">
+                                <i data-lucide="arrow-left"></i> Retour
+                            </button>
+                            <select id="entreesChartPeriod" onchange="filterCashFlowChartByPeriod('entree')" style="font-size:12px; padding:4px 8px;">
+                                <option value="all">Historique complet</option>
+                                <option value="current_month">Mois en cours</option>
+                                <option value="last_month">Mois précédent</option>
+                                <option value="3_months">3 derniers mois</option>
+                                <option value="current_year">Année en cours</option>
+                                <option value="custom">Dates personnalisées...</option>
+                            </select>
+                            <div id="entreesChartCustomDates" style="display:none; align-items:center; gap:4px;">
+                                <input type="date" id="entreesChartDateStart" onchange="filterCashFlowChartByPeriod('entree')" style="font-size:11px; padding:3px 6px;">
+                                <span style="font-size:11px; color:var(--text-tertiary);">à</span>
+                                <input type="date" id="entreesChartDateEnd" onchange="filterCashFlowChartByPeriod('entree')" style="font-size:11px; padding:3px 6px;">
+                            </div>
+                        </div>
                     </div>
                     <div id="entreesCategorySubtitle" style="font-size:11.5px; color:var(--text-tertiary); margin-top:-8px; margin-bottom:12px;">
                         Cliquez sur une catégorie pour voir le détail des postes
@@ -957,11 +971,26 @@
             </div>
             <div class="depenses-layout">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header" style="flex-wrap:wrap; gap:10px;">
                         <h3 id="depensesCategoryChartTitle"><i data-lucide="pie-chart"></i> Répartition par catégorie</h3>
-                        <button id="depensesCategoryResetBtn" class="btn-back" style="display:none; font-size:12px; padding:4px 10px;" onclick="resetCategoryDrilldown('sortie')">
-                            <i data-lucide="arrow-left"></i> Retour
-                        </button>
+                        <div class="filter-controls" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                            <button id="depensesCategoryResetBtn" class="btn-back" style="display:none; font-size:12px; padding:4px 10px;" onclick="resetCategoryDrilldown('sortie')">
+                                <i data-lucide="arrow-left"></i> Retour
+                            </button>
+                            <select id="depensesChartPeriod" onchange="filterCashFlowChartByPeriod('sortie')" style="font-size:12px; padding:4px 8px;">
+                                <option value="all">Historique complet</option>
+                                <option value="current_month">Mois en cours</option>
+                                <option value="last_month">Mois précédent</option>
+                                <option value="3_months">3 derniers mois</option>
+                                <option value="current_year">Année en cours</option>
+                                <option value="custom">Dates personnalisées...</option>
+                            </select>
+                            <div id="depensesChartCustomDates" style="display:none; align-items:center; gap:4px;">
+                                <input type="date" id="depensesChartDateStart" onchange="filterCashFlowChartByPeriod('sortie')" style="font-size:11px; padding:3px 6px;">
+                                <span style="font-size:11px; color:var(--text-tertiary);">à</span>
+                                <input type="date" id="depensesChartDateEnd" onchange="filterCashFlowChartByPeriod('sortie')" style="font-size:11px; padding:3px 6px;">
+                            </div>
+                        </div>
                     </div>
                     <div id="depensesCategorySubtitle" style="font-size:11.5px; color:var(--text-tertiary); margin-top:-8px; margin-bottom:12px;">
                         Cliquez sur une catégorie pour voir le détail des postes
@@ -1154,6 +1183,44 @@
                 <h1>Paramètres de l'application</h1>
             </div>
             <div class="parametres-layout">
+                <!-- Paramètres Assistant IA Gemini -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i data-lucide="bot"></i> Assistant IA Financier (Gemini)</h3>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggleChatbotActive" onchange="onChatbotToggleChange()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.45;">
+                        Activez votre conseiller patrimonial personnel propulsé par Google Gemini. Il analyse votre patrimoine et vos dépenses en direct pour vous conseiller.
+                    </p>
+                    <div id="chatbotSettingsContainer" style="display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-color);">
+                        <div class="form-group">
+                            <label style="display:flex; justify-content:space-between; align-items:center;">
+                                <span>Clé API Google AI Studio</span>
+                                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="font-size: 11.5px; color: var(--primary-color); text-decoration: none;">
+                                    Obtenir une clé gratuite ↗
+                                </a>
+                            </label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="password" id="settingGeminiApiKey" placeholder="Collez votre clé AIzaSy..." style="flex: 1;">
+                                <button type="button" class="btn-primary" onclick="saveGeminiApiKeyFromSettings()">Enregistrer</button>
+                            </div>
+                            <small style="color: var(--text-tertiary); font-size: 11px; margin-top: 6px; display: block;">
+                                🔒 Votre clé est stockée localement dans votre navigateur (localStorage). Elle ne quitte jamais votre appareil et ne transite par aucun serveur Welcker.
+                            </small>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Expert par défaut</label>
+                            <select id="settingGeminiPersona" onchange="onSettingPersonaChange()">
+                                <option value="wealth_manager">Conseiller Patrimonial (Général)</option>
+                                <option value="budget_coach">Analyste des Dépenses & Budget</option>
+                                <option value="investor">Investisseur (CTO, PEA & Crypto)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 <div class="card">
                     <div class="card-header">
                         <h3><i data-lucide="moon"></i> Apparence</h3>
@@ -1396,18 +1463,19 @@
                         <input type="date" id="entreeDate" required>
                     </div>
                     <div class="form-group">
-                        <label>Nature du revenu</label>
-                        <select id="entreeCategorie" required>
+                        <label>Nature du revenu (Catégorie)</label>
+                        <select id="entreeCategorie" onchange="onCategorieChange('entree')" required>
                             <option value="salaire">Rémunération & Salaire</option>
                             <option value="covoiturage">Covoiturage</option>
-                            <option value="freelance">Prestations freelance</option>
-                            <option value="investissement">Revenus de capitaux / Dividendes</option>
-                            <option value="autre">Autre revenu</option>
+                            <option value="autre">Autres revenus (Famille, Aides, Remboursements)</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Description</label>
-                        <input type="text" id="entreeDescription" placeholder="Ex: Salaire net" required>
+                        <label>Sous-catégorie / Poste</label>
+                        <select id="entreeSousCategorie" onchange="onSousCategorieChange('entree')" required style="margin-bottom: 6px;">
+                            <!-- Rempli dynamiquement -->
+                        </select>
+                        <input type="text" id="entreeCustomDescription" placeholder="Précisez le libellé..." style="display: none;">
                     </div>
                     <div class="form-group">
                         <label>Montant (€)</label>
@@ -1465,21 +1533,21 @@
                         <input type="date" id="depenseDate" required>
                     </div>
                     <div class="form-group">
-                        <label>Poste de dépense</label>
-                        <select id="depenseCategorie" required>
-                            <option value="alimentation">Alimentation & Courses</option>
+                        <label>Poste de dépense (Catégorie)</label>
+                        <select id="depenseCategorie" onchange="onCategorieChange('depense')" required>
+                            <option value="logement">Logement & Charges fixes</option>
                             <option value="transport">Transports & Mobilité</option>
-                            <option value="logement">Logement & Charges</option>
+                            <option value="alimentation">Alimentation & Restauration</option>
                             <option value="loisirs">Loisirs & Culture</option>
-                            <option value="sante">Santé & Prévoyance</option>
-                            <option value="habillement">Habillement</option>
-                            <option value="education">Formation & Éducation</option>
-                            <option value="autre">Autres charges</option>
+                            <option value="autre">Autres charges & Shopping</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Description</label>
-                        <input type="text" id="depenseDescription" placeholder="Ex: Loyer mensuel" required>
+                        <label>Sous-catégorie / Poste</label>
+                        <select id="depenseSousCategorie" onchange="onSousCategorieChange('depense')" required style="margin-bottom: 6px;">
+                            <!-- Rempli dynamiquement -->
+                        </select>
+                        <input type="text" id="depenseCustomDescription" placeholder="Précisez le libellé..." style="display: none;">
                     </div>
                     <div class="form-group">
                         <label>Montant (€)</label>
