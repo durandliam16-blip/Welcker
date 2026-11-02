@@ -1,4 +1,4 @@
-const CACHE_NAME = 'monpatrimoine-v203'; // Version 2.0.3 - Responsive mobile & fast portfolio
+const CACHE_NAME = 'monpatrimoine-v204'; // Version 2.0.4 - Assistant IA Gemini, Header épuré & Harmonisation // Version 2.0.3 - Responsive mobile & fast portfolio
 const ASSETS = [
   './',
   './index.html',
@@ -10,6 +10,7 @@ const ASSETS = [
   './css/profil_para.css',
   './css/utilities.css',
   './css/social.css',
+  './css/chatbot.css',
   // JS
   './js/config.js',
   './js/dataManager.js',
@@ -18,6 +19,7 @@ const ASSETS = [
   './js/others.js',
   './js/graphs.js',
   './js/social.js',
+  './js/chatbot.js',
   // CDN
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
   'https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js'

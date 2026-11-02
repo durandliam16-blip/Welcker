@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://qktbcgumyqjgbvcpynjo.supabase.co; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://qktbcgumyqjgbvcpynjo.supabase.co https://generativelanguage.googleapis.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcker - Wealth & Portfolio Tracker</title>
     <meta name="title" content="Welcker - Wealth & Portfolio Tracker">
@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="css/utilities.css">
     <link rel="stylesheet" href="css/profil_para.css">
     <link rel="stylesheet" href="css/social.css">
+    <link rel="stylesheet" href="css/chatbot.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
     <link rel="icon" href="icon-192.png">
@@ -56,6 +57,11 @@
                 <i data-lucide="arrow-left-right"></i>
                 <span>Flux financiers</span>
             </a>
+            <a href="#" class="nav-link nav-link-ai" onclick="event.preventDefault(); toggleChatbot();">
+                <i data-lucide="bot"></i>
+                <span>Assistant IA</span>
+                <span class="badge-ai-pill">Gemini</span>
+            </a>
             <a href="#" class="nav-link" data-page="social">
                 <i data-lucide="users"></i>
                 <span>Social</span>
@@ -79,23 +85,140 @@
     <!-- Volet d'arrière plan mobile -->
     <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
 
-    <!-- Main Content -->
+    <!-- Volet Drawer de l'Assistant IA Financier (Gemini) -->
+    <div class="ai-drawer-backdrop" id="aiDrawerBackdrop" onclick="toggleChatbot()"></div>
+    <aside class="ai-drawer" id="aiDrawer">
+        <div class="ai-drawer-header">
+            <div class="ai-header-info">
+                <div class="ai-avatar">
+                    <i data-lucide="bot"></i>
+                </div>
+                <div>
+                    <h3 class="ai-title">Assistant Financier</h3>
+                    <span class="ai-status"><span class="ai-status-dot"></span> Connecté à votre patrimoine</span>
+                </div>
+            </div>
+            <div class="ai-header-actions">
+                <button class="btn-icon" id="aiSettingsBtn" onclick="toggleAiSettings()" title="Configuration de la clé API">
+                    <i data-lucide="key"></i>
+                </button>
+                <button class="btn-icon" onclick="clearAiChat()" title="Effacer la discussion">
+                    <i data-lucide="trash-2"></i>
+                </button>
+                <button class="btn-icon" onclick="toggleChatbot()" title="Fermer">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Contrôles : Persona & Modèle Gemini -->
+        <div class="ai-controls-bar">
+            <div class="ai-control-group">
+                <label for="aiPersonaSelect"><i data-lucide="user-check"></i> Persona :</label>
+                <select id="aiPersonaSelect" onchange="onAiPersonaChange()">
+                    <option value="wealth_manager" selected>Conseiller Patrimonial (Privé)</option>
+                    <option value="analyst">Analyste Financier & Quant</option>
+                    <option value="budget_coach">Coach Budgétaire Radical</option>
+                    <option value="growth_trader">Trader & Croissance / Crypto</option>
+                </select>
+            </div>
+            <div class="ai-control-group">
+                <label for="aiModelSelect"><i data-lucide="cpu"></i> Modèle :</label>
+                <select id="aiModelSelect" onchange="onAiModelChange()">
+                    <option value="gemini-2.5-pro" selected>Gemini 2.5 Pro (Raisonnement)</option>
+                    <option value="gemini-2.5-flash">Gemini 2.5 Flash (Rapide)</option>
+                    <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Volet de configuration Clé API -->
+        <div class="ai-api-key-panel" id="aiApiKeyPanel" style="display: none;">
+            <div class="ai-api-key-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <label style="font-weight: 600; font-size: 12px; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                        <i data-lucide="shield-check" style="width:14px;height:14px;color:var(--success-color);"></i>
+                        Clé API Google AI Studio (Gemini)
+                    </label>
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="font-size: 11px; color: var(--primary-color); text-decoration: none;">
+                        Obtenir une clé ↗
+                    </a>
+                </div>
+                <div style="display: flex; gap: 6px;">
+                    <input type="password" id="aiApiKeyInput" placeholder="Collez votre clé AIzaSy..." style="flex: 1; padding: 7px 10px; font-size: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);">
+                    <button type="button" class="btn-primary" style="padding: 7px 12px; font-size: 12px;" onclick="saveAiApiKey()">Enregistrer</button>
+                </div>
+                <p style="font-size: 11px; color: var(--text-tertiary); margin-top: 6px; line-height: 1.35;">
+                    Votre clé reste strictement sur votre navigateur (stockage local sécurisé) et n'est jamais transmise à aucun serveur tiers.
+                </p>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="ai-messages-container" id="aiMessagesContainer">
+            <!-- Rendu automatique via JS -->
+        </div>
+
+        <!-- Suggestions de Prompts Rapides -->
+        <div class="ai-quick-prompts-wrapper">
+            <span class="ai-quick-label">Suggestions rapides :</span>
+            <div class="ai-quick-prompts" id="aiQuickPrompts">
+                <button class="ai-prompt-chip" onclick="sendAiPrompt('Fais-moi un bilan patrimonial complet et détaille mes forces et vulnérabilités.')">
+                    📊 Bilan patrimonial complet
+                </button>
+                <button class="ai-prompt-chip" onclick="sendAiPrompt('Quels sont mes 3 plus gros postes de dépenses et comment puis-je les réduire concrètement ?')">
+                    ✂️ Réduire mes dépenses
+                </button>
+                <button class="ai-prompt-chip" onclick="sendAiPrompt('Analyse la diversification de mes actifs (liquidités, placements, biens physiques). Que me conseilles-tu de rééquilibrer ?')">
+                    ⚖️ Diversification & Allocation
+                </button>
+                <button class="ai-prompt-chip" onclick="sendAiPrompt('Combien de mois de dépenses courantes mes liquidités actuelles couvrent-elles (matelas de sécurité) ?')">
+                    🛡️ Matelas de sécurité / Runway
+                </button>
+                <button class="ai-prompt-chip" onclick="sendAiPrompt('Analyse mes portefeuilles d'investissement (CTO, PEA, Crypto). Quel est mon rendement global ?')">
+                    📈 Analyse des investissements
+                </button>
+                <button class="ai-prompt-chip" onclick="sendAiPrompt('Établis un plan d'action financier sur 12 mois pour faire croître mon patrimoine.')">
+                    🎯 Plan d'action 12 mois
+                </button>
+            </div>
+        </div>
+
+        <!-- Saisie du message -->
+        <div class="ai-input-area">
+            <form id="aiChatForm" onsubmit="handleAiSubmit(event)">
+                <div class="ai-input-wrapper">
+                    <textarea id="aiMessageInput" placeholder="Posez une question sur vos finances ou vos comptes..." rows="1" onkeydown="handleAiInputKeydown(event)"></textarea>
+                    <button type="submit" class="ai-send-btn" id="aiSendBtn" title="Envoyer">
+                        <i data-lucide="arrow-up"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </aside>
+
+        <!-- Main Content -->
     <main class="main-content">
         <!-- Header -->
         <header class="header">
-            <button class="btn-icon mobile-menu-btn" id="mobileMenuBtn" title="Menu" onclick="toggleMobileSidebar()">
-                <i data-lucide="menu"></i>
-            </button>
-            <div class="search-container">
-                <i data-lucide="search"></i>
-                <input type="text" class="search-bar" placeholder="Rechercher des transactions, titres, comptes...">
-                <span class="search-shortcut">⌘K</span>
+            <div class="header-left">
+                <button class="btn-icon mobile-menu-btn" id="mobileMenuBtn" title="Menu" onclick="toggleMobileSidebar()">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="header-title-wrap">
+                    <span class="header-app-badge">Welcker</span>
+                    <span class="header-page-title" id="headerPageTitle">Tableau de bord</span>
+                </div>
             </div>
             <div class="header-actions">
+                <button class="btn-primary-subtle header-ai-btn" id="headerAiBtn" onclick="toggleChatbot()" title="Ouvrir l'Assistant IA Financier">
+                    <i data-lucide="bot"></i>
+                    <span class="ai-btn-label">Assistant IA</span>
+                </button>
                 <button class="btn-icon" id="notificationBtn" title="Notifications">
                     <i data-lucide="bell"></i>
                 </button>
-                <button class="btn-icon" id="userBtn" title="Profil utilisateur">
+                <button class="btn-icon" id="userBtn" onclick="navigateTo('profil')" title="Profil utilisateur">
                     <i data-lucide="user"></i>
                 </button>
             </div>
@@ -1662,6 +1785,7 @@
     <script src="js/others.js"></script>
     <script src="js/graphs.js"></script>
     <script src="js/social.js"></script>
+    <script src="js/chatbot.js"></script>
 
     <!-- Initialisation -->
     <script>

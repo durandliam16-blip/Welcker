@@ -246,10 +246,25 @@ function renderCashFlowCategoryChart(type, data, selectedCategory = null) {
         }
         if (resetBtn) resetBtn.style.display = 'inline-flex';
 
-        // Grouper par description
+        // Grouper par description harmonisée
         const subs = {};
         items.forEach(i => {
-            const desc = (i.description || 'Divers').trim();
+            let desc = (i.description || 'Divers').trim();
+            if (desc.length > 0) {
+                const lower = desc.toLowerCase();
+                if (lower === 'blablacar') desc = 'BlaBlaCar';
+                else if (lower === 'netflix') desc = 'Netflix';
+                else if (lower === 'edf') desc = 'EDF';
+                else if (lower === 'sncf') desc = 'SNCF';
+                else if (lower === 'apl') desc = 'APL';
+                else if (lower === 'caf') desc = 'CAF';
+                else if (lower === 'visa') desc = 'Carte Bancaire / VISA';
+                else if (lower === 'restos' || lower === 'resto') desc = 'Restaurants';
+                else if (lower === 'kdo' || lower === 'kdos') desc = 'Cadeaux';
+                else {
+                    desc = desc.charAt(0).toUpperCase() + desc.slice(1);
+                }
+            }
             subs[desc] = (subs[desc] || 0) + parseFloat(i.montant || 0);
         });
 

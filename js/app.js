@@ -37,6 +37,26 @@ async function navigateTo(page) {
     const el = document.getElementById(`page-${page}`);
     if (el) { 
         el.classList.add('active'); 
+        
+        // Mise à jour dynamique du titre dans l'en-tête
+        const titles = {
+            accueil: 'Tableau de bord',
+            bilan: 'Bilan patrimonial',
+            comptes: 'Comptes & Portefeuilles',
+            cto: 'Compte-Titres (CTO)',
+            pea: 'Plan d'Épargne Actions (PEA)',
+            crypto: 'Actifs numériques & Crypto',
+            'autres-biens': 'Autres biens & Immobilier',
+            flux: 'Flux financiers',
+            entrees: 'Entrées de trésorerie',
+            depenses: 'Décaissements & Dépenses',
+            social: 'Réseau & Partage',
+            profil: 'Profil utilisateur',
+            parametres: 'Paramètres'
+        };
+        const titleEl = document.getElementById('headerPageTitle');
+        if (titleEl && titles[page]) titleEl.textContent = titles[page];
+
         await updatePageContent(page); 
         if (window.lucide) lucide.createIcons();
     }

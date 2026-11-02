@@ -78,6 +78,6 @@ Pour l'instant sur GitHub pages en gratuit
 
 ---
 
-**Version** : 2.0.3 (Design unslop, Responsive Mobile natif, Drill-down camembert, Réévaluation des biens, Ajustement rapide investissements & PWA Auto-update)
+**Version** : 2.0.4 (Assistant IA Financier Gemini avec personas & prompts, suppression barre de recherche, harmonisation catégories & PWA auto-update v204)
 **Date** : Mars 2026  
 **Licence** : Partage aux proches
