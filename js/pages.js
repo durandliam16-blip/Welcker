@@ -326,57 +326,119 @@ async function renderBankAccountsList() {
 }
 
 async function updateComptes() {
-    const [accs, cto, pea, crypto, ctoCash, peaCash, cryptoCash] = await Promise.all([
-        dataManager.getBankAccounts(),
-        dataManager.getInvestments('CTO'),
-        dataManager.getInvestments('PEA'),
-        dataManager.getCryptoTransactions(),
-        dataManager.getCashTransactions('CTO'),
-        dataManager.getCashTransactions('PEA'),
-        dataManager.getCashTransactions('CRYPTO')
-    ]);
-    
-    const ctoStats = calcStatsPro(cto, ctoCash);
-    const peaStats = calcStatsPro(pea, peaCash);
-    const cryptoStats = calcStatsPro(crypto, cryptoCash);
-    
-    // Stats des 3 portefeuilles
-    document.getElementById('ctoAmount').textContent = fmt(ctoStats.totalPortefeuille);
-    document.getElementById('peaAmount').textContent = fmt(peaStats.totalPortefeuille);
-    document.getElementById('cryptoAmount').textContent = fmt(cryptoStats.totalPortefeuille);
-    
-    document.getElementById('ctoEvolution').innerHTML = `<span class="${ctoStats.performance >= 0 ? 'positive' : 'negative'}">${ctoStats.performance >= 0 ? '+' : ''}${ctoStats.performance.toFixed(2)}%</span>`;
-    document.getElementById('peaEvolution').innerHTML = `<span class="${peaStats.performance >= 0 ? 'positive' : 'negative'}">${peaStats.performance >= 0 ? '+' : ''}${peaStats.performance.toFixed(2)}%</span>`;
-    document.getElementById('cryptoEvolution').innerHTML = `<span class="${cryptoStats.performance >= 0 ? 'positive' : 'negative'}">${cryptoStats.performance >= 0 ? '+' : ''}${cryptoStats.performance.toFixed(2)}%</span>`;
-    
-    // Totaux et ratios consolidés (Innovation)
-    const totalLiquidites = accs.reduce((s, a) => s + parseFloat(a.solde || 0), 0);
-    const totalInvested = ctoStats.totalPortefeuille + peaStats.totalPortefeuille + cryptoStats.totalPortefeuille;
-    const totalCombined = totalLiquidites + totalInvested;
-    
-    const pctCash = totalCombined > 0 ? Math.round((totalLiquidites / totalCombined) * 100) : 0;
-    const pctInv = totalCombined > 0 ? (100 - pctCash) : 0;
-    
-    const elCash = document.getElementById('comptesTotalCash');
-    if (elCash) elCash.textContent = fmt(totalLiquidites);
-    const elCountCash = document.getElementById('comptesCountCash');
-    if (elCountCash) elCountCash.textContent = `${accs.length} compte(s) bancaire(s)`;
-    
-    const elInvest = document.getElementById('comptesTotalInvest');
-    if (elInvest) elInvest.textContent = fmt(totalInvested);
-    
-    const elRatio = document.getElementById('comptesAllocationRatio');
-    if (elRatio) elRatio.textContent = `${pctCash}% Liquidités · ${pctInv}% Investissements`;
-    
-    const barCash = document.getElementById('comptesBarCash');
-    if (barCash) barCash.style.width = `${pctCash}%`;
-    const barInvest = document.getElementById('comptesBarInvest');
-    if (barInvest) barInvest.style.width = `${pctInv}%`;
-    
-    window._allBankAccounts = accs;
-    renderBankAccountsList();
-    
-    if (window.lucide) lucide.createIcons();
+    try {
+        const [accs, cto, pea, crypto, ctoCash, peaCash, cryptoCash] = await Promise.all([
+            dataManager.getBankAccounts(),
+            dataManager.getInvestments('CTO'),
+            dataManager.getInvestments('PEA'),
+            dataManager.getCryptoTransactions(),
+            dataManager.getCashTransactions('CTO'),
+            dataManager.getCashTransactions('PEA'),
+            dataManager.getCashTransactions('CRYPTO')
+        ]);
+        
+        const ctoStats = calcStatsPro(cto, ctoCash);
+        const peaStats = calcStatsPro(pea, peaCash);
+        const cryptoStats = calcStatsPro(crypto, cryptoCash);
+        
+        // Stocker pour accès rapide par les boutons
+        window._ctoStats = ctoStats;
+        window._peaStats = peaStats;
+        window._cryptoStats = cryptoStats;
+        
+        // Montants des 3 portefeuilles
+        const elCtoAmount = document.getElementById('ctoAmount');
+        if (elCtoAmount) elCtoAmount.textContent = fmt(ctoStats.totalPortefeuille);
+        const elPeaAmount = document.getElementById('peaAmount');
+        if (elPeaAmount) elPeaAmount.textContent = fmt(peaStats.totalPortefeuille);
+        const elCryptoAmount = document.getElementById('cryptoAmount');
+        if (elCryptoAmount) elCryptoAmount.textContent = fmt(cryptoStats.totalPortefeuille);
+        
+        // Indicateurs d'évolution s'ils existent
+        const elCtoEvol = document.getElementById('ctoEvolution');
+        if (elCtoEvol) elCtoEvol.innerHTML = `<span class="${ctoStats.performance >= 0 ? 'positive' : 'negative'}">${ctoStats.performance >= 0 ? '+' : ''}${ctoStats.performance.toFixed(2)}%</span>`;
+        const elPeaEvol = document.getElementById('peaEvolution');
+        if (elPeaEvol) elPeaEvol.innerHTML = `<span class="${peaStats.performance >= 0 ? 'positive' : 'negative'}">${peaStats.performance >= 0 ? '+' : ''}${peaStats.performance.toFixed(2)}%</span>`;
+        const elCryptoEvol = document.getElementById('cryptoEvolution');
+        if (elCryptoEvol) elCryptoEvol.innerHTML = `<span class="${cryptoStats.performance >= 0 ? 'positive' : 'negative'}">${cryptoStats.performance >= 0 ? '+' : ''}${cryptoStats.performance.toFixed(2)}%</span>`;
+        
+        // Courbes Sparklines avec axes ↑ et → pour CTO, PEA et Crypto
+        const [ctoSparkVals, peaSparkVals, cryptoSparkVals] = await Promise.all([
+            getSparklineDataForAccount(null, 'CTO', ctoStats.totalPortefeuille),
+            getSparklineDataForAccount(null, 'PEA', peaStats.totalPortefeuille),
+            getSparklineDataForAccount(null, 'CRYPTO', cryptoStats.totalPortefeuille)
+        ]);
+
+        const ctoEl = document.getElementById('ctoSparkline');
+        if (ctoEl && window.generateSparklineSvg) {
+            const isPos = ctoSparkVals[ctoSparkVals.length - 1] >= ctoSparkVals[0];
+            ctoEl.innerHTML = window.generateSparklineSvg(ctoSparkVals, { isPositive: isPos, strokeColor: isPos ? '#10b981' : '#2563eb', withAxes: true });
+        }
+        const peaEl = document.getElementById('peaSparkline');
+        if (peaEl && window.generateSparklineSvg) {
+            const isPos = peaSparkVals[peaSparkVals.length - 1] >= peaSparkVals[0];
+            peaEl.innerHTML = window.generateSparklineSvg(peaSparkVals, { isPositive: isPos, strokeColor: isPos ? '#10b981' : '#2563eb', withAxes: true });
+        }
+        const cryptoEl = document.getElementById('cryptoSparkline');
+        if (cryptoEl && window.generateSparklineSvg) {
+            const isPos = cryptoSparkVals[cryptoSparkVals.length - 1] >= cryptoSparkVals[0];
+            cryptoEl.innerHTML = window.generateSparklineSvg(cryptoSparkVals, { isPositive: isPos, strokeColor: isPos ? '#10b981' : '#f59e0b', withAxes: true });
+        }
+
+        // Lier les boutons Saisir nouvelle valeur
+        const btnCto = document.getElementById('btnSaisirCto');
+        if (btnCto) {
+            btnCto.onclick = (e) => {
+                e.stopPropagation();
+                openSaisirNouvelleValeur(null, 'Compte-titres ordinaire (CTO)', ctoStats.totalPortefeuille, 'CTO');
+            };
+        }
+        const btnPea = document.getElementById('btnSaisirPea');
+        if (btnPea) {
+            btnPea.onclick = (e) => {
+                e.stopPropagation();
+                openSaisirNouvelleValeur(null, 'Plan d\'Épargne Actions (PEA)', peaStats.totalPortefeuille, 'PEA');
+            };
+        }
+        const btnCrypto = document.getElementById('btnSaisirCrypto');
+        if (btnCrypto) {
+            btnCrypto.onclick = (e) => {
+                e.stopPropagation();
+                openSaisirNouvelleValeur(null, 'Actifs numériques (Crypto)', cryptoStats.totalPortefeuille, 'CRYPTO');
+            };
+        }
+
+        // Totaux et ratios consolidés
+        const totalLiquidites = accs.reduce((s, a) => s + parseFloat(a.solde || 0), 0);
+        const totalInvested = ctoStats.totalPortefeuille + peaStats.totalPortefeuille + cryptoStats.totalPortefeuille;
+        const totalCombined = totalLiquidites + totalInvested;
+        
+        const pctCash = totalCombined > 0 ? Math.round((totalLiquidites / totalCombined) * 100) : 0;
+        const pctInv = totalCombined > 0 ? (100 - pctCash) : 0;
+        
+        const elCash = document.getElementById('comptesTotalCash');
+        if (elCash) elCash.textContent = fmt(totalLiquidites);
+        const elCountCash = document.getElementById('comptesCountCash');
+        if (elCountCash) elCountCash.textContent = `${accs.length} compte(s) bancaire(s)`;
+        
+        const elInvest = document.getElementById('comptesTotalInvest');
+        if (elInvest) elInvest.textContent = fmt(totalInvested);
+        
+        const elRatio = document.getElementById('comptesAllocationRatio');
+        if (elRatio) elRatio.textContent = `${pctCash}% Liquidités · ${pctInv}% Investissements`;
+        
+        const barCash = document.getElementById('comptesBarCash');
+        if (barCash) barCash.style.width = `${pctCash}%`;
+        const barInvest = document.getElementById('comptesBarInvest');
+        if (barInvest) barInvest.style.width = `${pctInv}%`;
+        
+        window._allBankAccounts = accs;
+        await renderBankAccountsList();
+        
+        if (window.lucide) lucide.createIcons();
+    } catch (err) {
+        console.error('Erreur updateComptes:', err);
+    }
 }
 
 // =============================================================================
@@ -1085,24 +1147,22 @@ window.openAiReevaluateModal = function(bienId) {
     if (t === 'vehicule') {
         const vModel = document.getElementById('aiVehiculeModel');
         if (vModel && !vModel.value) vModel.value = b.nom || 'Renault Clio 4';
-        const vNotes = document.getElementById('aiVehiculeNotes');
-        if (vNotes && b.fournisseur) vNotes.value = b.fournisseur;
     } else if (t === 'immobilier') {
         const iVille = document.getElementById('aiImmoVille');
         if (iVille && !iVille.value) iVille.value = 'France';
     } else if (t === 'objet-valeur') {
         const oNom = document.getElementById('aiObjetNom');
         if (oNom && !oNom.value) oNom.value = b.nom;
-        const oNotes = document.getElementById('aiObjetNotes');
-        if (oNotes && b.fournisseur) oNotes.value = b.fournisseur;
     }
 
     // Réinitialiser la zone de résultat
     const resDiv = document.getElementById('aiReevalResultContainer');
     if (resDiv) resDiv.style.display = 'none';
 
+    // Remplir uniquement le champ de commentaires unifié
     const userCommentsInput = document.getElementById('aiReevalUserComments');
     if (userCommentsInput) userCommentsInput.value = b.fournisseur || '';
+
     modal.classList.add('active');
     if (window.lucide) lucide.createIcons();
 };
@@ -1116,12 +1176,14 @@ window.calculateAiValuation = async function() {
     const calcBtn = document.getElementById('aiCalculateValuationBtn');
     if (calcBtn) {
         calcBtn.disabled = true;
-        calcBtn.innerHTML = '<i data-lucide="loader" class="ai-spin"></i> Estimation en cours...';
+        calcBtn.innerHTML = '<i data-lucide="loader" class="ai-spin"></i> Décision de l\'IA en cours...';
     }
 
     try {
         const t = (b.type || 'autre').toLowerCase();
         let promptDetails = '';
+
+        const userComments = document.getElementById('aiReevalUserComments')?.value || b.fournisseur || '';
 
         if (t === 'vehicule') {
             const model = document.getElementById('aiVehiculeModel')?.value || b.nom;
@@ -1129,8 +1191,7 @@ window.calculateAiValuation = async function() {
             const km = document.getElementById('aiVehiculeKm')?.value || '90 000 km';
             const etat = document.getElementById('aiVehiculeEtat')?.value || 'Bon état';
             const carburant = document.getElementById('aiVehiculeCarburant')?.value || 'Essence';
-            const notes = document.getElementById('aiVehiculeNotes')?.value || b.fournisseur || '';
-            promptDetails = `VÉHICULE : Modèle "${model}", Année ${annee}, Kilométrage ${km}, Carburant ${carburant}, État général "${etat}". Précisions supplémentaires : "${notes}".`;
+            promptDetails = `VÉHICULE : Modèle "${model}", Année ${annee}, Kilométrage ${km}, Carburant ${carburant}, État général "${etat}".`;
         } else if (t === 'immobilier') {
             const surface = document.getElementById('aiImmoSurface')?.value || '50 m²';
             const ville = document.getElementById('aiImmoVille')?.value || 'France';
@@ -1142,32 +1203,29 @@ window.calculateAiValuation = async function() {
             const marque = document.getElementById('aiObjetMarque')?.value || '';
             const etat = document.getElementById('aiObjetEtat')?.value || 'Très bon état';
             const papiers = document.getElementById('aiObjetPapiers')?.value || 'Oui';
-            const notes = document.getElementById('aiObjetNotes')?.value || b.fournisseur || '';
-            promptDetails = `OBJET DE VALEUR / ART : "${nom}", Marque/Référence "${marque}", État "${etat}", Boîte & Papiers d'origine : ${papiers}. Détails : "${notes}".`;
+            promptDetails = `OBJET DE VALEUR / ART : "${nom}", Marque/Référence "${marque}", État "${etat}", Boîte & Papiers d'origine : ${papiers}.`;
         } else {
             const desc = document.getElementById('aiAutreDescription')?.value || b.nom;
             const prixOrig = document.getElementById('aiAutrePrixOrigine')?.value || b.solde;
             promptDetails = `ACTIF MATÉRIEL DIVERS : Description "${desc}", Prix d'acquisition de référence ${prixOrig} €.`;
         }
 
-        const promptText = `Tu es un expert agréé en évaluation et cotation de patrimoine en France.
-Nous sommes en novembre 2026. Réévalue la valeur vénale marchande actuelle (valeur de revente réaliste) de cet actif :
-${promptDetails}
-Valeur enregistrée précédemment dans l'application : ${b.solde} €
+        const promptText = `Tu es un expert indépendant de premier plan en cotation et estimation de patrimoine en France.
+Nous sommes en novembre 2026.
+Analyse avec la plus grande rigueur les caractéristiques et les commentaires précis de ce bien pour décider de sa valeur vénale finale la plus juste et réaliste possible (prix net vendeur en euros) :
 
-RÈGLE ABSOLUE : Réponds UNIQUEMENT par un objet JSON valide (aucun blabla ni Markdown autour), au format suivant :
+${promptDetails}
+Commentaires et historique saisis par l'utilisateur : "${userComments}"
+Valeur précédemment enregistrée : ${b.solde} €
+
+RÈGLE IMPÉRATIVE : L'utilisateur ne veut AUCUNE explication ni blabla. Tu dois décider de la valeur finale unique exacte en euros.
+Réponds STRICTEMENT par un JSON valide (sans aucun texte autour) au format :
 {
-  "valeur_estimee": 6400,
-  "fourchette_basse": 6100,
-  "fourchette_haute": 6700,
-  "evolution_pct": -1.5,
-  "explication": "Décote d'usure kilométrique normale...",
-  "marche_reference": "Cote Argus / Marché de l'occasion en France"
+  "valeur_estimee": 6400
 }`;
 
         const response = await window.callGeminiGeneric(promptText, 'Tu es un expert indépendant en estimation d\'actifs et valorisation de patrimoine.');
         
-        // Extraction du JSON
         let jsonStr = response.trim();
         const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
         if (jsonMatch) jsonStr = jsonMatch[0];
@@ -1176,18 +1234,15 @@ RÈGLE ABSOLUE : Réponds UNIQUEMENT par un objet JSON valide (aucun blabla ni M
         window._pendingAiValuation = {
             bienId: b.id,
             valeur: result.valeur_estimee,
-            notes: result.explication,
-            result: result
+            userComments: userComments
         };
 
-        // Afficher les résultats dans la modale
+        // Afficher UNIQUEMENT la valeur finale décidée sans explications
         const resDiv = document.getElementById('aiReevalResultContainer');
         if (resDiv) {
             resDiv.style.display = 'block';
-            document.getElementById('aiReevalResultValue').textContent = fmt(result.valeur_estimee);
-            document.getElementById('aiReevalResultRange').textContent = `Fourchette estimée : ${fmt(result.fourchette_basse)} - ${fmt(result.fourchette_haute)}`;
-            document.getElementById('aiReevalResultExplanation').textContent = result.explication || '';
-            document.getElementById('aiReevalResultMarket').textContent = `Source / Référence : ${result.marche_reference || 'Marché français'}`;
+            const valEl = document.getElementById('aiReevalResultValue');
+            if (valEl) valEl.textContent = fmt(result.valeur_estimee);
         }
 
     } catch (err) {
@@ -1310,7 +1365,7 @@ window.openSaisirNouvelleValeur = function(id, nom, currentVal, type) {
     
     const valInput = document.getElementById('saisieCompteNouvelleValeur');
     if (valInput) {
-        valInput.value = currentVal;
+        valInput.value = (currentVal !== undefined && currentVal !== null) ? parseFloat(currentVal).toFixed(2) : '0.00';
         setTimeout(() => { valInput.focus(); valInput.select(); }, 150);
     }
 
@@ -1319,8 +1374,7 @@ window.openSaisirNouvelleValeur = function(id, nom, currentVal, type) {
         dateInput.value = new Date().toISOString().split('T')[0];
     }
 
-    modal.classList.add('active');
-    if (window.lucide) lucide.createIcons();
+    openModal('modalSaisirNouvelleValeur');
 };
 
 window.saveSaisirNouvelleValeur = async function(e) {
@@ -1339,13 +1393,12 @@ window.saveSaisirNouvelleValeur = async function(e) {
 
     try {
         if (id) {
-            // Mise à jour du solde du compte
+            // Mise à jour du solde du compte bancaire
             await sb.from('accounts').update({
                 solde: newVal,
                 date_now: new Date().toISOString()
             }).eq('id', id);
 
-            // Enregistrement de l'historique mensuel
             if (window.dataManager && typeof dataManager.saveAccountValuation === 'function') {
                 await dataManager.saveAccountValuation({
                     accountId: id,
@@ -1355,7 +1408,30 @@ window.saveSaisirNouvelleValeur = async function(e) {
                 });
             }
         } else {
-            // CTO, PEA ou CRYPTO
+            // CTO, PEA ou CRYPTO : calculer le delta et ajuster la trésorerie associée
+            let currentVal = 0;
+            if (type === 'CTO') {
+                const [tx, cash] = await Promise.all([dataManager.getInvestments('CTO'), dataManager.getCashTransactions('CTO')]);
+                currentVal = calcStatsPro(tx, cash).totalPortefeuille;
+            } else if (type === 'PEA') {
+                const [tx, cash] = await Promise.all([dataManager.getInvestments('PEA'), dataManager.getCashTransactions('PEA')]);
+                currentVal = calcStatsPro(tx, cash).totalPortefeuille;
+            } else if (type === 'CRYPTO') {
+                const [tx, cash] = await Promise.all([dataManager.getCryptoTransactions(), dataManager.getCashTransactions('CRYPTO')]);
+                currentVal = calcStatsPro(tx, cash).totalPortefeuille;
+            }
+
+            const delta = newVal - currentVal;
+            if (Math.abs(delta) >= 0.01) {
+                const today = new Date().toISOString().split('T')[0];
+                await dataManager.addCashTransaction(type, {
+                    type: delta > 0 ? 'depot' : 'retrait',
+                    montant: Math.abs(delta),
+                    description: `Ajustement direct valorisation (${delta > 0 ? '+' : ''}${delta.toFixed(2)} €)`,
+                    date: today
+                });
+            }
+
             if (window.dataManager && typeof dataManager.saveAccountValuation === 'function') {
                 await dataManager.saveAccountValuation({
                     accountType: type,

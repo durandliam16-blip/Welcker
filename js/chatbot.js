@@ -667,6 +667,43 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
         if (window.lucide) lucide.createIcons();
     }
 
+    
+    function syncContainersMessages() {
+        const containers = getMessageContainers();
+        containers.forEach(container => {
+            if (conversationHistory.length === 0) {
+                if (!container.querySelector('.ai-welcome-card') && container.children.length === 0) {
+                    renderWelcomeCard();
+                }
+            } else {
+                const welcome = container.querySelector('.ai-welcome-card');
+                if (welcome) welcome.remove();
+                
+                const existingBubbles = container.querySelectorAll('.ai-message:not(.typing-placeholder)').length;
+                if (existingBubbles < conversationHistory.length) {
+                    container.innerHTML = '';
+                    conversationHistory.forEach(item => {
+                        const role = item.role === 'model' ? 'assistant' : item.role;
+                        const text = (item.parts && item.parts[0] && item.parts[0].text) ? item.parts[0].text : (item.text || '');
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = "ai-message " + role;
+                        if (role === 'user') {
+                            msgDiv.innerHTML = '<div class="ai-message-bubble">' + escapeHTML(text).replace(/\n/g, '<br>') + '</div>';
+                        } else {
+                            msgDiv.innerHTML = '<div class="ai-avatar" style="width:28px;height:28px;align-self:flex-start;margin-top:2px;">' +
+                                '<i data-lucide="bot" style="width:15px;height:15px;"></i>' +
+                                '</div>' +
+                                '<div class="ai-message-bubble">' + renderMarkdown(text) + '</div>';
+                        }
+                        container.appendChild(msgDiv);
+                    });
+                }
+            }
+        });
+        scrollToBottom();
+        if (window.lucide) lucide.createIcons();
+    }
+
     function renderWelcomeCard() {
         const containers = getMessageContainers();
         if (!containers.length) return;

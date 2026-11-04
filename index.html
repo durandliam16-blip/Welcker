@@ -338,7 +338,7 @@
                     <div class="compte-body-sketch">
                         <div class="compte-left-sketch">
                             <div class="compte-amount-sketch" id="ctoAmount">0,00 €</div>
-                            <button type="button" class="btn-saisir-sketch" id="btnSaisirCto">
+                            <button type="button" class="btn-saisir-sketch" id="btnSaisirCto" onclick="openSaisirNouvelleValeur(null, 'Compte-titres ordinaire (CTO)', (window._ctoStats ? window._ctoStats.totalPortefeuille : 0), 'CTO')">
                                 <i data-lucide="edit-3" style="width:13px;height:13px;"></i> Saisir nouvelle valeur
                             </button>
                         </div>
@@ -359,7 +359,7 @@
                     <div class="compte-body-sketch">
                         <div class="compte-left-sketch">
                             <div class="compte-amount-sketch" id="peaAmount">0,00 €</div>
-                            <button type="button" class="btn-saisir-sketch" id="btnSaisirPea">
+                            <button type="button" class="btn-saisir-sketch" id="btnSaisirPea" onclick="openSaisirNouvelleValeur(null, 'Plan d\'Épargne Actions (PEA)', (window._peaStats ? window._peaStats.totalPortefeuille : 0), 'PEA')">
                                 <i data-lucide="edit-3" style="width:13px;height:13px;"></i> Saisir nouvelle valeur
                             </button>
                         </div>
@@ -380,7 +380,7 @@
                     <div class="compte-body-sketch">
                         <div class="compte-left-sketch">
                             <div class="compte-amount-sketch" id="cryptoAmount">0,00 €</div>
-                            <button type="button" class="btn-saisir-sketch" id="btnSaisirCrypto">
+                            <button type="button" class="btn-saisir-sketch" id="btnSaisirCrypto" onclick="openSaisirNouvelleValeur(null, 'Actifs numériques (Crypto)', (window._cryptoStats ? window._cryptoStats.totalPortefeuille : 0), 'CRYPTO')">
                                 <i data-lucide="edit-3" style="width:13px;height:13px;"></i> Saisir nouvelle valeur
                             </button>
                         </div>
@@ -1234,7 +1234,7 @@
                     </div>
                     <div class="ai-fullpage-header-right">
                         <div class="ai-fullpage-persona-wrap">
-                            <span style="font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-tertiary); font-weight:600;">Expert :</span>
+                            <span style="font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-tertiary); font-weight:600; white-space:nowrap;">Expert :</span>
                             <select id="aiFullPersonaSelect" class="ai-persona-select" onchange="onAiFullPersonaChange()">
                                 <option value="wealth_manager">Conseiller Patrimonial (Général)</option>
                                 <option value="budget_coach">Analyste des Dépenses & Budget</option>
@@ -2203,10 +2203,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label>Options / Particularités</label>
-                        <input type="text" id="aiVehiculeNotes" placeholder="Ex: 2 places société, révision faite">
-                    </div>
+                    
                 </div>
 
                 <!-- Champs spécifiques Immobilier -->
@@ -2267,10 +2264,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label>Remarques</label>
-                        <input type="text" id="aiObjetNotes" placeholder="Ex: 5 montres différentes">
-                    </div>
+                    
                 </div>
 
                 <!-- Champs spécifiques Autres -->
@@ -2284,11 +2278,6 @@
                         <input type="number" id="aiAutrePrixOrigine" placeholder="Ex: 1500">
                     </div>
                 </div>
-
-                <!-- Bouton de calcul IA -->
-                <button type="button" class="btn-primary" id="aiCalculateValuationBtn" style="width:100%; margin-top:14px; padding:10px;" onclick="calculateAiValuation()">
-                    <i data-lucide="sparkles"></i> Calculer l'estimation avec l'IA (Gemini)
-                </button>
 
                 <!-- Commentaires & Détails transmis à l'IA -->
                 <div class="form-group" style="margin-top: 14px;">

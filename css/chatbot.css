@@ -646,6 +646,16 @@
     flex-direction: column;
 }
 
+/* ── Assistant Pleine Page ─────────────────────────────────── */
+#page-assistant.page.active {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--header-height) - 40px);
+    max-height: calc(100vh - var(--header-height) - 40px);
+    padding: 0;
+    overflow: hidden;
+}
+
 .ai-fullpage-wrapper {
     display: flex;
     flex-direction: column;
@@ -654,6 +664,9 @@
     margin: 0 auto;
     width: 100%;
     gap: 12px;
+    padding: 0 16px 14px 16px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .ai-fullpage-header {
@@ -662,6 +675,9 @@
     align-items: center;
     padding: 12px 18px;
     flex-shrink: 0;
+    border-radius: var(--radius-lg);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
 }
 
 .ai-fullpage-header-left {
@@ -671,15 +687,16 @@
 }
 
 .ai-fullpage-avatar {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     border-radius: var(--radius-md);
-    background: var(--primary-subtle);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(99, 102, 241, 0.18));
     border: 1px solid var(--primary-border);
     color: var(--primary-color);
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .ai-fullpage-header-right {
@@ -696,6 +713,31 @@
     padding: 4px 10px;
     border-radius: var(--radius-md);
     border: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+
+.ai-persona-select {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 5px 10px;
+    font-size: 12.5px;
+    font-weight: 500;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+    transition: border-color var(--transition-fast);
+}
+
+.ai-persona-select:focus,
+.ai-persona-select:hover {
+    border-color: var(--primary-border);
+}
+
+.ai-persona-select option {
+    background: var(--bg-primary);
+    color: var(--text-primary);
 }
 
 .ai-fullpage-body {
@@ -706,13 +748,16 @@
     flex-direction: column;
     gap: 16px;
     min-height: 0;
+    border-radius: var(--radius-lg);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
 }
 
 .ai-fullpage-suggestions {
     display: flex;
     gap: 8px;
     overflow-x: auto;
-    padding-bottom: 2px;
+    padding: 2px 2px 4px 2px;
     flex-shrink: 0;
     scrollbar-width: none;
 }
@@ -721,9 +766,43 @@
     display: none;
 }
 
+.ai-quick-btn {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 9999px;
+    padding: 8px 16px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    font-family: inherit;
+    transition: all var(--transition-fast);
+}
+
+.ai-quick-btn:hover {
+    background: var(--primary-subtle);
+    color: var(--primary-color);
+    border-color: var(--primary-border);
+    transform: translateY(-1px);
+}
+
 .ai-fullpage-footer {
     padding: 10px 14px;
     flex-shrink: 0;
+    border-radius: var(--radius-lg);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+}
+
+.ai-fullpage-footer form {
+    display: flex;
+    width: 100%;
+    gap: 10px;
+    align-items: center;
 }
 
 .ai-fullpage-footer textarea {
@@ -738,6 +817,7 @@
     resize: none;
     max-height: 120px;
     outline: none;
+    box-sizing: border-box;
 }
 
 .ai-fullpage-footer textarea:focus {
@@ -746,17 +826,27 @@
 }
 
 @media (max-width: 768px) {
-    #page-assistant {
-        padding: 8px 10px;
-        height: calc(100vh - 60px - var(--header-height));
+    #page-assistant.page.active {
+        height: calc(100vh - var(--header-height) - 70px);
+        max-height: calc(100vh - var(--header-height) - 70px);
+        padding: 0;
+    }
+    .ai-fullpage-wrapper {
+        padding: 0 8px 8px 8px;
+        gap: 8px;
     }
     .ai-fullpage-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
+        padding: 10px 12px;
     }
     .ai-fullpage-header-right {
         width: 100%;
         justify-content: space-between;
+    }
+    .ai-quick-btn {
+        padding: 6px 12px;
+        font-size: 11.5px;
     }
 }

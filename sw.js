@@ -1,4 +1,4 @@
-const CACHE_NAME = 'monpatrimoine-v211'; // Version 2.0.7 - Cartes comptes selon croquis, saisie rapide sans sous-pages, IA biens sans blabla avec commentaires
+const CACHE_NAME = 'monpatrimoine-v212'; // Version 2.0.8 - Correctif affichage complet comptes bancaires, métriques, boutons saisie, UI assistant IA, et dédoublement modal réévaluation
 const ASSETS = [
   './',
   './index.html',
