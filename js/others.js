@@ -648,8 +648,8 @@ const SUB_CATEGORIES_DEPENSES = {
     logement: ['Loyer', 'Elec', 'Hotel', 'Autre'],
     transport: ['Essence', 'Péage', 'Assurance', 'Avion', 'Snacks', 'Voiture', 'Autre'],
     alimentation: ['Courses', 'Repas', 'Boissons', 'Autre'],
-    loisirs: ['Sortie', 'Sport', 'Voyage', 'Autre'],
-    autre: ['Médical', 'Shopping/Vetement', 'Abonnements internet', 'Meublement', 'Lessive', 'Kdo', 'Autre']
+    loisirs: ['Sortie', 'Sport', 'Voyage', 'Repas', 'Autre'],
+    autre: ['Abonnements internet', 'Médical', 'Shopping/Vetement', 'Meublement', 'Vacance', 'Kdo', 'Vélo', 'Lessive', 'Autres']
 };
 
 const SUB_CATEGORIES_ENTREES = {
