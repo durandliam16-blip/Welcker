@@ -338,6 +338,67 @@ class DataManager {
     // deleteBien = deleteAccount (même table)
     async deleteBien(id) { return this.deleteAccount(id); }
 
+    // ── Suivi des valorisations mensuelles (table: account_valuations) ─────────
+    async getAccountValuations(accountId = null, accountType = null) {
+        const user = await getUser(); if (!user) return [];
+        let query = sb.from('account_valuations').select('*').eq('user_id', user.id);
+        if (accountId) {
+            query = query.eq('account_id', accountId);
+        } else if (accountType) {
+            query = query.eq('account_type', accountType);
+        }
+        const { data, error } = await query.order('mois', { ascending: true });
+        if (error) {
+            console.error('getAccountValuations:', error.message);
+            return [];
+        }
+        return data || [];
+    }
+
+    async saveAccountValuation({ accountId = null, accountType = null, mois, valeur, apportMensuel = 0, notes = '' }) {
+        const user = await getUser(); if (!user) return false;
+        const payload = {
+            user_id: user.id,
+            account_id: accountId,
+            account_type: accountType,
+            mois: mois,
+            valeur: parseFloat(valeur || 0),
+            apport_mensuel: parseFloat(apportMensuel || 0),
+            notes: notes || null,
+            date: new Date().toISOString().split('T')[0]
+        };
+
+        const { error } = await sb.from('account_valuations')
+            .upsert(payload, { onConflict: 'user_id,account_id,account_type,mois' });
+
+        if (error) {
+            console.error('saveAccountValuation:', error.message);
+            showToast('Erreur enregistrement valorisation : ' + error.message, 'error');
+            return false;
+        }
+
+        // Si c\'est lié à un compte dans accounts, mettre aussi à jour le solde actuel
+        if (accountId) {
+            await sb.from('accounts').update({
+                solde: payload.valeur,
+                date_now: new Date().toISOString()
+            }).eq('id', accountId).eq('user_id', user.id);
+        }
+
+        return true;
+    }
+
+    async deleteAccountValuation(id) {
+        const user = await getUser(); if (!user) return false;
+        const { error } = await sb.from('account_valuations').delete().eq('id', id).eq('user_id', user.id);
+        if (error) {
+            console.error('deleteAccountValuation:', error.message);
+            showToast('Erreur suppression : ' + error.message, 'error');
+            return false;
+        }
+        return true;
+    }
+
     // ── Paramètres (localStorage uniquement, pas de table dédiée) ────────────
     getSettings() { return JSON.parse(localStorage.getItem('welcker_settings') || '{"theme":"light","devise":"EUR"}'); }
     saveSettings(s) { localStorage.setItem('welcker_settings', JSON.stringify(s)); }

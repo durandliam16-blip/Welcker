@@ -211,7 +211,8 @@ function renderCashFlowCategoryChart(type, data, selectedCategory = null) {
             },
             options: {
                 responsive: true,
-                cutout: '58%',
+                maintainAspectRatio: false,
+                cutout: '62%',
                 plugins: {
                     legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10 } },
                     tooltip: {
@@ -804,7 +805,10 @@ window.filterCashFlowChartByPeriod = function(type) {
     let filtered = [...rawData];
     const now = new Date();
 
-    if (period === 'current_month') {
+    if (period === 'all') {
+        const todayIso = new Date().toISOString().split('T')[0];
+        filtered = filtered.filter(i => (i.date || '') <= todayIso);
+    } else if (period === 'current_month') {
         filtered = filtered.filter(i => {
             const d = new Date(i.date);
             return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
@@ -835,4 +839,76 @@ window.filterCashFlowChartByPeriod = function(type) {
     }
 
     renderCashFlowCategoryChart(type, filtered, null);
+};
+
+
+// =============================================================================
+// GÉNÉRATEUR DE MINI COURBES D'ÉVOLUTION (SPARKLINES SVG)
+// =============================================================================
+window.generateSparklineSvg = function(dataPoints = [], options = {}) {
+    const width = options.width || 140;
+    const height = options.height || 54;
+    const isPositive = options.isPositive !== undefined ? options.isPositive : true;
+    const strokeColor = options.strokeColor || (isPositive ? '#10b981' : '#3b82f6');
+    const withAxes = options.withAxes !== undefined ? options.withAxes : true;
+
+    let values = (dataPoints || []).map(v => typeof v === 'number' ? v : parseFloat(v || 0));
+    if (values.length < 2) {
+        const base = values[0] || 100;
+        values = [base * 0.94, base * 0.97, base * 0.95, base * 0.98, base * 0.99, base];
+    }
+
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const range = (max - min) === 0 ? 1 : (max - min);
+
+    // Marge pour les axes ↑ et → du croquis
+    const originX = withAxes ? 12 : 2;
+    const originY = height - 8;
+    const effWidth = width - originX - 10;
+    const effHeight = originY - 10;
+
+    const points = values.map((val, idx) => {
+        const x = originX + (idx / (values.length - 1)) * effWidth;
+        const y = originY - ((val - min) / range) * effHeight;
+        return { x: Number(x.toFixed(1)), y: Number(y.toFixed(1)) };
+    });
+
+    let dPath = 'M ' + points[0].x + ',' + points[0].y;
+    for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[i];
+        const p1 = points[i + 1];
+        const midX = (p0.x + p1.x) / 2;
+        dPath += ' C ' + midX + ',' + p0.y + ' ' + midX + ',' + p1.y + ' ' + p1.x + ',' + p1.y;
+    }
+
+    const dArea = dPath + ' L ' + (originX + effWidth) + ',' + originY + ' L ' + originX + ',' + originY + ' Z';
+    const lastP = points[points.length - 1];
+    const gradId = 'spk_' + Math.random().toString(36).substring(2, 9);
+
+    let axesSvg = '';
+    if (withAxes) {
+        axesSvg = `
+            <!-- Axe vertical avec flèche ↑ -->
+            <line x1="${originX}" y1="${originY}" x2="${originX}" y2="4" stroke="#64748b" stroke-width="1.3" stroke-linecap="round" />
+            <polygon points="${originX-2.5},6 ${originX+2.5},6 ${originX},2" fill="#64748b" />
+            
+            <!-- Axe horizontal avec flèche → -->
+            <line x1="${originX}" y1="${originY}" x2="${width - 4}" y2="${originY}" stroke="#64748b" stroke-width="1.3" stroke-linecap="round" />
+            <polygon points="${width-6},${originY-2.5} ${width-6},${originY+2.5} ${width-2},${originY}" fill="#64748b" />
+        `;
+    }
+
+    return '<svg class="sparkline-svg sparkline-with-axes" viewBox="0 0 ' + width + ' ' + height + '" preserveAspectRatio="none" style="width:100%; height:100%; display:block; overflow:visible;">' +
+        '<defs>' +
+        '<linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0%" stop-color="' + strokeColor + '" stop-opacity="0.25" />' +
+        '<stop offset="100%" stop-color="' + strokeColor + '" stop-opacity="0.0" />' +
+        '</linearGradient>' +
+        '</defs>' +
+        axesSvg +
+        '<path d="' + dArea + '" fill="url(#' + gradId + ')" />' +
+        '<path d="' + dPath + '" fill="none" stroke="' + strokeColor + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />' +
+        '<circle cx="' + lastP.x + '" cy="' + lastP.y + '" r="2.8" fill="' + strokeColor + '" stroke="#ffffff" stroke-width="1.5" />' +
+        '</svg>';
 };

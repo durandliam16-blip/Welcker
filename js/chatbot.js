@@ -351,13 +351,16 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
         const financialContext = await extractFinancialContext();
 
         // Système d'instruction complet
-        const systemPrompt = `${persona.prompt}\n\n${financialContext}\n\nRÈGLES STRICTES DE RÉPONSE :
-1. Réponds TOUJOURS en français avec clarté, élégance et précision.
-2. Utilise les données financières réelles fournies ci-dessus (ne dis jamais que tu n'as pas accès aux comptes de l'utilisateur : TU AS LEUR SYNTHÈSE COMPLÈTE EN TEMPS RÉEL).
-3. Cite les chiffres précis en euros (€), calcule les pourcentages pertinents et structure tes réponses avec des puces claires.
-4. Adopte strictement la personnalité sélectionnée : ${persona.title}.`;
+        const systemPrompt = `${persona.prompt}\n\n${financialContext}\n\nRÈGLES STRICTES D'EXCELLENCE PATRIMONIALE :
+1. Réponds TOUJOURS en français avec clarté, élégance, concision et haute valeur ajoutée.
+2. Utilise les données financières réelles ci-dessus (tu as la synthèse exacte et en temps réel de tous les comptes, biens et flux).
+3. Ne tronque JAMAIS ta réponse : termine impérativement toutes tes sections et tes phrases. Structure avec :
+   - 📌 Synthèse & Constat clé (avec montants exacts en €)
+   - 💡 Points forts & Vulnérabilités constatées
+   - 🎯 Actions recommandées concrètes et chiffrées
+4. Cite les chiffres précis formatés en euros (ex: 2 191,58 €) et les ratios pertinents (% d'épargne, couverture matelas de sécurité).
+5. Incarne strictement l'expert sélectionné : ${persona.title}.`;
 
-        // Ajouter message utilisateur à l'historique local
         conversationHistory.push({
             role: 'user',
             parts: [{ text: userMessage }]
@@ -381,7 +384,7 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
                         contents: conversationHistory,
                         generationConfig: {
                             temperature: 0.35,
-                            maxOutputTokens: 2500
+                            maxOutputTokens: 8192
                         }
                     })
                 });
@@ -399,7 +402,9 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
                 }
 
                 const data = await response.json();
-                const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                const candidate = data.candidates?.[0];
+                let replyText = candidate?.content?.parts?.map(p => p.text || '').join('');
+                if (candidate?.finishReason === 'MAX_TOKENS') { replyText += '\n\n*(Note: Analyse longue atteignant la limite maximale de tokens)*'; }
                 if (!replyText) {
                     throw new Error('Réponse vide reçue de l\'API Gemini');
                 }
@@ -421,6 +426,49 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
     }
 
     // ── GESTION DE L'INTERFACE UI ──────────────────────────────────────────────
+    
+    // Helper pour exécuter un appel Gemini ponctuel (ex: estimation de biens ou calculs financiers)
+    window.callGeminiGeneric = async function(promptText, customSystemPrompt = '') {
+        const apiKey = getApiKey();
+        if (!apiKey) throw new Error('MISSING_API_KEY');
+
+        const modelsToTry = await resolveActiveModels(apiKey);
+        let lastError = null;
+
+        for (const candidateModel of modelsToTry) {
+            try {
+                const url = "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(candidateModel) + ":generateContent?key=" + encodeURIComponent(apiKey);
+                const bodyPayload = {
+                    contents: [{ role: 'user', parts: [{ text: promptText }] }],
+                    generationConfig: { temperature: 0.2, maxOutputTokens: 3000 }
+                };
+                if (customSystemPrompt) {
+                    bodyPayload.systemInstruction = { parts: [{ text: customSystemPrompt }] };
+                }
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bodyPayload)
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    const errMsg = errData.error?.message || ("HTTP " + response.status);
+                    lastError = new Error(errMsg);
+                    continue;
+                }
+
+                const data = await response.json();
+                const reply = data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('');
+                if (reply) return reply;
+            } catch (e) {
+                lastError = e;
+            }
+        }
+        throw lastError || new Error('Erreur lors de la communication avec Gemini');
+    };
+
     window.toggleChatbot = function() {
         const drawer = document.getElementById('aiDrawer');
         const backdrop = document.getElementById('aiDrawerBackdrop');
@@ -506,219 +554,232 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
 
     window.handleAiSubmit = async function(e) {
         if (e) e.preventDefault();
-        if (isWaitingResponse) return;
-
         const input = document.getElementById('aiMessageInput');
-        const sendBtn = document.getElementById('aiSendBtn');
         const text = input ? input.value.trim() : '';
-
         if (!text) return;
-
-        const apiKey = getApiKey();
-        if (!apiKey) {
-            appendMessage('user', text);
-            appendSystemNotice('api_key_required');
-            if (input) input.value = '';
-            return;
-        }
-
-        // Afficher message utilisateur
-        appendMessage('user', text);
         if (input) {
             input.value = '';
             input.style.height = 'auto';
         }
-
-        // Afficher indicateur de réflexion
-        isWaitingResponse = true;
-        if (sendBtn) sendBtn.disabled = true;
-        const loadingBubble = showTypingIndicator();
-
-        try {
-            const response = await callGeminiApi(text);
-            removeTypingIndicator(loadingBubble);
-            appendMessage('assistant', response);
-        } catch (err) {
-            removeTypingIndicator(loadingBubble);
-            console.error('Erreur Chatbot Gemini:', err);
-            if (err.message === 'MISSING_API_KEY' || err.message === 'INVALID_API_KEY') {
-                appendSystemNotice(err.message === 'INVALID_API_KEY' ? 'api_key_invalid' : 'api_key_required');
-            } else {
-                appendMessage('assistant', `⚠️ **Erreur de communication avec Gemini** : ${err.message || 'Vérifiez votre connexion internet ou vos quotas Google AI Studio.'}`);
-            }
-        } finally {
-            isWaitingResponse = false;
-            if (sendBtn) sendBtn.disabled = false;
-            scrollToBottom();
-            if (window.lucide) lucide.createIcons();
-        }
+        await executeAiPrompt(text);
     };
 
+    
+    function getMessageContainers() {
+        const containers = [];
+        const drawerC = document.getElementById('aiMessagesContainer');
+        const fullC = document.getElementById('aiFullMessagesContainer');
+        if (drawerC) containers.push(drawerC);
+        if (fullC) containers.push(fullC);
+        return containers;
+    }
+
     function appendMessage(role, text) {
-        const container = document.getElementById('aiMessagesContainer');
-        if (!container) return;
+        const containers = getMessageContainers();
+        if (!containers.length) return;
 
-        // Supprimer la carte de bienvenue dès le 1er message
-        const welcome = container.querySelector('.ai-welcome-card');
-        if (welcome && conversationHistory.length <= 1) {
-            welcome.remove();
-        }
+        containers.forEach(container => {
+            const welcome = container.querySelector('.ai-welcome-card');
+            if (welcome && conversationHistory.length <= 1) {
+                welcome.remove();
+            }
 
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `ai-message ${role}`;
+            const msgDiv = document.createElement('div');
+            msgDiv.className = "ai-message " + role;
 
-        if (role === 'user') {
-            msgDiv.innerHTML = `<div class="ai-message-bubble">${escapeHTML(text).replace(/\n/g, '<br>')}</div>`;
-        } else {
-            msgDiv.innerHTML = `
-                <div class="ai-avatar" style="width:28px;height:28px;align-self:flex-start;margin-top:2px;">
-                    <i data-lucide="bot" style="width:15px;height:15px;"></i>
-                </div>
-                <div class="ai-message-bubble">${renderMarkdown(text)}</div>
-            `;
-        }
+            if (role === 'user') {
+                msgDiv.innerHTML = '<div class="ai-message-bubble">' + escapeHTML(text).replace(/\n/g, '<br>') + '</div>';
+            } else {
+                msgDiv.innerHTML = '<div class="ai-avatar" style="width:28px;height:28px;align-self:flex-start;margin-top:2px;">' +
+                    '<i data-lucide="bot" style="width:15px;height:15px;"></i>' +
+                    '</div>' +
+                    '<div class="ai-message-bubble">' + renderMarkdown(text) + '</div>';
+            }
 
-        container.appendChild(msgDiv);
+            container.appendChild(msgDiv);
+        });
+
         scrollToBottom();
         if (window.lucide) lucide.createIcons();
     }
 
     function showTypingIndicator() {
-        const container = document.getElementById('aiMessagesContainer');
-        if (!container) return null;
-
-        const typingDiv = document.createElement('div');
-        typingDiv.className = 'ai-message assistant typing-placeholder';
-        typingDiv.innerHTML = `
-            <div class="ai-avatar" style="width:28px;height:28px;align-self:flex-start;margin-top:2px;">
-                <i data-lucide="bot" style="width:15px;height:15px;"></i>
-            </div>
-            <div class="ai-message-bubble" style="padding:10px 14px;">
-                <div class="ai-typing-indicator">
-                    <span class="ai-typing-dot"></span>
-                    <span class="ai-typing-dot"></span>
-                    <span class="ai-typing-dot"></span>
-                </div>
-            </div>
-        `;
-        container.appendChild(typingDiv);
+        const containers = getMessageContainers();
+        const indicators = [];
+        containers.forEach(container => {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'ai-message assistant typing-placeholder';
+            typingDiv.innerHTML = '<div class="ai-avatar" style="width:28px;height:28px;align-self:flex-start;margin-top:2px;">' +
+                '<i data-lucide="bot" style="width:15px;height:15px;"></i>' +
+                '</div>' +
+                '<div class="ai-message-bubble" style="padding:10px 14px;">' +
+                '<div class="ai-typing-indicator">' +
+                '<span class="ai-typing-dot"></span>' +
+                '<span class="ai-typing-dot"></span>' +
+                '<span class="ai-typing-dot"></span>' +
+                '</div></div>';
+            container.appendChild(typingDiv);
+            indicators.push(typingDiv);
+        });
         scrollToBottom();
         if (window.lucide) lucide.createIcons();
-        return typingDiv;
+        return indicators;
     }
 
-    function removeTypingIndicator(el) {
-        if (el && el.parentNode) el.remove();
+    function removeTypingIndicator(indicators) {
+        if (!indicators) return;
+        if (Array.isArray(indicators)) {
+            indicators.forEach(el => { if (el && el.parentNode) el.remove(); });
+        } else if (indicators.parentNode) {
+            indicators.remove();
+        }
     }
 
     function appendSystemNotice(type) {
-        const container = document.getElementById('aiMessagesContainer');
-        if (!container) return;
+        const containers = getMessageContainers();
+        containers.forEach(container => {
+            const noticeDiv = document.createElement('div');
+            noticeDiv.className = 'ai-message assistant';
 
-        const noticeDiv = document.createElement('div');
-        noticeDiv.className = 'ai-message assistant';
+            if (type === 'api_key_required' || type === 'api_key_invalid') {
+                const isInvalid = type === 'api_key_invalid';
+                noticeDiv.innerHTML = '<div class="ai-avatar" style="width:28px;height:28px;align-self:flex-start;color:var(--danger-color);">' +
+                    '<i data-lucide="key" style="width:15px;height:15px;"></i></div>' +
+                    '<div class="ai-message-bubble" style="border-left: 3px solid var(--danger-color);">' +
+                    '<h3 style="margin-top:0;color:var(--text-primary);display:flex;align-items:center;gap:6px;">' +
+                    (isInvalid ? 'Clé API Gemini invalide' : 'Clé API Google AI Studio requise') +
+                    '</h3>' +
+                    '<p style="font-size:13px;color:var(--text-secondary);">' +
+                    (isInvalid 
+                        ? 'La clé configurée a été refusée par l\'API Google AI Studio. Veuillez vérifier que vous l\'avez copiée intégralement.' 
+                        : 'Pour dialoguer avec votre assistant financier et analyser votre patrimoine en direct, veuillez renseigner votre clé gratuite Google AI Studio.') +
+                    '</p>' +
+                    '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">' +
+                    '<button type="button" class="btn-primary" style="font-size:12px;padding:6px 12px;" onclick="toggleAiSettings()">' +
+                    '<i data-lucide="key" style="width:13px;height:13px;"></i> Configurer ma clé API</button>' +
+                    '<a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="btn-secondary" style="font-size:12px;padding:6px 12px;text-decoration:none;">' +
+                    'Créer ma clé gratuite sur aistudio.google.com ↗</a></div></div>';
+            }
+            container.appendChild(noticeDiv);
+        });
 
-        if (type === 'api_key_required' || type === 'api_key_invalid') {
-            const isInvalid = type === 'api_key_invalid';
-            noticeDiv.innerHTML = `
-                <div class="ai-avatar" style="width:28px;height:28px;align-self:flex-start;color:var(--danger-color);">
-                    <i data-lucide="key" style="width:15px;height:15px;"></i>
-                </div>
-                <div class="ai-message-bubble" style="border-left: 3px solid var(--danger-color);">
-                    <h3 style="margin-top:0;color:var(--text-primary);display:flex;align-items:center;gap:6px;">
-                        ${isInvalid ? 'Clé API Gemini invalide' : 'Clé API Google AI Studio requise'}
-                    </h3>
-                    <p style="font-size:13px;color:var(--text-secondary);">
-                        ${isInvalid 
-                            ? 'La clé configurée a été refusée par l\'API Google AI Studio. Veuillez vérifier que vous l\'avez copiée intégralement.' 
-                            : 'Pour dialoguer avec votre assistant financier et analyser votre patrimoine en direct, veuillez renseigner votre clé gratuite Google AI Studio.'}
-                    </p>
-                    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-                        <button type="button" class="btn-primary" style="font-size:12px;padding:6px 12px;" onclick="toggleAiSettings()">
-                            <i data-lucide="key" style="width:13px;height:13px;"></i> Configurer ma clé API
-                        </button>
-                        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="btn-secondary" style="font-size:12px;padding:6px 12px;text-decoration:none;">
-                            Créer ma clé gratuite sur aistudio.google.com ↗
-                        </a>
-                    </div>
-                </div>
-            `;
-        }
-
-        container.appendChild(noticeDiv);
         scrollToBottom();
         if (window.lucide) lucide.createIcons();
     }
 
     function renderWelcomeCard() {
-        const container = document.getElementById('aiMessagesContainer');
-        if (!container) return;
+        const containers = getMessageContainers();
+        if (!containers.length) return;
 
-        container.innerHTML = '';
         const personaKey = getSelectedPersona();
         const persona = PERSONAS[personaKey] || PERSONAS.wealth_manager;
         const hasKey = !!getApiKey();
 
-        const welcome = document.createElement('div');
-        welcome.className = 'ai-welcome-card';
-        welcome.innerHTML = `
-            <div class="ai-welcome-header">
-                <div class="ai-avatar">
-                    <i data-lucide="sparkles"></i>
-                </div>
-                <div>
-                    <h3>Bonjour ! Je suis votre ${persona.title}.</h3>
-                    <p class="ai-welcome-desc">J'ai accès à l'ensemble de votre patrimoine consolidé, comptes bancaires, portefeuilles et flux de trésorerie Welcker.</p>
-                </div>
-            </div>
+        containers.forEach(container => {
+            container.innerHTML = '';
+            const welcome = document.createElement('div');
+            welcome.className = 'ai-welcome-card';
+            welcome.innerHTML = '<div class="ai-welcome-header">' +
+                '<div class="ai-avatar"><i data-lucide="sparkles"></i></div>' +
+                '<div><h3>Bonjour ! Je suis votre ' + persona.title + '.</h3>' +
+                '<p class="ai-welcome-desc">J\'ai accès à l\'ensemble de votre patrimoine consolidé, comptes bancaires, portefeuilles et flux de trésorerie Welcker.</p></div></div>' +
+                '<div class="ai-welcome-features">' +
+                '<div class="ai-feature-pill"><i data-lucide="pie-chart"></i><span>Allocation & diversification</span></div>' +
+                '<div class="ai-feature-pill"><i data-lucide="trending-up"></i><span>Optimisation de cash-flow</span></div>' +
+                '<div class="ai-feature-pill"><i data-lucide="shield"></i><span>Audit du matelas de réserve</span></div>' +
+                '<div class="ai-feature-pill" id="aiActiveModelPill"><i data-lucide="sparkles"></i><span>Modèle : ' + formatModelDisplayName(getSelectedModel()) + '</span></div></div>' +
+                (!hasKey ? '<div style="background:var(--primary-subtle);border:1px solid var(--primary-border);border-radius:var(--radius-md);padding:10px 12px;margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:10px;">' +
+                    '<div style="font-size:12px;color:var(--text-primary);"><strong>Clé API requise :</strong> Activez votre assistant avec votre clé Google AI Studio.</div>' +
+                    '<button type="button" class="btn-primary" style="font-size:11.5px;padding:5px 10px;white-space:nowrap;" onclick="toggleAiSettings()">Ajouter ma clé</button></div>' :
+                    '<div style="font-size:11.5px;color:var(--text-tertiary);margin-top:4px;">Posez-moi n\'importe quelle question ou choisissez une suggestion ci-dessous pour démarrer l\'analyse.</div>');
+            container.appendChild(welcome);
+        });
 
-            <div class="ai-welcome-features">
-                <div class="ai-feature-pill">
-                    <i data-lucide="pie-chart"></i>
-                    <span>Allocation & diversification</span>
-                </div>
-                <div class="ai-feature-pill">
-                    <i data-lucide="trending-up"></i>
-                    <span>Optimisation de cash-flow</span>
-                </div>
-                <div class="ai-feature-pill">
-                    <i data-lucide="shield"></i>
-                    <span>Audit du matelas de réserve</span>
-                </div>
-                <div class="ai-feature-pill" id="aiActiveModelPill">
-                    <i data-lucide="sparkles"></i>
-                    <span>Modèle : ${formatModelDisplayName(getSelectedModel())}</span>
-                </div>
-            </div>
-
-            ${!hasKey ? `
-            <div style="background:var(--primary-subtle);border:1px solid var(--primary-border);border-radius:var(--radius-md);padding:10px 12px;margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
-                <div style="font-size:12px;color:var(--text-primary);">
-                    <strong>Clé API requise :</strong> Activez votre assistant avec votre clé Google AI Studio.
-                </div>
-                <button type="button" class="btn-primary" style="font-size:11.5px;padding:5px 10px;white-space:nowrap;" onclick="toggleAiSettings()">
-                    Ajouter ma clé
-                </button>
-            </div>
-            ` : `
-            <div style="font-size:11.5px;color:var(--text-tertiary);margin-top:4px;">
-                Posez-moi n'importe quelle question ou choisissez une suggestion ci-dessous pour démarrer l'analyse.
-            </div>
-            `}
-        `;
-
-        container.appendChild(welcome);
         if (window.lucide) lucide.createIcons();
     }
 
     function scrollToBottom() {
-        const container = document.getElementById('aiMessagesContainer');
-        if (container) {
-            container.scrollTop = container.scrollHeight;
+        const containers = getMessageContainers();
+        containers.forEach(c => {
+            c.scrollTop = c.scrollHeight;
+        });
+    }
+
+    async function executeAiPrompt(text) {
+        if (isWaitingResponse) return;
+
+        const apiKey = getApiKey();
+        if (!apiKey) {
+            appendMessage('user', text);
+            appendSystemNotice('api_key_required');
+            return;
+        }
+
+        appendMessage('user', text);
+
+        isWaitingResponse = true;
+        const sendBtn = document.getElementById('aiSendBtn');
+        const fullSendBtn = document.getElementById('aiFullSendBtn');
+        if (sendBtn) sendBtn.disabled = true;
+        if (fullSendBtn) fullSendBtn.disabled = true;
+
+        const loadingBubbles = showTypingIndicator();
+
+        try {
+            const response = await callGeminiApi(text);
+            removeTypingIndicator(loadingBubbles);
+            appendMessage('assistant', response);
+        } catch (err) {
+            removeTypingIndicator(loadingBubbles);
+            console.error('Erreur Chatbot Gemini:', err);
+            if (err.message === 'MISSING_API_KEY' || err.message === 'INVALID_API_KEY') {
+                appendSystemNotice(err.message === 'INVALID_API_KEY' ? 'api_key_invalid' : 'api_key_required');
+            } else {
+                appendMessage('assistant', "⚠️ **Erreur de communication avec Gemini** : " + (err.message || "Vérifiez votre connexion internet ou vos quotas Google AI Studio."));
+            }
+        } finally {
+            isWaitingResponse = false;
+            if (sendBtn) sendBtn.disabled = false;
+            if (fullSendBtn) fullSendBtn.disabled = false;
+            scrollToBottom();
+            if (window.lucide) lucide.createIcons();
         }
     }
 
-    async function initChatbotUI() {
+    window.handleAiFullSubmit = async function(e) {
+        if (e) e.preventDefault();
+        const input = document.getElementById('aiFullMessageInput');
+        if (!input) return;
+        const text = input.value.trim();
+        if (!text) return;
+        input.value = '';
+        await executeAiPrompt(text);
+    };
+
+    window.handleAiFullInputKeydown = function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            window.handleAiFullSubmit();
+        }
+    };
+
+    window.onAiFullPersonaChange = function() {
+        const sel = document.getElementById('aiFullPersonaSelect');
+        if (!sel) return;
+        setSelectedPersona(sel.value);
+        const drawerSel = document.getElementById('aiPersonaSelect');
+        if (drawerSel) drawerSel.value = sel.value;
+        const settingSel = document.getElementById('settingGeminiPersona');
+        if (settingSel) settingSel.value = sel.value;
+        if (typeof showToast === 'function') {
+            const p = PERSONAS[sel.value];
+            showToast("Expert activé : " + (p ? p.title : sel.value), 'info');
+        }
+        renderWelcomeCard();
+    };
+
+
+    window.initChatbotUI = async function initChatbotUI() {
         // Synchronisation automatique depuis Supabase si la clé n'est pas encore en local
         if (!getApiKey() && window.dataManager && typeof dataManager.getProfile === 'function') {
             try {
@@ -735,6 +796,8 @@ Cite les chiffres précis des portefeuilles CTO, PEA et Crypto du client et donn
             }
         }
 
+        const fullPersonaSelect = document.getElementById('aiFullPersonaSelect');
+        if (fullPersonaSelect) fullPersonaSelect.value = getSelectedPersona();
         const personaSelect = document.getElementById('aiPersonaSelect');
         if (personaSelect) personaSelect.value = getSelectedPersona();
 

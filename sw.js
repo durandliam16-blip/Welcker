@@ -1,4 +1,4 @@
-const CACHE_NAME = 'monpatrimoine-v210'; // Version 2.0.6 - Correctif requêtes non-HTTP & syntaxe app.js
+const CACHE_NAME = 'monpatrimoine-v211'; // Version 2.0.7 - Cartes comptes selon croquis, saisie rapide sans sous-pages, IA biens sans blabla avec commentaires
 const ASSETS = [
   './',
   './index.html',

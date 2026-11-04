@@ -813,3 +813,259 @@
 .toggle-switch input:checked + .toggle-slider:before {
     transform: translateX(20px);
 }
+
+
+/* ── Sparklines & Badges mensuels ─────────────────────────────────── */
+.account-sparkline-wrap {
+    width: 100%;
+    height: 34px;
+    display: block;
+    position: relative;
+    overflow: hidden;
+}
+
+.sparkline-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.compte-evolution-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: var(--radius-sm);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.compte-evolution-badge.positive {
+    background: var(--success-subtle);
+    color: var(--success-color);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.compte-evolution-badge.neutral {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.compte-evolution-badge.negative {
+    background: var(--danger-subtle);
+    color: var(--danger-color);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* ── Wrappers de graphiques pour ratio maîtrisé sur mobile & desktop ─ */
+.chart-canvas-wrapper.pie-wrapper {
+    position: relative;
+    height: 250px;
+    max-height: 250px;
+    width: 100%;
+}
+
+.chart-canvas-wrapper.line-wrapper {
+    position: relative;
+    height: 200px;
+    max-height: 200px;
+    width: 100%;
+}
+
+/* ── Contrôle d'onglets mobile pour Entrées / Dépenses ─────────────── */
+.mobile-cf-tabs {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .chart-canvas-wrapper.pie-wrapper {
+        height: 215px !important;
+        max-height: 215px !important;
+    }
+
+    .chart-canvas-wrapper.line-wrapper {
+        height: 180px !important;
+        max-height: 180px !important;
+    }
+
+    .mobile-cf-tabs {
+        display: flex;
+        gap: 6px;
+        background: var(--bg-secondary);
+        padding: 4px;
+        border-radius: var(--radius-md);
+        margin-bottom: 12px;
+        border: 1px solid var(--border-color);
+    }
+
+    .mobile-cf-tab {
+        flex: 1;
+        padding: 7px 10px;
+        font-size: 11.5px;
+        font-weight: 500;
+        border: none;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--text-secondary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        transition: all 150ms ease;
+    }
+
+    .mobile-cf-tab.active {
+        background: var(--bg-primary);
+        color: var(--primary-color);
+        font-weight: 600;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+
+    .mobile-cf-tab i,
+    .mobile-cf-tab svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .depenses-layout,
+    .entrees-layout {
+        gap: 12px !important;
+    }
+}
+
+
+/* ── Cartes Comptes selon le croquis utilisateur ─────────────────── */
+.compte-card-sketch {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 16px 18px;
+    min-height: 145px;
+    border-radius: var(--radius-lg);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.compte-card-sketch:hover {
+    border-color: var(--primary-border);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.compte-header-sketch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.compte-body-sketch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.compte-left-sketch {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.compte-amount-sketch {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.4px;
+    font-variant-numeric: tabular-nums;
+}
+
+.btn-saisir-sketch {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 11.5px;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    background: var(--primary-subtle);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-border);
+    cursor: pointer;
+    white-space: nowrap;
+    width: fit-content;
+    transition: all var(--transition-fast);
+}
+
+.btn-saisir-sketch:hover {
+    background: var(--primary-color);
+    color: #ffffff;
+}
+
+.compte-right-sketch {
+    width: 145px;
+    height: 56px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sparkline-with-axes {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.btn-micro {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: 3px 6px;
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all 150ms ease;
+}
+
+.btn-micro:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--text-secondary);
+}
+
+.btn-micro-danger:hover {
+    background: var(--danger-subtle);
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+.ai-clean-decision-card {
+    text-align: center;
+    padding: 16px;
+    border-radius: var(--radius-md);
+    background: var(--primary-subtle);
+    border: 1px solid var(--primary-border);
+}
+
+.ai-clean-decision-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.ai-clean-decision-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}

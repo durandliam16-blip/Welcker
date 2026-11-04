@@ -34,6 +34,12 @@ async function navigateTo(page) {
     document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
     document.querySelectorAll('.mobile-nav-item').forEach(l => l.classList.toggle('active', l.dataset.page === page));
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    if (page === 'assistant') {
+        const drawer = document.getElementById('aiDrawer');
+        const backdrop = document.getElementById('aiDrawerBackdrop');
+        if (drawer) drawer.classList.remove('active');
+        if (backdrop) backdrop.classList.remove('active');
+    }
     const el = document.getElementById(`page-${page}`);
     if (el) { 
         el.classList.add('active'); 
@@ -52,7 +58,8 @@ async function navigateTo(page) {
             depenses: 'Décaissements & Dépenses',
             social: 'Réseau & Partage',
             profil: 'Profil utilisateur',
-            parametres: 'Paramètres'
+            parametres: 'Paramètres',
+            assistant: 'Assistant IA Financier'
         };
         const titleEl = document.getElementById('headerPageTitle');
         if (titleEl && titles[page]) titleEl.textContent = titles[page];
@@ -242,6 +249,7 @@ async function updatePageContent(page) {
         case 'social':       await updateSocial();               break;
         case 'profil':       await updateProfil();               break;
         case 'parametres':   updateParametres();                 break;
+        case 'assistant':    if (window.initChatbotUI) await window.initChatbotUI(); break;
     }
 }
 
@@ -352,5 +360,31 @@ window.saveFastPortfolio = async function(e) {
     } catch (err) {
         console.error('Erreur ajustement portefeuille:', err);
         showToast('Erreur lors de la mise à jour de la valorisation.', 'error');
+    }
+};
+
+
+// =============================================================================
+// CONTRÔLE D'ONGLETS MOBILE POUR ENTRÉES ET DÉPENSES
+// =============================================================================
+window.switchMobileCfTab = function(type, tab) {
+    const isE = type === 'entree';
+    const pageId = isE ? 'page-entrees' : 'page-depenses';
+    const pageEl = document.getElementById(pageId);
+    if (!pageEl) return;
+
+    pageEl.querySelectorAll('.mobile-cf-tab').forEach(b => {
+        b.classList.toggle('active', b.dataset.tab === tab);
+    });
+
+    const cards = pageEl.querySelectorAll('.depenses-layout > .card, .entrees-layout > .card');
+    if (cards.length >= 3) {
+        if (window.innerWidth <= 768) {
+            cards[0].style.display = (tab === 'categories' || tab === 'all') ? 'block' : 'none';
+            cards[1].style.display = (tab === 'evolution' || tab === 'all') ? 'block' : 'none';
+            cards[2].style.display = (tab === 'registre' || tab === 'all') ? 'block' : 'none';
+        } else {
+            cards.forEach(c => c.style.display = 'block');
+        }
     }
 };
