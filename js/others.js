@@ -649,7 +649,7 @@ const SUB_CATEGORIES_DEPENSES = {
     transport: ['Essence', 'Péage', 'Assurance', 'Avion', 'Snacks', 'Voiture', 'Autre'],
     alimentation: ['Courses', 'Repas', 'Boissons', 'Autre'],
     loisirs: ['Sortie', 'Sport', 'Voyage', 'Autre'],
-    autre: ['Médical', 'Shopping/Vetement', 'Abonnements internet', 'Netflix', 'IA', 'Meublement', 'Lessive', 'Kdo', 'Autre']
+    autre: ['Médical', 'Shopping/Vetement', 'Abonnements internet', 'Meublement', 'Lessive', 'Kdo', 'Autre']
 };
 
 const SUB_CATEGORIES_ENTREES = {
