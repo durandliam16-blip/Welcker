@@ -848,21 +848,40 @@ window.filterCashFlowChartByPeriod = function(type) {
 window.generateSparklineSvg = function(dataPoints = [], options = {}) {
     const width = options.width || 140;
     const height = options.height || 54;
-    const isPositive = options.isPositive !== undefined ? options.isPositive : true;
-    const strokeColor = options.strokeColor || (isPositive ? '#10b981' : '#3b82f6');
     const withAxes = options.withAxes !== undefined ? options.withAxes : true;
 
-    let values = (dataPoints || []).map(v => typeof v === 'number' ? v : parseFloat(v || 0));
-    if (values.length < 2) {
-        const base = values[0] || 100;
-        values = [base * 0.94, base * 0.97, base * 0.95, base * 0.98, base * 0.99, base];
+    // Nettoyage et conversion des points réels
+    let values = (dataPoints || [])
+        .map(v => typeof v === 'number' ? v : parseFloat(v || 0))
+        .filter(v => !isNaN(v));
+
+    if (values.length === 0) {
+        values = [0, 0];
+    } else if (values.length === 1) {
+        values = [values[0], values[0]];
     }
 
     const min = Math.min(...values);
     const max = Math.max(...values);
-    const range = (max - min) === 0 ? 1 : (max - min);
+    const isFlat = (max === min);
 
-    // Marge pour les axes ↑ et → du croquis
+    // Évolution réelle : positive, négative ou stable
+    const startVal = values[0];
+    const endVal = values[values.length - 1];
+    const isPositive = endVal >= startVal;
+    
+    let strokeColor = options.strokeColor;
+    if (!strokeColor) {
+        if (isFlat) {
+            strokeColor = '#64748b'; // Neutre ardoise (stable)
+        } else if (isPositive) {
+            strokeColor = '#10b981'; // Hausse réelle : vert
+        } else {
+            strokeColor = '#ef4444'; // Baisse réelle : rouge (ex: décote véhicule)
+        }
+    }
+
+    // Marge pour les axes ↑ et →
     const originX = withAxes ? 12 : 2;
     const originY = height - 8;
     const effWidth = width - originX - 10;
@@ -870,7 +889,9 @@ window.generateSparklineSvg = function(dataPoints = [], options = {}) {
 
     const points = values.map((val, idx) => {
         const x = originX + (idx / (values.length - 1)) * effWidth;
-        const y = originY - ((val - min) / range) * effHeight;
+        const y = isFlat 
+            ? (originY - (effHeight / 2)) 
+            : (originY - ((val - min) / (max - min)) * effHeight);
         return { x: Number(x.toFixed(1)), y: Number(y.toFixed(1)) };
     });
 
@@ -902,7 +923,7 @@ window.generateSparklineSvg = function(dataPoints = [], options = {}) {
     return '<svg class="sparkline-svg sparkline-with-axes" viewBox="0 0 ' + width + ' ' + height + '" preserveAspectRatio="none" style="width:100%; height:100%; display:block; overflow:visible;">' +
         '<defs>' +
         '<linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1">' +
-        '<stop offset="0%" stop-color="' + strokeColor + '" stop-opacity="0.25" />' +
+        '<stop offset="0%" stop-color="' + strokeColor + '" stop-opacity="' + (isFlat ? '0.08' : '0.22') + '" />' +
         '<stop offset="100%" stop-color="' + strokeColor + '" stop-opacity="0.0" />' +
         '</linearGradient>' +
         '</defs>' +

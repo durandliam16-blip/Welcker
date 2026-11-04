@@ -224,29 +224,30 @@ window.filterComptesCategory = async function(filter) {
 // ── Fonctions Sparklines pour tous les comptes & biens ────────────────────────
 async function getSparklineDataForAccount(accountId, accountType, currentSolde) {
     let vals = [];
+    const curVal = parseFloat(currentSolde || 0);
     try {
         if (window.dataManager && typeof dataManager.getAccountValuations === 'function') {
             const hist = await dataManager.getAccountValuations(accountId, accountType);
             if (hist && hist.length > 0) {
                 vals = hist.map(h => parseFloat(h.valeur || 0));
+                // Si la valeur actuelle en base diffère du dernier point enregistré, l'ajouter
+                const lastHistVal = vals[vals.length - 1];
+                if (Math.abs(curVal - lastHistVal) >= 0.01) {
+                    vals.push(curVal);
+                }
             }
         }
     } catch (e) {
         console.warn('Erreur lecture valuations:', e);
     }
 
-    if (vals.length < 2) {
-        const base = parseFloat(currentSolde || 0);
-        // Courbe de tendance mensuelle naturelle
-        vals = [
-            Math.max(0, base * 0.94),
-            Math.max(0, base * 0.96),
-            Math.max(0, base * 0.95),
-            Math.max(0, base * 0.98),
-            Math.max(0, base * 0.99),
-            base
-        ];
+    // Données réelles uniquement : si aucun historique, retourner [curVal, curVal] pour une ligne plate neutre
+    if (vals.length === 0) {
+        vals = [curVal, curVal];
+    } else if (vals.length === 1) {
+        vals = [vals[0], vals[0]];
     }
+
     return vals;
 }
 
@@ -703,12 +704,26 @@ async function renderBiensList() {
         const meta = typeMeta[t] || { label: b.type || 'Bien', icon: 'package' };
         const pct = totalBiens > 0 ? ((parseFloat(b.solde || 0) / totalBiens) * 100).toFixed(1) : 0;
         
-        // Données d'évolution mensuelle pour la sparkline
+        // Données d'évolution réelles
         const sparkVals = await getSparklineDataForAccount(b.id, b.type, b.solde);
-        const isPos = sparkVals[sparkVals.length - 1] >= sparkVals[0];
-        const diff = sparkVals[sparkVals.length - 1] - sparkVals[sparkVals.length - 2];
+        const hasHistory = sparkVals.length >= 2 && sparkVals[0] !== sparkVals[sparkVals.length - 1];
+        const diff = hasHistory ? (sparkVals[sparkVals.length - 1] - sparkVals[0]) : 0;
+        const isPos = diff >= 0;
+
+        let badgeHtml = '';
+        if (hasHistory) {
+            const pctDiff = sparkVals[0] > 0 ? ((diff / sparkVals[0]) * 100).toFixed(1) : '0.0';
+            badgeHtml = `<span class="compte-evolution-badge ${isPos ? 'positive' : 'negative'}">
+                ${diff >= 0 ? '+' : ''}${fmt(diff)} (${diff >= 0 ? '+' : ''}${pctDiff}%)
+            </span>`;
+        } else {
+            badgeHtml = `<span class="compte-evolution-badge neutral" style="color:var(--text-tertiary); background:var(--bg-secondary);">
+                Stable
+            </span>`;
+        }
+
         const sparkSvg = window.generateSparklineSvg 
-            ? window.generateSparklineSvg(sparkVals, { isPositive: isPos, strokeColor: isPos ? '#10b981' : '#f59e0b' }) 
+            ? window.generateSparklineSvg(sparkVals, { withAxes: true }) 
             : '';
 
         const lastEvalDate = b.date_now ? new Date(b.date_now).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' }) : 'Récent';
@@ -720,15 +735,13 @@ async function renderBiensList() {
                     <i data-lucide="${meta.icon}" style="width:16px;height:16px;color:var(--text-secondary);"></i>
                     <span class="bien-type" style="margin-bottom:0;">${meta.label}</span>
                 </div>
-                <span class="compte-evolution-badge ${isPos ? 'positive' : 'neutral'}">
-                    ${diff >= 0 ? '+' : ''}${fmt(diff)} ce mois
-                </span>
+                ${badgeHtml}
             </div>
             <h3 style="font-size:16px; margin: 4px 0 6px 0;">${escapeHTML(b.nom)}</h3>
             <div class="bien-value">${fmt(b.solde)}</div>
             
-            <!-- Mini courbe d'évolution mensuelle -->
-            <div class="account-sparkline-wrap" style="margin: 8px 0;">
+            <!-- Mini courbe d'évolution mensuelle réelle -->
+            <div class="account-sparkline-wrap" style="margin: 8px 0; height: 50px;">
                 ${sparkSvg}
             </div>
 
@@ -1263,31 +1276,62 @@ window.applyAiValuation = async function() {
 
     const currentMonth = new Date().toISOString().substring(0, 7);
 
-    // Mettre à jour le solde et les commentaires dans accounts
-    await sb.from('accounts').update({
-        solde: pending.valeur,
-        fournisseur: pending.userComments || null,
-        date_now: new Date().toISOString()
-    }).eq('id', pending.bienId);
+    try {
+        // 1. Vérifier s'il existait déjà un historique pour ce bien
+        let existingHist = [];
+        if (window.dataManager && typeof dataManager.getAccountValuations === 'function') {
+            existingHist = await dataManager.getAccountValuations(pending.bienId);
+        }
 
-    // Enregistrer l'historique dans account_valuations
-    if (window.dataManager && typeof dataManager.saveAccountValuation === 'function') {
-        await dataManager.saveAccountValuation({
-            accountId: pending.bienId,
-            mois: currentMonth,
-            valeur: pending.valeur,
-            notes: pending.userComments || null
-        });
+        const biens = window._allBiens || [];
+        const currentBien = biens.find(item => item.id === pending.bienId);
+        const oldSolde = currentBien ? parseFloat(currentBien.solde || 0) : null;
+
+        // Si aucun historique mais qu'on avait une ancienne valeur différente, enregistrer le point initial pour le mois précédent
+        if (existingHist.length === 0 && oldSolde !== null && Math.abs(oldSolde - pending.valeur) >= 0.01) {
+            const prevDate = new Date();
+            prevDate.setMonth(prevDate.getMonth() - 1);
+            const prevMonth = prevDate.toISOString().substring(0, 7);
+            
+            await dataManager.saveAccountValuation({
+                accountId: pending.bienId,
+                accountType: currentBien ? currentBien.type : 'autre',
+                mois: prevMonth,
+                valeur: oldSolde,
+                notes: 'Valeur antérieure'
+            });
+        }
+
+        // 2. Mettre à jour le solde et les commentaires dans accounts
+        await sb.from('accounts').update({
+            solde: pending.valeur,
+            fournisseur: pending.userComments || null,
+            date_now: new Date().toISOString()
+        }).eq('id', pending.bienId);
+
+        // 3. Enregistrer l'historique dans account_valuations pour ce mois
+        if (window.dataManager && typeof dataManager.saveAccountValuation === 'function') {
+            await dataManager.saveAccountValuation({
+                accountId: pending.bienId,
+                accountType: currentBien ? currentBien.type : 'autre',
+                mois: currentMonth,
+                valeur: pending.valeur,
+                notes: pending.userComments || null
+            });
+        }
+
+        const modal = document.getElementById('modalAiReevaluateBien');
+        if (modal) modal.classList.remove('active');
+
+        showToast('Valeur mise à jour avec succès !', 'success');
+        window._pendingAiValuation = null;
+
+        await updateAutresBiens();
+        await updateAccueil();
+    } catch (err) {
+        console.error('Erreur applyAiValuation:', err);
+        showToast('Erreur : ' + err.message, 'error');
     }
-
-    const modal = document.getElementById('modalAiReevaluateBien');
-    if (modal) modal.classList.remove('active');
-
-    showToast('Valeur mise à jour avec succès !', 'success');
-    window._pendingAiValuation = null;
-
-    await updateAutresBiens();
-    await updateAccueil();
 };
 
 // =============================================================================
@@ -1393,6 +1437,31 @@ window.saveSaisirNouvelleValeur = async function(e) {
 
     try {
         if (id) {
+            // Vérifier historique existant
+            let existingHist = [];
+            if (window.dataManager && typeof dataManager.getAccountValuations === 'function') {
+                existingHist = await dataManager.getAccountValuations(id);
+            }
+
+            const accs = window._allBankAccounts || [];
+            const currentAcc = accs.find(item => item.id === id);
+            const oldSolde = currentAcc ? parseFloat(currentAcc.solde || 0) : null;
+
+            // Si 0 historique antérieur, créer le point d'origine
+            if (existingHist.length === 0 && oldSolde !== null && Math.abs(oldSolde - newVal) >= 0.01) {
+                const prevDate = new Date();
+                prevDate.setMonth(prevDate.getMonth() - 1);
+                const prevMonth = prevDate.toISOString().substring(0, 7);
+                
+                await dataManager.saveAccountValuation({
+                    accountId: id,
+                    accountType: type,
+                    mois: prevMonth,
+                    valeur: oldSolde,
+                    notes: 'Valeur initiale'
+                });
+            }
+
             // Mise à jour du solde du compte bancaire
             await sb.from('accounts').update({
                 solde: newVal,
@@ -1408,7 +1477,7 @@ window.saveSaisirNouvelleValeur = async function(e) {
                 });
             }
         } else {
-            // CTO, PEA ou CRYPTO : calculer le delta et ajuster la trésorerie associée
+            // CTO, PEA ou CRYPTO
             let currentVal = 0;
             if (type === 'CTO') {
                 const [tx, cash] = await Promise.all([dataManager.getInvestments('CTO'), dataManager.getCashTransactions('CTO')]);
@@ -1419,6 +1488,23 @@ window.saveSaisirNouvelleValeur = async function(e) {
             } else if (type === 'CRYPTO') {
                 const [tx, cash] = await Promise.all([dataManager.getCryptoTransactions(), dataManager.getCashTransactions('CRYPTO')]);
                 currentVal = calcStatsPro(tx, cash).totalPortefeuille;
+            }
+
+            // Si 0 historique pour ce portefeuille, enregistrer le point antérieur
+            let existingHist = [];
+            if (window.dataManager && typeof dataManager.getAccountValuations === 'function') {
+                existingHist = await dataManager.getAccountValuations(null, type);
+            }
+            if (existingHist.length === 0 && currentVal > 0 && Math.abs(currentVal - newVal) >= 0.01) {
+                const prevDate = new Date();
+                prevDate.setMonth(prevDate.getMonth() - 1);
+                const prevMonth = prevDate.toISOString().substring(0, 7);
+                await dataManager.saveAccountValuation({
+                    accountType: type,
+                    mois: prevMonth,
+                    valeur: currentVal,
+                    notes: 'Valorisation précédente'
+                });
             }
 
             const delta = newVal - currentVal;

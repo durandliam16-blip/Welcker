@@ -1,4 +1,4 @@
-const CACHE_NAME = 'monpatrimoine-v212'; // Version 2.0.8 - Correctif affichage complet comptes bancaires, métriques, boutons saisie, UI assistant IA, et dédoublement modal réévaluation
+const CACHE_NAME = 'monpatrimoine-v213'; // Version 2.0.9 - Courbes historiques réelles (baisse/hausse/neutre), suppression données simulées, enregistrement chronologique
 const ASSETS = [
   './',
   './index.html',
