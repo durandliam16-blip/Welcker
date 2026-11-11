@@ -345,7 +345,7 @@ class DataManager {
         if (accountId) {
             query = query.eq('account_id', accountId);
         } else if (accountType) {
-            query = query.eq('account_type', accountType);
+            query = query.is('account_id', null).eq('account_type', accountType);
         }
         const { data, error } = await query.order('mois', { ascending: true });
         if (error) {
@@ -377,8 +377,9 @@ class DataManager {
             return false;
         }
 
-        // Si c\'est lié à un compte dans accounts, mettre aussi à jour le solde actuel
-        if (accountId) {
+        // Synchroniser accounts.solde uniquement pour le mois courant ou futur (ne pas écraser le solde actuel lors d'un point historique antérieur)
+        const curMonth = new Date().toISOString().substring(0, 7);
+        if (accountId && (!mois || mois >= curMonth)) {
             await sb.from('accounts').update({
                 solde: payload.valeur,
                 date_now: new Date().toISOString()
@@ -677,3 +678,4 @@ class DataManager {
 }
 
 const dataManager = new DataManager();
+window.dataManager = dataManager;

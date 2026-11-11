@@ -920,7 +920,8 @@ window.generateSparklineSvg = function(dataPoints = [], options = {}) {
         `;
     }
 
-    return '<svg class="sparkline-svg sparkline-with-axes" viewBox="0 0 ' + width + ' ' + height + '" preserveAspectRatio="none" style="width:100%; height:100%; display:block; overflow:visible;">' +
+    const preserveAspectRatio = options.preserveAspectRatio || 'xMaxYMid meet';
+    return '<svg class="sparkline-svg sparkline-with-axes" viewBox="0 0 ' + width + ' ' + height + '" preserveAspectRatio="' + preserveAspectRatio + '" style="width:100%; height:100%; max-width:100%; display:block; overflow:hidden;">' +
         '<defs>' +
         '<linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1">' +
         '<stop offset="0%" stop-color="' + strokeColor + '" stop-opacity="' + (isFlat ? '0.08' : '0.22') + '" />' +

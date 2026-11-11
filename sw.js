@@ -1,4 +1,4 @@
-const CACHE_NAME = 'monpatrimoine-v213'; // Version 2.0.9 - Courbes historiques réelles (baisse/hausse/neutre), suppression données simulées, enregistrement chronologique
+const CACHE_NAME = 'monpatrimoine-v214'; // Version 2.0.10 - Dimensionnement responsive des courbes comptes, badges types, et exposition window.dataManager pour historique réel
 const ASSETS = [
   './',
   './index.html',

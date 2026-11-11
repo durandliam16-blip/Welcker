@@ -284,9 +284,8 @@ async function renderBankAccountsList() {
     const cardHtmlPromises = filtered.map(async (a) => {
         const meta = typeMeta[a.type] || { label: a.type || 'Compte', icon: 'wallet' };
         const sparkVals = await getSparklineDataForAccount(a.id, a.type, a.solde);
-        const isPos = sparkVals[sparkVals.length - 1] >= sparkVals[0];
         const sparkSvg = window.generateSparklineSvg 
-            ? window.generateSparklineSvg(sparkVals, { isPositive: isPos, strokeColor: isPos ? '#10b981' : '#3b82f6', withAxes: true }) 
+            ? window.generateSparklineSvg(sparkVals, { withAxes: true }) 
             : '';
 
         return `
@@ -372,18 +371,15 @@ async function updateComptes() {
 
         const ctoEl = document.getElementById('ctoSparkline');
         if (ctoEl && window.generateSparklineSvg) {
-            const isPos = ctoSparkVals[ctoSparkVals.length - 1] >= ctoSparkVals[0];
-            ctoEl.innerHTML = window.generateSparklineSvg(ctoSparkVals, { isPositive: isPos, strokeColor: isPos ? '#10b981' : '#2563eb', withAxes: true });
+            ctoEl.innerHTML = window.generateSparklineSvg(ctoSparkVals, { withAxes: true });
         }
         const peaEl = document.getElementById('peaSparkline');
         if (peaEl && window.generateSparklineSvg) {
-            const isPos = peaSparkVals[peaSparkVals.length - 1] >= peaSparkVals[0];
-            peaEl.innerHTML = window.generateSparklineSvg(peaSparkVals, { isPositive: isPos, strokeColor: isPos ? '#10b981' : '#2563eb', withAxes: true });
+            peaEl.innerHTML = window.generateSparklineSvg(peaSparkVals, { withAxes: true });
         }
         const cryptoEl = document.getElementById('cryptoSparkline');
         if (cryptoEl && window.generateSparklineSvg) {
-            const isPos = cryptoSparkVals[cryptoSparkVals.length - 1] >= cryptoSparkVals[0];
-            cryptoEl.innerHTML = window.generateSparklineSvg(cryptoSparkVals, { isPositive: isPos, strokeColor: isPos ? '#10b981' : '#f59e0b', withAxes: true });
+            cryptoEl.innerHTML = window.generateSparklineSvg(cryptoSparkVals, { withAxes: true });
         }
 
         // Lier les boutons Saisir nouvelle valeur
@@ -723,7 +719,7 @@ async function renderBiensList() {
         }
 
         const sparkSvg = window.generateSparklineSvg 
-            ? window.generateSparklineSvg(sparkVals, { withAxes: true }) 
+            ? window.generateSparklineSvg(sparkVals, { width: 240, height: 50, withAxes: true, preserveAspectRatio: 'xMidYMid meet' }) 
             : '';
 
         const lastEvalDate = b.date_now ? new Date(b.date_now).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' }) : 'Récent';
@@ -1495,7 +1491,7 @@ window.saveSaisirNouvelleValeur = async function(e) {
             if (window.dataManager && typeof dataManager.getAccountValuations === 'function') {
                 existingHist = await dataManager.getAccountValuations(null, type);
             }
-            if (existingHist.length === 0 && currentVal > 0 && Math.abs(currentVal - newVal) >= 0.01) {
+            if (existingHist.length === 0 && currentVal >= 0 && Math.abs(currentVal - newVal) >= 0.01) {
                 const prevDate = new Date();
                 prevDate.setMonth(prevDate.getMonth() - 1);
                 const prevMonth = prevDate.toISOString().substring(0, 7);
